@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "Resolver",
+    name: "Flux",
     platforms: [
         .iOS(.v13),
         .macOS(.v10_15)
