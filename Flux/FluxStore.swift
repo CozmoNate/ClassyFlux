@@ -44,14 +44,14 @@ open class FluxStore<State: FluxState>: ObservableObject {
 
     // MARK: - Private
 
-    private let worker: FluxDispatcher.Worker
+    private let worker: FluxWorker
     private var dispatcher: FluxDispatcher?
 
     // MARK: - Methods
 
     public init(initialState: State, register reducers: ((_ reducers: Reducers<State>) -> Void)? = nil) {
         state = initialState
-        worker = FluxDispatcher.Worker()
+        worker = FluxWorker()
 
         defer {
             if let reducers = reducers {
@@ -79,17 +79,17 @@ extension FluxStore {
 
     public class Reducers<State: FluxState> {
 
-        private let worker: FluxDispatcher.Worker
+        private let worker: FluxWorker
         private let store: FluxStore<State>
 
-        internal init(store: FluxStore<State>, worker: FluxDispatcher.Worker) {
+        internal init(store: FluxStore<State>, worker: FluxWorker) {
             self.worker = worker
             self.store = store
         }
 
         public func register<Action: FluxAction>(reducer reduce: @escaping (Action, State) -> State) {
 
-            let performer: FluxDispatcher.Worker.Perform<Action> = { [weak store] action, completion in
+            let performer: FluxWorker.Perform<Action> = { [weak store] action, completion in
 
                 guard let store = store else {
                     completion()

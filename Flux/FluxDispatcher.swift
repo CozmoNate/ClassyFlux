@@ -34,12 +34,12 @@ import Combine
 import Resolver
 import AsyncOperation
 
-public class FluxDispatcher {
+open class FluxDispatcher {
 
     // MARK: - Private
 
     private var tokens: Set<UUID>
-    private var workers: [Worker]
+    private var workers: [FluxWorker]
     private let operationQueue: OperationQueue
 
     // MARK: - Methods
@@ -54,7 +54,7 @@ public class FluxDispatcher {
         operationQueue.maxConcurrentOperationCount = 1
     }
 
-    public func register(worker: Worker) {
+    public func register(worker: FluxWorker) {
         operationQueue.addOperation {
             if self.tokens.insert(worker.token).inserted {
                 self.workers.append(worker)
@@ -80,44 +80,6 @@ public class FluxDispatcher {
                     worker.perform(action: action, completion: completion)
                 }
             }
-        }
-    }
-
-}
-
-extension FluxDispatcher {
-
-    public class Worker {
-
-        // MARK: - Types
-
-        public typealias Perform<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
-
-        // MARK: - Public
-
-        public let token = UUID()
-
-        // MARK: - Private
-
-        private let performers = ResolverContainer()
-
-        // MARK: - Methods
-
-        public func register<Action: FluxAction>(action: Action.Type = Action.self, work perform: @escaping Perform<Action>) {
-            performers.register { perform }
-        }
-
-        public func unregister<Action: FluxAction>(action: Action.Type) {
-            performers.unregister(Perform<Action>.self)
-        }
-
-        func perform<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
-            guard let perform: Perform<Action> = try? self.performers.resolve() else {
-                completion()
-                return
-            }
-
-            perform(action, completion)
         }
     }
 
