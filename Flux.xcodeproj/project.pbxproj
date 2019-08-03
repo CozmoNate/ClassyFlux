@@ -19,6 +19,7 @@
 		7EA2A6E622F41A7000104CCA /* FluxTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA2A6E522F41A7000104CCA /* FluxTests.swift */; };
 		7EA2A6E822F41A7000104CCA /* Flux.h in Headers */ = {isa = PBXBuildFile; fileRef = 7EA2A6DA22F41A7000104CCA /* Flux.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7EBB251122F5FB4800FF9632 /* FluxWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EBB251022F5FB4800FF9632 /* FluxWorker.swift */; };
+		7EBB251E22F615D200FF9632 /* FluxActionPerformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EBB251D22F615D200FF9632 /* FluxActionPerformer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		7EA2A6E722F41A7000104CCA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7EA2A6F122F41AEE00104CCA /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = SOURCE_ROOT; };
 		7EBB251022F5FB4800FF9632 /* FluxWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxWorker.swift; sourceTree = "<group>"; };
+		7EBB251D22F615D200FF9632 /* FluxActionPerformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxActionPerformer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +96,7 @@
 				7E24883B22F5DACC00517865 /* FluxAction.swift */,
 				7E24883C22F5DACC00517865 /* FluxState.swift */,
 				7EBB251022F5FB4800FF9632 /* FluxWorker.swift */,
+				7EBB251D22F615D200FF9632 /* FluxActionPerformer.swift */,
 				7E24883A22F5DACC00517865 /* FluxDispatcher.swift */,
 				7E24883922F5DACC00517865 /* FluxStore.swift */,
 				7EA2A6DA22F41A7000104CCA /* Flux.h */,
@@ -236,6 +239,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7EBB251122F5FB4800FF9632 /* FluxWorker.swift in Sources */,
+				7EBB251E22F615D200FF9632 /* FluxActionPerformer.swift in Sources */,
 				7E24883D22F5DACC00517865 /* FluxStore.swift in Sources */,
 				7E24883F22F5DACC00517865 /* FluxAction.swift in Sources */,
 				7E24884022F5DACC00517865 /* FluxState.swift in Sources */,

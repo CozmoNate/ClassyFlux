@@ -1,5 +1,5 @@
 //
-//  FluxWorker.swift
+//  FluxActionPerformer.swift
 //  Flux
 //
 //  Created by Natan Zalkin on 03/08/2019.
@@ -30,12 +30,43 @@
  */
 
 import Foundation
+import Resolver
 
-public protocol FluxWorker {
+public class FluxActionPerformer: FluxWorker {
 
-    var token: UUID { get }
+    // MARK: - Types
 
-    func perform<Action: FluxAction>(action: Action, completion: @escaping () -> Void)
+    public typealias Perform<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
 
+    // MARK: - Public
+
+    public let token: UUID
+
+    // MARK: - Private
+
+    private let performers: ResolverContainer
+
+    // MARK: - Methods
+
+    public init() {
+        token = UUID()
+        performers = ResolverContainer()
+    }
+
+    public func register<Action: FluxAction>(action: Action.Type = Action.self, work execute: @escaping Perform<Action>) {
+        performers.register { execute }
+    }
+
+    public func unregister<Action: FluxAction>(action: Action.Type) {
+        performers.unregister(Perform<Action>.self)
+    }
+
+    public func perform<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
+        guard let perform: Perform<Action> = try? self.performers.resolve() else {
+            completion()
+            return
+        }
+
+        perform(action, completion)
+    }
 }
-
