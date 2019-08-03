@@ -44,7 +44,7 @@ public class FluxDispatcher {
 
     // MARK: - Methods
 
-    init() {
+    public init() {
 
         tokens = Set()
         workers = []
