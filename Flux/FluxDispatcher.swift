@@ -103,10 +103,6 @@ extension FluxDispatcher {
 
         // MARK: - Methods
 
-        init(registration: ((Worker) -> Void)? = nil) {
-            defer { registration?(self) }
-        }
-
         public func register<Action: FluxAction>(action: Action.Type = Action.self, work perform: @escaping Perform<Action>) {
             performers.register { perform }
         }
