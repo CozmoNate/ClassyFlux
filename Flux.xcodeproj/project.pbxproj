@@ -89,12 +89,12 @@
 		7EA2A6D922F41A7000104CCA /* Flux */ = {
 			isa = PBXGroup;
 			children = (
+				7E24883B22F5DACC00517865 /* FluxAction.swift */,
+				7E24883C22F5DACC00517865 /* FluxState.swift */,
+				7E24883A22F5DACC00517865 /* FluxDispatcher.swift */,
+				7E24883922F5DACC00517865 /* FluxStore.swift */,
 				7EA2A6DA22F41A7000104CCA /* Flux.h */,
 				7EA2A6DB22F41A7000104CCA /* Info.plist */,
-				7E24883B22F5DACC00517865 /* FluxAction.swift */,
-				7E24883A22F5DACC00517865 /* FluxDispatcher.swift */,
-				7E24883C22F5DACC00517865 /* FluxState.swift */,
-				7E24883922F5DACC00517865 /* FluxStore.swift */,
 			);
 			path = Flux;
 			sourceTree = "<group>";
