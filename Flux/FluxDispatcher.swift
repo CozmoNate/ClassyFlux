@@ -50,6 +50,7 @@ public class FluxDispatcher {
         workers = []
 
         operationQueue = OperationQueue()
+        operationQueue.qualityOfService = .userInitiated
         operationQueue.maxConcurrentOperationCount = 1
     }
 
