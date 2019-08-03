@@ -15,9 +15,11 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/Quick/Quick.git", from: "2.0.0"),
         .package(url: "https://github.com/Quick/Nimble.git", from: "8.0.0"),
+        .package(url: "https://github.com/kzlekk/Resolver.git", from: "1.1.0"),
+        .package(url: "https://github.com/kzlekk/AsyncOperation.git", from: "1.0.0"),
     ],
     targets: [
-        .target(name: "Flux", dependencies: [], path: "Flux"),
+        .target(name: "Flux", dependencies: ["Resolver", "AsyncOperation"], path: "Flux"),
         .testTarget(name: "FluxTests", dependencies: ["Flux", "Quick", "Nimble"], path: "FluxTests")
     ],
     swiftLanguageVersions: [ .v5 ]
