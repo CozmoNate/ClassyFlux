@@ -1,0 +1,43 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "AsyncOperation",
+        "repositoryURL": "https://github.com/kzlekk/AsyncOperation.git",
+        "state": {
+          "branch": null,
+          "revision": "5a958af5728b3316e0ad0bcfdda0cecc60dba9d2",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "Nimble",
+        "repositoryURL": "https://github.com/Quick/Nimble.git",
+        "state": {
+          "branch": null,
+          "revision": "f8657642dfdec9973efc79cc68bcef43a653a2bc",
+          "version": "8.0.2"
+        }
+      },
+      {
+        "package": "Quick",
+        "repositoryURL": "https://github.com/Quick/Quick.git",
+        "state": {
+          "branch": null,
+          "revision": "94df9b449508344667e5afc7e80f8bcbff1e4c37",
+          "version": "2.1.0"
+        }
+      },
+      {
+        "package": "Resolver",
+        "repositoryURL": "https://github.com/kzlekk/Resolver.git",
+        "state": {
+          "branch": null,
+          "revision": "c4a3d3fbe52928bd121001d01f82d4139a92c175",
+          "version": "1.1.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
