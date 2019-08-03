@@ -64,7 +64,7 @@ open class FluxStore<State: FluxState>: ObservableObject {
         reducers(Reducers(store: self, worker: worker))
     }
 
-    public func register(to dispatcher: FluxDispatcher) {
+    public func assign(dispatcher: FluxDispatcher) {
         self.dispatcher = dispatcher
         self.dispatcher?.register(worker: worker)
     }

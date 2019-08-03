@@ -63,7 +63,7 @@ public class FluxDispatcher {
     }
 
     public func register<Store: FluxStore<State>, State: FluxState>(store: Store) {
-        store.register(to: self)
+        store.assign(dispatcher: self)
     }
 
     public func unregisterAll() {
