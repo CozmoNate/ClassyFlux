@@ -3,4 +3,5 @@ workspace: Flux.xcworkspace
 xcodeproj: Flux.xcodeproj
 scheme: Flux
 ignore:
+  - ../*
   - FluxTests/*
