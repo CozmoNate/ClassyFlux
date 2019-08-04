@@ -38,9 +38,9 @@ open class FluxDispatcher {
 
     // MARK: - Private
 
-    private var tokens: Set<UUID>
-    private var workers: [FluxWorker]
-    private let operationQueue: OperationQueue
+    var tokens: Set<UUID>
+    var workers: [FluxWorker]
+    let operationQueue: OperationQueue
 
     // MARK: - Methods
 
@@ -61,18 +61,7 @@ open class FluxDispatcher {
             }
         }
     }
-
-    public func register<Store: FluxStore<State>, State: FluxState>(store: Store) {
-        store.assign(dispatcher: self)
-    }
-
-    public func unregisterAll() {
-        operationQueue.addOperation {
-            self.tokens.removeAll()
-            self.workers.removeAll()
-        }
-    }
-
+    
     public func dispatch<Action: FluxAction>(action: Action) {
         operationQueue.addOperation {
             self.workers.forEach { worker in

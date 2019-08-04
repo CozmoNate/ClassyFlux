@@ -15,11 +15,14 @@
 		7E24884022F5DACC00517865 /* FluxState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E24883C22F5DACC00517865 /* FluxState.swift */; };
 		7E24884322F5DAE500517865 /* Resolver in Frameworks */ = {isa = PBXBuildFile; productRef = 7E24884222F5DAE500517865 /* Resolver */; };
 		7E24887722F5E81B00517865 /* AsyncOperation in Frameworks */ = {isa = PBXBuildFile; productRef = 7E24887622F5E81B00517865 /* AsyncOperation */; };
+		7E46BA0722F747AA00162C03 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E46BA0622F747AA00162C03 /* Mocks.swift */; };
+		7E46BA0922F7482600162C03 /* FluxMiddlewareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E46BA0822F7482600162C03 /* FluxMiddlewareTests.swift */; };
+		7E4E252822F73D68002C0C09 /* FluxStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E4E252722F73D68002C0C09 /* FluxStoreTests.swift */; };
 		7EA2A6E122F41A7000104CCA /* Flux.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EA2A6D722F41A7000104CCA /* Flux.framework */; };
-		7EA2A6E622F41A7000104CCA /* FluxTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA2A6E522F41A7000104CCA /* FluxTests.swift */; };
+		7EA2A6E622F41A7000104CCA /* FluxDispatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA2A6E522F41A7000104CCA /* FluxDispatcherTests.swift */; };
 		7EA2A6E822F41A7000104CCA /* Flux.h in Headers */ = {isa = PBXBuildFile; fileRef = 7EA2A6DA22F41A7000104CCA /* Flux.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7EBB251122F5FB4800FF9632 /* FluxWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EBB251022F5FB4800FF9632 /* FluxWorker.swift */; };
-		7EBB251E22F615D200FF9632 /* FluxActionPerformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EBB251D22F615D200FF9632 /* FluxActionPerformer.swift */; };
+		7EBB251E22F615D200FF9632 /* FluxMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EBB251D22F615D200FF9632 /* FluxMiddleware.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,15 +40,18 @@
 		7E24883A22F5DACC00517865 /* FluxDispatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FluxDispatcher.swift; sourceTree = "<group>"; };
 		7E24883B22F5DACC00517865 /* FluxAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FluxAction.swift; sourceTree = "<group>"; };
 		7E24883C22F5DACC00517865 /* FluxState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FluxState.swift; sourceTree = "<group>"; };
+		7E46BA0622F747AA00162C03 /* Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mocks.swift; sourceTree = "<group>"; };
+		7E46BA0822F7482600162C03 /* FluxMiddlewareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxMiddlewareTests.swift; sourceTree = "<group>"; };
+		7E4E252722F73D68002C0C09 /* FluxStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxStoreTests.swift; sourceTree = "<group>"; };
 		7EA2A6D722F41A7000104CCA /* Flux.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Flux.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EA2A6DA22F41A7000104CCA /* Flux.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Flux.h; sourceTree = "<group>"; };
 		7EA2A6DB22F41A7000104CCA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7EA2A6E022F41A7000104CCA /* FluxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FluxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		7EA2A6E522F41A7000104CCA /* FluxTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxTests.swift; sourceTree = "<group>"; };
+		7EA2A6E522F41A7000104CCA /* FluxDispatcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxDispatcherTests.swift; sourceTree = "<group>"; };
 		7EA2A6E722F41A7000104CCA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7EA2A6F122F41AEE00104CCA /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = SOURCE_ROOT; };
 		7EBB251022F5FB4800FF9632 /* FluxWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxWorker.swift; sourceTree = "<group>"; };
-		7EBB251D22F615D200FF9632 /* FluxActionPerformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxActionPerformer.swift; sourceTree = "<group>"; };
+		7EBB251D22F615D200FF9632 /* FluxMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxMiddleware.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,8 +102,8 @@
 				7E24883B22F5DACC00517865 /* FluxAction.swift */,
 				7E24883C22F5DACC00517865 /* FluxState.swift */,
 				7EBB251022F5FB4800FF9632 /* FluxWorker.swift */,
-				7EBB251D22F615D200FF9632 /* FluxActionPerformer.swift */,
 				7E24883A22F5DACC00517865 /* FluxDispatcher.swift */,
+				7EBB251D22F615D200FF9632 /* FluxMiddleware.swift */,
 				7E24883922F5DACC00517865 /* FluxStore.swift */,
 				7EA2A6DA22F41A7000104CCA /* Flux.h */,
 				7EA2A6DB22F41A7000104CCA /* Info.plist */,
@@ -108,7 +114,10 @@
 		7EA2A6E422F41A7000104CCA /* FluxTests */ = {
 			isa = PBXGroup;
 			children = (
-				7EA2A6E522F41A7000104CCA /* FluxTests.swift */,
+				7E46BA0622F747AA00162C03 /* Mocks.swift */,
+				7EA2A6E522F41A7000104CCA /* FluxDispatcherTests.swift */,
+				7E46BA0822F7482600162C03 /* FluxMiddlewareTests.swift */,
+				7E4E252722F73D68002C0C09 /* FluxStoreTests.swift */,
 				7EA2A6E722F41A7000104CCA /* Info.plist */,
 			);
 			path = FluxTests;
@@ -239,7 +248,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7EBB251122F5FB4800FF9632 /* FluxWorker.swift in Sources */,
-				7EBB251E22F615D200FF9632 /* FluxActionPerformer.swift in Sources */,
+				7EBB251E22F615D200FF9632 /* FluxMiddleware.swift in Sources */,
 				7E24883D22F5DACC00517865 /* FluxStore.swift in Sources */,
 				7E24883F22F5DACC00517865 /* FluxAction.swift in Sources */,
 				7E24884022F5DACC00517865 /* FluxState.swift in Sources */,
@@ -251,7 +260,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7EA2A6E622F41A7000104CCA /* FluxTests.swift in Sources */,
+				7E46BA0922F7482600162C03 /* FluxMiddlewareTests.swift in Sources */,
+				7E4E252822F73D68002C0C09 /* FluxStoreTests.swift in Sources */,
+				7EA2A6E622F41A7000104CCA /* FluxDispatcherTests.swift in Sources */,
+				7E46BA0722F747AA00162C03 /* Mocks.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,6 +334,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -378,6 +391,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;

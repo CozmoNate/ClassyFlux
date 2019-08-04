@@ -29,8 +29,6 @@
  *
  */
 
-import Foundation
-
 public protocol FluxWorker {
 
     var token: UUID { get }

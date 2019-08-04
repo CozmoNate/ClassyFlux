@@ -1,5 +1,5 @@
 //
-//  FluxActionPerformer.swift
+//  FluxMiddleware.swift
 //  Flux
 //
 //  Created by Natan Zalkin on 03/08/2019.
@@ -32,7 +32,7 @@
 import Foundation
 import Resolver
 
-public class FluxActionPerformer: FluxWorker {
+public class FluxMiddleware: FluxWorker {
 
     // MARK: - Types
 
@@ -44,25 +44,29 @@ public class FluxActionPerformer: FluxWorker {
 
     // MARK: - Private
 
-    private let performers: ResolverContainer
+    let performers: ResolverContainer
 
     // MARK: - Methods
 
-    public init() {
+    public init(registration: ((_ middleware: FluxMiddleware) -> Void)? = nil) {
+        
         token = UUID()
         performers = ResolverContainer()
+
+        defer {
+            registration?(self)
+        }
     }
 
     public func register<Action: FluxAction>(action: Action.Type = Action.self, work execute: @escaping Perform<Action>) {
         performers.register { execute }
     }
 
-    public func unregister<Action: FluxAction>(action: Action.Type) {
-        performers.unregister(Perform<Action>.self)
-    }
-
     public func perform<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
-        guard let perform: Perform<Action> = try? self.performers.resolve() else {
+
+        typealias Performer = Perform<Action>
+
+        guard let perform = try? self.performers.resolve(Performer.self) else {
             completion()
             return
         }

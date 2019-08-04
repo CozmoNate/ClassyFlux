@@ -31,83 +31,60 @@
 
 import Foundation
 import Combine
+import Resolver
 
-open class FluxStore<State: FluxState>: ObservableObject {
+open class FluxStore<State: FluxState>: ObservableObject, FluxWorker {
 
     // MARK: - Types
 
     public typealias State = State
+    public typealias Perform<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
+    public typealias Reduce<Action: FluxAction> = (Action, inout State) -> Void
 
     // MARK: - Public
+
+    public let token: UUID
 
     @Published public private(set) var state: State
 
     // MARK: - Private
 
-    private let worker: FluxActionPerformer
-    private var dispatcher: FluxDispatcher?
+    let reducers: ResolverContainer
 
     // MARK: - Methods
 
-    public init(initialState: State, register reducers: ((_ reducers: Reducers<State>) -> Void)? = nil) {
+    public init(initialState: State, registration: ((_ store: FluxStore<State>) -> Void)? = nil) {
 
+        token = UUID()
         state = initialState
-        worker = FluxActionPerformer()
+        reducers = ResolverContainer()
 
         defer {
-            if let reducers = reducers {
-                register(reducers: reducers)
-            }
+            registration?(self)
         }
     }
 
-    public func register(reducers: (_ reducers: Reducers<State>) -> Void)  {
-        reducers(Reducers(store: self, worker: worker))
+    public func register<Action: FluxAction>(reducer: @escaping Reduce<Action>) {
+        reducers.register { reducer }
     }
 
-    public func assign(dispatcher: FluxDispatcher) {
-        self.dispatcher = dispatcher
-        self.dispatcher?.register(worker: worker)
-    }
+    public func perform<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
 
-    public func dispatch<Action: FluxAction>(action: Action) {
-        dispatcher?.dispatch(action: action)
-    }
+        typealias Reducer = Reduce<Action>
 
-}
-
-extension FluxStore {
-
-    public class Reducers<State: FluxState> {
-
-        private let worker: FluxActionPerformer
-        private let store: FluxStore<State>
-
-        internal init(store: FluxStore<State>, worker: FluxActionPerformer) {
-            self.worker = worker
-            self.store = store
+        guard let reduce = try? reducers.resolve(Reducer.self) else {
+            completion()
+            return
         }
 
-        public func register<Action: FluxAction>(reducer reduce: @escaping (Action, State) -> State) {
+        var mutated = state
 
-            let performer: FluxActionPerformer.Perform<Action> = { [weak store] action, completion in
+        reduce(action, &mutated)
 
-                guard let store = store else {
-                    completion()
-                    return
-                }
-
-                let state = reduce(action, store.state)
-
-                DispatchQueue.main.async {
-                    store.state = state
-                    completion()
-                }
-            }
-
-            worker.register(work: performer)
+        DispatchQueue.main.async {
+            self.state = mutated
+            completion()
         }
-
     }
 
 }

@@ -1,0 +1,6 @@
+coverage_service: coveralls
+workspace: Flux.xcworkspace
+xcodeproj: Flux.xcodeproj
+scheme: Flux
+ignore:
+  - FluxTests/*
