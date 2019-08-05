@@ -50,14 +50,16 @@ open class FluxDispatcher {
         workers = []
 
         operationQueue = OperationQueue()
-        operationQueue.qualityOfService = .userInitiated
+        operationQueue.qualityOfService = .userInteractive
         operationQueue.maxConcurrentOperationCount = 1
     }
 
-    public func register(worker: FluxWorker) {
+    public func register(workers: [FluxWorker]) {
         operationQueue.addOperation {
-            if self.tokens.insert(worker.token).inserted {
-                self.workers.append(worker)
+            workers.forEach { worker in
+                if self.tokens.insert(worker.token).inserted {
+                    self.workers.append(worker)
+                }
             }
         }
     }
