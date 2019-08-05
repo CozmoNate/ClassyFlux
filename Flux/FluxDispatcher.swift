@@ -54,7 +54,7 @@ open class FluxDispatcher {
         operationQueue.maxConcurrentOperationCount = 1
     }
 
-    public func registerWorker(_ worker: FluxWorker) {
+    public func register(worker: FluxWorker) {
         operationQueue.addOperation {
             if self.tokens.insert(worker.token).inserted {
                 self.workers.append(worker)
@@ -62,7 +62,7 @@ open class FluxDispatcher {
         }
     }
     
-    public func dispatchAction<Action: FluxAction>(_ action: Action) {
+    public func dispatch<Action: FluxAction>(action: Action) {
         operationQueue.addOperation {
             self.workers.forEach { worker in
                 self.operationQueue.addOperation { completion in

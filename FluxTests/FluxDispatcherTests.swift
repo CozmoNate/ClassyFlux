@@ -39,7 +39,7 @@ class FluxDispatcherTests: QuickSpec {
                         }
                     }
 
-                    dispatcher.registerWorker(worker)
+                    dispatcher.register(worker: worker)
                 }
 
                 it("registers worker and token") {
@@ -51,7 +51,7 @@ class FluxDispatcherTests: QuickSpec {
                 context("when tried to register worker with the same token") {
 
                     beforeEach {
-                        dispatcher.registerWorker(worker)
+                        dispatcher.register(worker: worker)
                     }
 
                     it("does not registers new worker and token") {
@@ -64,7 +64,7 @@ class FluxDispatcherTests: QuickSpec {
                 context("when dispatched action") {
 
                     beforeEach {
-                        dispatcher.dispatchAction(ChangeValueAction(value: "test"))
+                        dispatcher.dispatch(action: ChangeValueAction(value: "test"))
                     }
 
                     it("perform action on registered worker") {
