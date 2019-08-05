@@ -21,7 +21,7 @@ class FluxStoreTests: QuickSpec {
 
             beforeEach {
                 store = FluxStore<TestSate>(initialState: TestSate(value: "initial", number: 0)) {
-                    $0.register { (action: ChangeValueAction, state) in
+                    $0.registerReducer { (state, action: ChangeValueAction) in
                         state.value = action.value
                     }
                 }
@@ -36,12 +36,32 @@ class FluxStoreTests: QuickSpec {
                 expect(try? store.reducers.resolve(FluxStore<TestSate>.Reduce<ChangeValueAction>.self)).toNot(beNil())
             }
 
-            context("when performed ChangeValueAction") {
+            context("when performed unknown action") {
 
                 var didFinish: Bool = false
 
                 beforeEach {
-                    store.perform(action: ChangeValueAction(value: "test")) {
+                    store.handle(action: UnknownAction()) {
+                        didFinish = true
+                    }
+                }
+
+                it("doesn't change store's state") {
+                    expect(store.state.value).toEventually(equal("initial"))
+                    expect(store.state.number).toEventually(equal(0))
+                }
+
+                it("finishes operation") {
+                    expect(didFinish).toEventually(beTrue())
+                }
+            }
+
+            context("when performed well known action") {
+
+                var didFinish: Bool = false
+
+                beforeEach {
+                    store.handle(action: ChangeValueAction(value: "test")) {
                         didFinish = true
                     }
                 }
@@ -58,7 +78,7 @@ class FluxStoreTests: QuickSpec {
             context("can add another reducer") {
 
                 beforeEach {
-                    store.register { (action: IncrementNumberAction, state) in
+                    store.registerReducer { (state, action: IncrementNumberAction) in
                         state.number += action.increment
                     }
                 }
@@ -67,12 +87,12 @@ class FluxStoreTests: QuickSpec {
                     expect(try? store.reducers.resolve(FluxStore<TestSate>.Reduce<IncrementNumberAction>.self)).toNot(beNil())
                 }
 
-                context("when performed IncrementNumberAction") {
+                context("when performed another action") {
 
                     var didFinish: Bool = false
 
                     beforeEach {
-                        store.perform(action: IncrementNumberAction(increment: 2)) {
+                        store.handle(action: IncrementNumberAction(increment: 2)) {
                             didFinish = true
                         }
                     }

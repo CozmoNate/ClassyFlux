@@ -33,13 +33,12 @@ import Foundation
 import Combine
 import Resolver
 
-open class FluxStore<State: FluxState>: ObservableObject, FluxWorker {
+open class FluxStore<State: FluxState>: ObservableObject {
 
     // MARK: - Types
 
     public typealias State = State
-    public typealias Perform<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
-    public typealias Reduce<Action: FluxAction> = (Action, inout State) -> Void
+    public typealias Reduce<Action: FluxAction> = (inout State, Action) -> Void
 
     // MARK: - Public
 
@@ -64,11 +63,15 @@ open class FluxStore<State: FluxState>: ObservableObject, FluxWorker {
         }
     }
 
-    public func register<Action: FluxAction>(reducer: @escaping Reduce<Action>) {
+    public func registerReducer<Action: FluxAction>(for action: Action.Type = Action.self, reducer: @escaping Reduce<Action>) {
         reducers.register { reducer }
     }
 
-    public func perform<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
+}
+
+extension FluxStore: FluxWorker {
+
+    public func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
 
         typealias Reducer = Reduce<Action>
 
@@ -77,12 +80,12 @@ open class FluxStore<State: FluxState>: ObservableObject, FluxWorker {
             return
         }
 
-        var mutated = state
+        var draftState = state
 
-        reduce(action, &mutated)
+        reduce(&draftState, action)
 
         DispatchQueue.main.async {
-            self.state = mutated
+            self.state = draftState
             completion()
         }
     }

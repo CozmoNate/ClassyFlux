@@ -35,7 +35,7 @@ public protocol FluxWorker {
 
     var token: UUID { get }
 
-    func perform<Action: FluxAction>(action: Action, completion: @escaping () -> Void)
+    func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void)
 
 }
 

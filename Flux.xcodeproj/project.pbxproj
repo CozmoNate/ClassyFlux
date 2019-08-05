@@ -99,8 +99,8 @@
 		7EA2A6D922F41A7000104CCA /* Flux */ = {
 			isa = PBXGroup;
 			children = (
-				7E24883B22F5DACC00517865 /* FluxAction.swift */,
 				7E24883C22F5DACC00517865 /* FluxState.swift */,
+				7E24883B22F5DACC00517865 /* FluxAction.swift */,
 				7EBB251022F5FB4800FF9632 /* FluxWorker.swift */,
 				7E24883A22F5DACC00517865 /* FluxDispatcher.swift */,
 				7EBB251D22F615D200FF9632 /* FluxMiddleware.swift */,

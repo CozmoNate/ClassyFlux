@@ -25,7 +25,7 @@ class FluxMiddlewareTests: QuickSpec {
                 value = "initial"
 
                 middleware = FluxMiddleware {
-                    $0.register { (action: ChangeValueAction, completion) in
+                    $0.registerHandler { (action: ChangeValueAction, completion) in
                         value = action.value
                         completion()
                     }
@@ -33,7 +33,7 @@ class FluxMiddlewareTests: QuickSpec {
             }
 
             it("has registered ChangeValueAction performer") {
-                expect(try? middleware.performers.resolve(FluxMiddleware.Perform<ChangeValueAction>.self)).toNot(beNil())
+                expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<ChangeValueAction>.self)).toNot(beNil())
             }
 
             context("when performed ChangeValueAction") {
@@ -41,7 +41,7 @@ class FluxMiddlewareTests: QuickSpec {
                 var didFinish: Bool = false
 
                 beforeEach {
-                    middleware.perform(action: ChangeValueAction(value: "test")) {
+                    middleware.handle(action: ChangeValueAction(value: "test")) {
                         didFinish = true
                     }
                 }

@@ -32,11 +32,11 @@
 import Foundation
 import Resolver
 
-public class FluxMiddleware: FluxWorker {
+public class FluxMiddleware {
 
     // MARK: - Types
 
-    public typealias Perform<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
+    public typealias Handle<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
 
     // MARK: - Public
 
@@ -44,33 +44,38 @@ public class FluxMiddleware: FluxWorker {
 
     // MARK: - Private
 
-    let performers: ResolverContainer
+    let handlers: ResolverContainer
 
     // MARK: - Methods
 
     public init(registration: ((_ middleware: FluxMiddleware) -> Void)? = nil) {
         
         token = UUID()
-        performers = ResolverContainer()
+        handlers = ResolverContainer()
 
         defer {
             registration?(self)
         }
     }
 
-    public func register<Action: FluxAction>(action: Action.Type = Action.self, work execute: @escaping Perform<Action>) {
-        performers.register { execute }
+    public func registerHandler<Action: FluxAction>(for action: Action.Type = Action.self, work execute: @escaping Handle<Action>) {
+        handlers.register { execute }
     }
 
-    public func perform<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
+}
 
-        typealias Performer = Perform<Action>
+extension FluxMiddleware: FluxWorker {
 
-        guard let perform = try? self.performers.resolve(Performer.self) else {
+    public func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
+
+        typealias Performer = Handle<Action>
+
+        guard let perform = try? self.handlers.resolve(Performer.self) else {
             completion()
             return
         }
 
         perform(action, completion)
     }
+
 }

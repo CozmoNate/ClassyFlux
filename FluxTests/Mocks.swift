@@ -18,6 +18,9 @@ struct IncrementNumberAction: FluxAction {
     var increment: Int
 }
 
+struct UnknownAction: FluxAction {
+}
+
 struct TestSate: FluxState {
     var value: String
     var number: Int
