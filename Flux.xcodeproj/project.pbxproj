@@ -23,6 +23,8 @@
 		7EA2A6E822F41A7000104CCA /* Flux.h in Headers */ = {isa = PBXBuildFile; fileRef = 7EA2A6DA22F41A7000104CCA /* Flux.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7EBB251122F5FB4800FF9632 /* FluxWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EBB251022F5FB4800FF9632 /* FluxWorker.swift */; };
 		7EBB251E22F615D200FF9632 /* FluxMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EBB251D22F615D200FF9632 /* FluxMiddleware.swift */; };
+		7EE887EC22FF3B0E001ED466 /* FluxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE887EB22FF3B0E001ED466 /* FluxView.swift */; };
+		7EE887EE22FF3B51001ED466 /* FluxViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE887ED22FF3B51001ED466 /* FluxViewTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +54,8 @@
 		7EA2A6F122F41AEE00104CCA /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = SOURCE_ROOT; };
 		7EBB251022F5FB4800FF9632 /* FluxWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxWorker.swift; sourceTree = "<group>"; };
 		7EBB251D22F615D200FF9632 /* FluxMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxMiddleware.swift; sourceTree = "<group>"; };
+		7EE887EB22FF3B0E001ED466 /* FluxView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FluxView.swift; sourceTree = "<group>"; };
+		7EE887ED22FF3B51001ED466 /* FluxViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxViewTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +109,7 @@
 				7E24883A22F5DACC00517865 /* FluxDispatcher.swift */,
 				7EBB251D22F615D200FF9632 /* FluxMiddleware.swift */,
 				7E24883922F5DACC00517865 /* FluxStore.swift */,
+				7EE887EB22FF3B0E001ED466 /* FluxView.swift */,
 				7EA2A6DA22F41A7000104CCA /* Flux.h */,
 				7EA2A6DB22F41A7000104CCA /* Info.plist */,
 			);
@@ -118,6 +123,7 @@
 				7EA2A6E522F41A7000104CCA /* FluxDispatcherTests.swift */,
 				7E46BA0822F7482600162C03 /* FluxMiddlewareTests.swift */,
 				7E4E252722F73D68002C0C09 /* FluxStoreTests.swift */,
+				7EE887ED22FF3B51001ED466 /* FluxViewTests.swift */,
 				7EA2A6E722F41A7000104CCA /* Info.plist */,
 			);
 			path = FluxTests;
@@ -248,6 +254,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7EBB251122F5FB4800FF9632 /* FluxWorker.swift in Sources */,
+				7EE887EC22FF3B0E001ED466 /* FluxView.swift in Sources */,
 				7EBB251E22F615D200FF9632 /* FluxMiddleware.swift in Sources */,
 				7E24883D22F5DACC00517865 /* FluxStore.swift in Sources */,
 				7E24883F22F5DACC00517865 /* FluxAction.swift in Sources */,
@@ -263,6 +270,7 @@
 				7E46BA0922F7482600162C03 /* FluxMiddlewareTests.swift in Sources */,
 				7E4E252822F73D68002C0C09 /* FluxStoreTests.swift in Sources */,
 				7EA2A6E622F41A7000104CCA /* FluxDispatcherTests.swift in Sources */,
+				7EE887EE22FF3B51001ED466 /* FluxViewTests.swift in Sources */,
 				7E46BA0722F747AA00162C03 /* Mocks.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
