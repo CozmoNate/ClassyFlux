@@ -39,13 +39,13 @@ open class FluxDispatcher {
     var workers: [FluxWorker]
     let operationQueue: OperationQueue
 
-    public init() {
+    public init(qos: QualityOfService = .userInitiated) {
 
         tokens = Set()
         workers = []
 
         operationQueue = OperationQueue()
-        operationQueue.qualityOfService = .userInteractive
+        operationQueue.qualityOfService = qos
         operationQueue.maxConcurrentOperationCount = 1
     }
 
