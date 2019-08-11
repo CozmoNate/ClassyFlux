@@ -32,7 +32,7 @@
 import Foundation
 import Resolver
 
-public class FluxMiddleware {
+open class FluxMiddleware {
 
     public typealias Handle<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
 
