@@ -36,13 +36,9 @@ import AsyncOperation
 
 open class FluxDispatcher {
 
-    // MARK: - Private
-
     var tokens: Set<UUID>
     var workers: [FluxWorker]
     let operationQueue: OperationQueue
-
-    // MARK: - Methods
 
     public init() {
 

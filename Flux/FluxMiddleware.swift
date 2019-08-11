@@ -34,19 +34,11 @@ import Resolver
 
 public class FluxMiddleware {
 
-    // MARK: - Types
-
     public typealias Handle<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
-
-    // MARK: - Public
 
     public let token: UUID
 
-    // MARK: - Private
-
     let handlers: ResolverContainer
-
-    // MARK: - Methods
 
     public init(registration: ((_ middleware: FluxMiddleware) -> Void)? = nil) {
         
@@ -68,9 +60,9 @@ extension FluxMiddleware: FluxWorker {
 
     public func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
 
-        typealias Performer = Handle<Action>
+        typealias Handler = Handle<Action>
 
-        guard let perform = try? self.handlers.resolve(Performer.self) else {
+        guard let perform = try? self.handlers.resolve(Handler.self) else {
             completion()
             return
         }

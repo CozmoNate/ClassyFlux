@@ -35,22 +35,14 @@ import Resolver
 
 open class FluxStore<State: FluxState>: ObservableObject {
 
-    // MARK: - Types
-
     public typealias State = State
     public typealias Reduce<Action: FluxAction> = (inout State, Action) -> Void
-
-    // MARK: - Public
 
     public let token: UUID
 
     @Published public private(set) var state: State
 
-    // MARK: - Private
-
     let reducers: ResolverContainer
-
-    // MARK: - Methods
 
     public init(initialState: State, registration: ((_ store: FluxStore<State>) -> Void)? = nil) {
 
