@@ -1,7 +1,7 @@
 coverage_service: coveralls
-workspace: Flux.xcworkspace
-xcodeproj: Flux.xcodeproj
-scheme: Flux
+workspace: ClassyFlux.xcworkspace
+xcodeproj: ClassyFlux.xcodeproj
+scheme: ClassyFlux
 ignore:
   - ../*
   - FluxTests/*

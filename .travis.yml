@@ -12,11 +12,11 @@ cache:
 
 env:
   global:
-    - WORKSPACE=Flux.xcworkspace
+    - WORKSPACE=ClassyFlux.xcworkspace
     - COVERALLS_SERVICE_NAME=travis-ci
     - COVERALLS_SERVICE_JOB_ID=$TRAVIS_JOB_ID
   matrix:
-    - DESTINATION="OS=13.0,name=iPhone 8" SCHEME="Flux" SDK="iphonesimulator13.0"
+    - DESTINATION="OS=13.0,name=iPhone 8" SCHEME="ClassyFlux" SDK="iphonesimulator13.0"
 
 install:
   - bundle install --without=documentation
