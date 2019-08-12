@@ -31,6 +31,8 @@
 
 import SwiftUI
 
+
+@available(iOS 13.0, OSX 10.15, *)
 public protocol FluxView: View {
 
     associatedtype Properties
@@ -41,6 +43,7 @@ public protocol FluxView: View {
 
 }
 
+@available(iOS 13.0, OSX 10.15, *)
 public extension FluxView {
 
     var body: FluxRenderer<Content> {
@@ -51,6 +54,7 @@ public extension FluxView {
 
 }
 
+@available(iOS 13.0, OSX 10.15, *)
 public struct FluxRenderer<Content: View>: View {
 
     let render: () -> Content

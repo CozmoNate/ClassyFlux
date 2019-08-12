@@ -10,45 +10,30 @@ import Quick
 import Nimble
 import SwiftUI
 
-@testable import Flux
+@testable import ClassyFlux
 
 class FluxViewTests: QuickSpec {
 
     override func spec() {
 
-        describe("FluxView") {
+        if #available(iOS 13.0, OSX 10.15, *) {
 
-            var view: TestView!
+            describe("FluxView") {
 
-            beforeEach {
-                view = TestView(testValue: "Test")
-            }
+                var view: TestView!
 
-            it("correctly calculates properties") {
-                expect(view.calculateProperties().value).to(equal("Test"))
-            }
+                beforeEach {
+                    view = TestView(testValue: "Test")
+                }
 
-            it("Renders view regarding properties calculated") {
-                expect(view.body).to(beAKindOf(FluxRenderer<Text>.self))
+                it("correctly calculates properties") {
+                    expect(view.calculateProperties().value).to(equal("Test"))
+                }
+
+                it("Renders view regarding properties calculated") {
+                    expect(view.body).to(beAKindOf(FluxRenderer<Text>.self))
+                }
             }
         }
-        
-    }
-}
-
-struct TestView: FluxView {
-
-    struct Properties {
-        let value: String
-    }
-
-    let testValue: String
-
-    func calculateProperties() -> TestView.Properties {
-        return Properties(value: testValue)
-    }
-
-    func render(properties: Properties) -> some View {
-        Text(properties.value)
     }
 }

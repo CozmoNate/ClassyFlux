@@ -4,23 +4,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "Flux",
+    name: "ClassyFlux",
     platforms: [
-        .iOS(.v13),
-        .macOS(.v10_15)
+        .iOS(.v11),
+        .macOS(.v10_14)
     ],
     products: [
-        .library(name: "Flux", targets: ["Flux"])
+        .library(name: "ClassyFlux", targets: ["ClassyFlux"])
     ],
     dependencies: [
         .package(url: "https://github.com/Quick/Quick.git", from: "2.0.0"),
         .package(url: "https://github.com/Quick/Nimble.git", from: "8.0.0"),
-        .package(url: "https://github.com/kzlekk/Resolver.git", from: "1.1.0"),
-        .package(url: "https://github.com/kzlekk/AsyncOperation.git", from: "1.0.0"),
+        .package(url: "https://github.com/kzlekk/ResolverContainer.git", from: "1.1.0"),
+        .package(url: "https://github.com/kzlekk/CustomOperation.git", from: "1.0.0"),
     ],
     targets: [
-        .target(name: "Flux", dependencies: ["Resolver", "AsyncOperation"], path: "Flux"),
-        .testTarget(name: "FluxTests", dependencies: ["Flux", "Quick", "Nimble"], path: "FluxTests")
+        .target(name: "ClassyFlux", dependencies: ["ResolverContainer", "CustomOperation"], path: "Flux"),
+        .testTarget(name: "ClassyFluxTests", dependencies: ["ClassyFlux", "Quick", "Nimble"], path: "FluxTests")
     ],
     swiftLanguageVersions: [ .v5 ]
 )

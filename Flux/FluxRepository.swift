@@ -1,8 +1,8 @@
 //
-//  FluxMiddleware.swift
+//  FluxRepository.swift
 //  Flux
 //
-//  Created by Natan Zalkin on 03/08/2019.
+//  Created by Natan Zalkin on 12/08/2019.
 //  Copyright © 2019 Natan Zalkin. All rights reserved.
 //
 
@@ -33,42 +33,40 @@ import Foundation
 import ResolverContainer
 
 
-open class FluxMiddleware {
+extension Notification.Name {
+    static let FluxRepositoryChanged = Notification.Name("FluxRepositoryChanged")
+}
 
-    public typealias Handle<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
+public protocol FluxRepository: FluxWorker {
 
-    public let token: UUID
-
-    let handlers: ResolverContainer
-
-    public init(registration: ((_ middleware: FluxMiddleware) -> Void)? = nil) {
-        
-        token = UUID()
-        handlers = ResolverContainer()
-
-        defer {
-            registration?(self)
-        }
-    }
-
-    public func registerHandler<Action: FluxAction>(for action: Action.Type = Action.self, work execute: @escaping Handle<Action>) {
-        handlers.register { execute }
-    }
+    var reducers: ResolverContainer { get }
 
 }
 
-extension FluxMiddleware: FluxWorker {
+extension FluxRepository {
+
+    public typealias Reduce<Action: FluxAction> = (Self, Action) -> Bool
+
+    public func registerReducer<Action: FluxAction>(for action: Action.Type = Action.self, reducer: @escaping Reduce<Action>) {
+        reducers.register { reducer }
+    }
 
     public func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
 
-        typealias Handler = Handle<Action>
+        typealias Reducer = Reduce<Action>
 
-        guard let perform = try? self.handlers.resolve(Handler.self) else {
+        guard let reduce = try? reducers.resolve(Reducer.self) else {
             completion()
             return
         }
 
-        perform(action, completion)
+        if reduce(self, action) {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .FluxRepositoryChanged, object: self)
+            }
+        }
+
+        completion()
     }
 
 }

@@ -9,13 +9,15 @@
 import Quick
 import Nimble
 
-@testable import Flux
+@testable import ClassyFlux
 
 class FluxStoreTests: QuickSpec {
 
     override func spec() {
 
-        describe("FluxStore") {
+        if #available(iOS 13.0, OSX 10.15, *) {
+
+            describe("FluxStore") {
 
             var store: FluxStore<TestSate>!
 
@@ -109,6 +111,7 @@ class FluxStoreTests: QuickSpec {
             }
         }
 
+        }
     }
 
 }

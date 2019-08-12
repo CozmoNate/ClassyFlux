@@ -31,8 +31,10 @@
 
 import Foundation
 import Combine
-import Resolver
+import ResolverContainer
 
+
+@available(iOS 13.0, OSX 10.15, *)
 open class FluxStore<State: FluxState>: ObservableObject {
 
     public typealias State = State
@@ -61,6 +63,7 @@ open class FluxStore<State: FluxState>: ObservableObject {
 
 }
 
+@available(iOS 13.0, OSX 10.15, *)
 extension FluxStore: FluxWorker {
 
     public func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {

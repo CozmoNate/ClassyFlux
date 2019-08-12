@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7EA2A6D622F41A7000104CCA"
-               BuildableName = "Flux.framework"
-               BlueprintName = "Flux"
-               ReferencedContainer = "container:Flux.xcodeproj">
+               BuildableName = "ClassyFlux.framework"
+               BlueprintName = "ClassyFlux"
+               ReferencedContainer = "container:ClassyFlux.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7EA2A6D622F41A7000104CCA"
-            BuildableName = "Flux.framework"
-            BlueprintName = "Flux"
-            ReferencedContainer = "container:Flux.xcodeproj">
+            BuildableName = "ClassyFlux.framework"
+            BlueprintName = "ClassyFlux"
+            ReferencedContainer = "container:ClassyFlux.xcodeproj">
          </BuildableReference>
       </CodeCoverageTargets>
       <Testables>
@@ -44,9 +44,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7EA2A6DF22F41A7000104CCA"
-               BuildableName = "FluxTests.xctest"
-               BlueprintName = "FluxTests"
-               ReferencedContainer = "container:Flux.xcodeproj">
+               BuildableName = "ClassyFluxTests.xctest"
+               BlueprintName = "ClassyFluxTests"
+               ReferencedContainer = "container:ClassyFlux.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7EA2A6D622F41A7000104CCA"
-            BuildableName = "Flux.framework"
-            BlueprintName = "Flux"
-            ReferencedContainer = "container:Flux.xcodeproj">
+            BuildableName = "ClassyFlux.framework"
+            BlueprintName = "ClassyFlux"
+            ReferencedContainer = "container:ClassyFlux.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

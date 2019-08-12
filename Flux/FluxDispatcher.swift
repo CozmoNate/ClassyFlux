@@ -30,8 +30,9 @@
  */
 
 import Foundation
-import Resolver
-import AsyncOperation
+import ResolverContainer
+import CustomOperation
+
 
 open class FluxDispatcher {
 
@@ -67,6 +68,10 @@ open class FluxDispatcher {
                 }
             }
         }
+    }
+
+    public func dispatch(operation: Operation) {
+        operationQueue.addOperation(operation)
     }
 
 }

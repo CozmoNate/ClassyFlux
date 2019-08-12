@@ -31,7 +31,8 @@
 
 import Foundation
 
-public protocol FluxWorker {
+
+public protocol FluxWorker: AnyObject {
 
     var token: UUID { get }
 

@@ -9,7 +9,7 @@
 import Quick
 import Nimble
 
-@testable import Flux
+@testable import ClassyFlux
 
 class FluxMiddlewareTests: QuickSpec {
 

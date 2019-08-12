@@ -2,12 +2,12 @@
   "object": {
     "pins": [
       {
-        "package": "AsyncOperation",
-        "repositoryURL": "https://github.com/kzlekk/AsyncOperation.git",
+        "package": "CustomOperation",
+        "repositoryURL": "https://github.com/kzlekk/CustomOperation.git",
         "state": {
           "branch": null,
-          "revision": "5a958af5728b3316e0ad0bcfdda0cecc60dba9d2",
-          "version": "1.0.0"
+          "revision": "06bd709878c9bad8e7b232d63f5a9a758a5a4984",
+          "version": "1.0.2"
         }
       },
       {
@@ -29,12 +29,12 @@
         }
       },
       {
-        "package": "Resolver",
-        "repositoryURL": "https://github.com/kzlekk/Resolver.git",
+        "package": "ResolverContainer",
+        "repositoryURL": "https://github.com/kzlekk/ResolverContainer.git",
         "state": {
           "branch": null,
-          "revision": "c4a3d3fbe52928bd121001d01f82d4139a92c175",
-          "version": "1.1.0"
+          "revision": "43f53e2ac0335aff9978b6bd5310d435c14f97a0",
+          "version": "1.2.2"
         }
       }
     ]

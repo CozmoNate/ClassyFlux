@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:Flux.xcodeproj">
+      location = "group:/Users/kozlek/Documents/ReFlux/ClassyFlux.xcodeproj">
    </FileRef>
 </Workspace>
