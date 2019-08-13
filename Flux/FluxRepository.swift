@@ -37,13 +37,20 @@ extension Notification.Name {
     static let FluxRepositoryChanged = Notification.Name("FluxRepositoryChanged")
 }
 
-public protocol FluxRepository: FluxWorker {
+open class FluxRepository: FluxState, FluxWorker {
 
-    var reducers: ResolverContainer { get }
+    public let token: UUID
+    
+    let reducers: ResolverContainer
+
+    public init() {
+        token = UUID()
+        reducers = ResolverContainer()
+    }
 
 }
 
-extension FluxRepository {
+extension FluxState where Self: FluxRepository {
 
     public typealias Reduce<Action: FluxAction> = (Self, Action) -> Bool
 

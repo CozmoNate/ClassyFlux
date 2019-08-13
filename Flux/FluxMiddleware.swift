@@ -33,7 +33,7 @@ import Foundation
 import ResolverContainer
 
 
-open class FluxMiddleware {
+open class FluxMiddleware: FluxWorker {
 
     public typealias Handle<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
 
@@ -54,10 +54,6 @@ open class FluxMiddleware {
     public func registerHandler<Action: FluxAction>(for action: Action.Type = Action.self, work execute: @escaping Handle<Action>) {
         handlers.register { execute }
     }
-
-}
-
-extension FluxMiddleware: FluxWorker {
 
     public func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
 

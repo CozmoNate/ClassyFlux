@@ -35,7 +35,7 @@ import ResolverContainer
 
 
 @available(iOS 13.0, OSX 10.15, *)
-open class FluxStore<State: FluxState>: ObservableObject {
+open class FluxStore<State: FluxState>: FluxWorker, ObservableObject {
 
     public typealias State = State
     public typealias Reduce<Action: FluxAction> = (inout State, Action) -> Void
@@ -46,25 +46,15 @@ open class FluxStore<State: FluxState>: ObservableObject {
 
     let reducers: ResolverContainer
 
-    public init(initialState: State, registration: ((_ store: FluxStore<State>) -> Void)? = nil) {
-
+    public init(initialState: State) {
         token = UUID()
         state = initialState
         reducers = ResolverContainer()
-
-        defer {
-            registration?(self)
-        }
     }
 
     public func registerReducer<Action: FluxAction>(for action: Action.Type = Action.self, reducer: @escaping Reduce<Action>) {
         reducers.register { reducer }
     }
-
-}
-
-@available(iOS 13.0, OSX 10.15, *)
-extension FluxStore: FluxWorker {
 
     public func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
 

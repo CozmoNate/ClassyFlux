@@ -116,8 +116,8 @@
 				7E24883C22F5DACC00517865 /* FluxState.swift */,
 				7E24883B22F5DACC00517865 /* FluxAction.swift */,
 				7EBB251022F5FB4800FF9632 /* FluxWorker.swift */,
-				AAED50A5230174CB00C201B4 /* FluxRepository.swift */,
 				7E24883A22F5DACC00517865 /* FluxDispatcher.swift */,
+				AAED50A5230174CB00C201B4 /* FluxRepository.swift */,
 				7EBB251D22F615D200FF9632 /* FluxMiddleware.swift */,
 				7E24883922F5DACC00517865 /* FluxStore.swift */,
 				7EE887EB22FF3B0E001ED466 /* FluxView.swift */,
@@ -443,7 +443,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4.2;
+				MARKETING_VERSION = 1.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.ClassyFlux;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -470,7 +470,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4.2;
+				MARKETING_VERSION = 1.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.ClassyFlux;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

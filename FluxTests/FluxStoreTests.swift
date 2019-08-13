@@ -22,10 +22,10 @@ class FluxStoreTests: QuickSpec {
             var store: FluxStore<TestSate>!
 
             beforeEach {
-                store = FluxStore<TestSate>(initialState: TestSate(value: "initial", number: 0)) {
-                    $0.registerReducer { (state, action: ChangeValueAction) in
-                        state.value = action.value
-                    }
+                store = FluxStore<TestSate>(initialState: TestSate(value: "initial", number: 0))
+
+                store.registerReducer { (state, action: ChangeValueAction) in
+                    state.value = action.value
                 }
             }
 

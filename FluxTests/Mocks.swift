@@ -30,10 +30,6 @@ struct TestSate: FluxState {
 
 class TestRepository: FluxRepository {
 
-    let token = UUID()
-    
-    let reducers = ResolverContainer()
-
     private(set) var value: String
     private(set) var number: Int
 
