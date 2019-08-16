@@ -32,7 +32,7 @@ class FluxMiddlewareTests: QuickSpec {
             context("when registered action handler") {
 
                 beforeEach {
-                    middleware.registerHandler { (_, action: ChangeValueAction, completion) in
+                    middleware.registerHandler { (action: ChangeValueAction, completion) in
                         value = action.value
                         completion()
                     }

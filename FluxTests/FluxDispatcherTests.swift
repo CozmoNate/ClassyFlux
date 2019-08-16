@@ -34,7 +34,7 @@ class FluxDispatcherTests: QuickSpec {
 
                     worker = FluxMiddleware()
 
-                    worker.registerHandler { (_, action: ChangeValueAction, done) in
+                    worker.registerHandler { (action: ChangeValueAction, done) in
                         value = action.value
                         done()
                     }

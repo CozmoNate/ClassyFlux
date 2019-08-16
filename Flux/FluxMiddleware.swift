@@ -36,6 +36,11 @@ import ResolverContainer
 /// An object that can be registered in FluxDispatcher and perform the work in a response to FluxAction send
 open class FluxMiddleware: FluxWorker {
 
+    /// An action handler closue
+    /// - Parameter action: The action to handle
+    /// - Parameter completion: The closure that should be called upon completion
+    public typealias Handle<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
+
     /// A unique identifier of the middleware
     public let token: UUID
 
@@ -71,17 +76,7 @@ open class FluxMiddleware: FluxWorker {
             return
         }
 
-        handle(self, action, completion)
+        handle(action, completion)
     }
-
-}
-
-public extension FluxWorker where Self: FluxMiddleware {
-
-    /// An action handler closue
-    /// - Parameter self: The reference to self instance
-    /// - Parameter action: The action to handle
-    /// - Parameter completion: The closure that should be called upon completion
-    typealias Handle<Action: FluxAction> = (_ middleware: Self, _ action: Action, _ completion: @escaping () -> Void) -> Void
 
 }
