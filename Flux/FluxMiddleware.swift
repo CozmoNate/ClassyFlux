@@ -41,7 +41,7 @@ open class FluxMiddleware: FluxWorker {
 
     let handlers: ResolverContainer
 
-    public required init() {
+    public init() {
         token = UUID()
         handlers = ResolverContainer()
     }

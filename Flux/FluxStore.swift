@@ -73,7 +73,7 @@ open class FluxStore<State>: FluxWorker {
 
     /// Initialises the store
     /// - Parameter initialState: The initial state of the store
-    public required init(initialState: State) {
+    public init(initialState: State) {
         token = UUID()
         state = initialState
         reducers = ResolverContainer()
