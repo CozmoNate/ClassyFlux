@@ -11,96 +11,78 @@ import Nimble
 
 @testable import ClassyFlux
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 class FluxStoreTests: QuickSpec {
 
     override func spec() {
 
-        if #available(iOS 13.0, OSX 10.15, *) {
-
-            describe("FluxStore") {
+        describe("FluxStore") {
 
             var store: FluxStore<TestSate>!
 
             beforeEach {
                 store = FluxStore<TestSate>(initialState: TestSate(value: "initial", number: 0))
-
-                store.registerReducer { (state, action: ChangeValueAction) in
-                    state.value = action.value
-                }
             }
 
-            it("has correct initial value") {
-                expect(store.state.value).to(equal("initial"))
-                expect(store.state.number).to(equal(0))
-            }
-
-            it("has registered initial ChangeValueAction reducer") {
-                expect(try? store.reducers.resolve(FluxStore<TestSate>.Reduce<ChangeValueAction>.self)).toNot(beNil())
-            }
-
-            context("when performed unknown action") {
-
-                var didFinish: Bool = false
+            context("when registered an action") {
 
                 beforeEach {
-                    store.handle(action: UnknownAction()) {
-                        didFinish = true
+                    store.registerReducer { (state, action: ChangeValueAction) in
+                        state.value = action.value
+                        return true
                     }
                 }
 
-                it("doesn't change store's state") {
-                    expect(store.state.value).toEventually(equal("initial"))
-                    expect(store.state.number).toEventually(equal(0))
+                it("has correct initial value") {
+                    expect(store.state.value).to(equal("initial"))
+                    expect(store.state.number).to(equal(0))
                 }
 
-                it("finishes operation") {
-                    expect(didFinish).toEventually(beTrue())
+                it("has registered initial ChangeValueAction reducer") {
+                    expect(try? store.reducers.resolve(FluxStore<TestSate>.Reduce<ChangeValueAction>.self)).toNot(beNil())
                 }
-            }
 
-            context("when performed well known action") {
+                context("when unregistered the action") {
 
-                var didFinish: Bool = false
+                    var flag: Bool!
 
-                beforeEach {
-                    store.handle(action: ChangeValueAction(value: "test")) {
-                        didFinish = true
+                    beforeEach {
+                        flag = store.unregisterRedcer(for: ChangeValueAction.self)
                     }
-                }
 
-                it("correctly reduces store's state") {
-                    expect(store.state.value).toEventually(equal("test"))
-                }
-
-                it("finishes operation") {
-                    expect(didFinish).toEventually(beTrue())
-                }
-            }
-
-            context("can add another reducer") {
-
-                beforeEach {
-                    store.registerReducer { (state, action: IncrementNumberAction) in
-                        state.number += action.increment
+                    it("successfully unregistered the reducer") {
+                        expect(flag).to(beTrue())
+                        expect(try? store.reducers.resolve(FluxStore<TestSate>.Reduce<ChangeValueAction>.self)).to(beNil())
                     }
+
+                    context("when performed unregistered action") {
+
+                        it("doesn't change store's state") {
+                            waitUntil { (done) in
+                                store.handle(action: ChangeValueAction(value: "change it!")) {
+                                    expect(store.state.value).to(equal("initial"))
+                                    expect(store.state.number).to(equal(0))
+                                    done()
+                                }
+                            }
+                        }
+
+                    }
+
                 }
 
-                it("has registered IncrementNumberAction reducer") {
-                    expect(try? store.reducers.resolve(FluxStore<TestSate>.Reduce<IncrementNumberAction>.self)).toNot(beNil())
-                }
-
-                context("when performed another action") {
+                context("when performed well known action") {
 
                     var didFinish: Bool = false
 
                     beforeEach {
-                        store.handle(action: IncrementNumberAction(increment: 2)) {
+                        store.handle(action: ChangeValueAction(value: "test")) {
                             didFinish = true
                         }
                     }
 
                     it("correctly reduces store's state") {
-                        expect(store.state.number).toEventually(equal(2))
+                        expect(store.state.value).toEventually(equal("test"))
                     }
 
                     it("finishes operation") {
@@ -108,10 +90,40 @@ class FluxStoreTests: QuickSpec {
                     }
                 }
 
+                context("can add another reducer") {
+
+                    beforeEach {
+                        store.registerReducer { (state, action: IncrementNumberAction) in
+                            state.number += action.increment
+                            return true
+                        }
+                    }
+
+                    it("has registered IncrementNumberAction reducer") {
+                        expect(try? store.reducers.resolve(FluxStore<TestSate>.Reduce<IncrementNumberAction>.self)).toNot(beNil())
+                    }
+
+                    context("when performed another action") {
+
+                        var didFinish: Bool = false
+
+                        beforeEach {
+                            store.handle(action: IncrementNumberAction(increment: 2)) {
+                                didFinish = true
+                            }
+                        }
+
+                        it("correctly reduces store's state") {
+                            expect(store.state.number).toEventually(equal(2))
+                        }
+
+                        it("finishes operation") {
+                            expect(didFinish).toEventually(beTrue())
+                        }
+                    }
+
+                }
             }
         }
-
-        }
     }
-
 }

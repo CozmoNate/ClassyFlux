@@ -6,8 +6,10 @@ import PackageDescription
 let package = Package(
     name: "ClassyFlux",
     platforms: [
+        .macOS(.v10_13),
         .iOS(.v11),
-        .macOS(.v10_14)
+        .watchOS(.v4),
+        .tvOS(.v11)
     ],
     products: [
         .library(name: "ClassyFlux", targets: ["ClassyFlux"])

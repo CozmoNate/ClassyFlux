@@ -33,38 +33,55 @@ import Foundation
 import ResolverContainer
 
 
+/// An object that can be registered in FluxDispatcher and perform the work in a response to FluxAction send
 open class FluxMiddleware: FluxWorker {
 
-    public typealias Handle<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
-
+    /// A unique identifier of the middleware
     public let token: UUID
 
     let handlers: ResolverContainer
 
-    public init(registration: ((_ middleware: FluxMiddleware) -> Void)? = nil) {
-        
+    public required init() {
         token = UUID()
         handlers = ResolverContainer()
-
-        defer {
-            registration?(self)
-        }
     }
 
+    /// Associates a handler with the actions of specified type
+    /// - Parameter action: The type of the actions to associate with handler
+    /// - Parameter execute: The closure that will be invoked when the action received
     public func registerHandler<Action: FluxAction>(for action: Action.Type = Action.self, work execute: @escaping Handle<Action>) {
         handlers.register { execute }
+    }
+
+    /// Unregisters handler associated with specified action type. Returns true if handler unregistered successfully. Returns false when no handler was registered for the action type.
+    /// - Parameter action: The action for which the associated handler should be removed
+    public func unregisterHandler<Action: FluxAction>(for action: Action.Type) -> Bool {
+
+        typealias Handler = Handle<Action>
+
+        return handlers.unregister(Handler.self)
     }
 
     public func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
 
         typealias Handler = Handle<Action>
 
-        guard let perform = try? self.handlers.resolve(Handler.self) else {
+        guard let handle = try? self.handlers.resolve(Handler.self) else {
             completion()
             return
         }
 
-        perform(action, completion)
+        handle(self, action, completion)
     }
+
+}
+
+public extension FluxWorker where Self: FluxMiddleware {
+
+    /// An action handler closue
+    /// - Parameter self: The reference to self instance
+    /// - Parameter action: The action to handle
+    /// - Parameter completion: The closure that should be called upon completion
+    typealias Handle<Action: FluxAction> = (_ middleware: Self, _ action: Action, _ completion: @escaping () -> Void) -> Void
 
 }

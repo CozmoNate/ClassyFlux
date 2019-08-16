@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/kzlekk/CustomOperation.git",
         "state": {
           "branch": null,
-          "revision": "06bd709878c9bad8e7b232d63f5a9a758a5a4984",
-          "version": "1.0.2"
+          "revision": "36701cac69c118fcc92f1e87956aaa5d217f175e",
+          "version": "1.0.3"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/kzlekk/ResolverContainer.git",
         "state": {
           "branch": null,
-          "revision": "43f53e2ac0335aff9978b6bd5310d435c14f97a0",
-          "version": "1.2.2"
+          "revision": "3b15e3b8a3a8caced90efc672b58f059328a28e1",
+          "version": "1.2.6"
         }
       }
     ]

@@ -32,35 +32,23 @@
 import SwiftUI
 
 
-@available(iOS 13.0, OSX 10.15, *)
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public protocol FluxView: View {
 
     associatedtype Properties
     associatedtype Content: View
 
     func calculateProperties() -> Properties
+
     func render(properties: Properties) -> Content
 
 }
 
-@available(iOS 13.0, OSX 10.15, *)
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public extension FluxView {
 
-    var body: FluxRenderer<Content> {
-        FluxRenderer {
-            self.render(properties: self.calculateProperties())
-        }
-    }
-
-}
-
-@available(iOS 13.0, OSX 10.15, *)
-public struct FluxRenderer<Content: View>: View {
-
-    let render: () -> Content
-
-    public var body: Content {
-        render()
+    var body: Content {
+        render(properties: self.calculateProperties())
     }
 
 }

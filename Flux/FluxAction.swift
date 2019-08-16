@@ -29,4 +29,16 @@
  *
  */
 
+/// A protocol describing abstract action
 public protocol FluxAction {}
+
+
+extension FluxAction {
+
+    /// Dispatches action with specified dispatcher
+    /// - Parameter dispatcher: The dispatcher that will process the action
+    public func dispatch(with dispatcher: FluxDispatcher = .default) {
+        dispatcher.dispatch(action: self)
+    }
+
+}

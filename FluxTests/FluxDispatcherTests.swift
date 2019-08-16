@@ -32,20 +32,34 @@ class FluxDispatcherTests: QuickSpec {
 
                     value = "initial"
 
-                    worker = FluxMiddleware {
-                        $0.registerHandler { (action: ChangeValueAction, done) in
-                            value = action.value
-                            done()
-                        }
+                    worker = FluxMiddleware()
+
+                    worker.registerHandler { (_, action: ChangeValueAction, done) in
+                        value = action.value
+                        done()
                     }
 
                     dispatcher.register(workers: [worker])
                 }
 
-                it("registers worker and token") {
+                it("registers the worker and its token") {
                     dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
                     expect(dispatcher.tokens.first).to(equal(worker.token))
                     expect(dispatcher.workers.first).to(beIdenticalTo(worker))
+                }
+
+                context("when unregisters worker by token") {
+
+                    beforeEach {
+                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                        dispatcher.unregister(tokens: [dispatcher.tokens.first!])
+                    }
+
+                    it("unregisters the worker and its token") {
+                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                        expect(dispatcher.tokens).to(beEmpty())
+                        expect(dispatcher.workers).to(beEmpty())
+                    }
                 }
 
                 context("when tried to register worker with the same token") {
@@ -64,12 +78,29 @@ class FluxDispatcherTests: QuickSpec {
                 context("when dispatched action") {
 
                     beforeEach {
-                        dispatcher.dispatch(action: ChangeValueAction(value: "test"))
+                        ChangeValueAction(value: "test").dispatch(with: dispatcher)
                     }
 
                     it("perform action on registered worker") {
                         dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
                         expect(value).to(equal("test"))
+                    }
+                }
+
+                context("when dispatched block") {
+
+                    var flag: Bool!
+
+                    beforeEach {
+                        flag = false
+                        dispatcher.dispatch {
+                            flag = true
+                        }
+                    }
+
+                    it("perform action on registered worker") {
+                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                        expect(flag).to(beTrue())
                     }
                 }
             }

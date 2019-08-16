@@ -20,38 +20,12 @@ struct IncrementNumberAction: FluxAction {
     var increment: Int
 }
 
-struct UnknownAction: FluxAction {
-}
-
-struct TestSate: FluxState {
+struct TestSate {
     var value: String
     var number: Int
 }
 
-class TestRepository: FluxRepository {
-
-    private(set) var value: String
-    private(set) var number: Int
-
-    init(value: String = "initial", number: Int = 0) {
-        self.value = value
-        self.number = number
-    }
-
-    func changeValue(_ newValue: String) -> Bool {
-        guard newValue != value else { return false }
-        value = newValue
-        return true
-    }
-
-    func incrementNumber(_ newNumber: Int) -> Bool {
-        guard newNumber != 0 else { return false }
-        number += newNumber
-        return true
-    }
-}
-
-@available(iOS 13.0, OSX 10.15, *)
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 struct TestView: FluxView {
 
     struct Properties {
