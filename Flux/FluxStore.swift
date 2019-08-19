@@ -67,7 +67,9 @@ open class FluxStore<State> {
     var backingState: State {
         willSet {
             if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
-                self.objectWillChange.send()
+                DispatchQueue.main.async {
+                    self.objectWillChange.send()
+                }
             }
         }
         didSet {
