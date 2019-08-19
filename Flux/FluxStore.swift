@@ -138,15 +138,13 @@ extension FluxStore: FluxWorker {
 
         typealias Reducer = Reduce<Action>
 
-        guard let reduce = try? reducers.resolve(Reducer.self) else {
-            completion()
-            return
-        }
+        if let reduce = try? reducers.resolve(Reducer.self) {
 
-        var draft = state
+            var draft = state
 
-        if reduce(&draft, action) {
-            state = draft
+            if reduce(&draft, action) {
+                state = draft
+            }
         }
 
         middlewares.forEach { $0.handle(action: action, state: state) }
