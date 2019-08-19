@@ -44,68 +44,6 @@ class FluxStoreTests: QuickSpec {
                     expect(try? store.reducers.resolve(TestStore.Reduce<ChangeValueAction>.self)).toNot(beNil())
                 }
 
-                context("when registered middleware") {
-
-                    var middleware: TestStore.Middleware!
-
-                    beforeEach {
-
-                        middleware = TestStore.Middleware()
-
-                        store.append(middlewares: [middleware])
-                    }
-
-                    it("registers the middleware and its token") {
-                        expect(store.tokens.contains(middleware.token)).to(beTrue())
-                        expect(store.middlewares.first).to(beIdenticalTo(middleware))
-                    }
-
-                    context("when unregisters middleware by token") {
-
-                        beforeEach {
-                            store.unregister(tokens: [middleware.token])
-                        }
-
-                        it("unregisters the worker and its token") {
-                            expect(store.tokens).to(beEmpty())
-                            expect(store.middlewares).to(beEmpty())
-                        }
-                    }
-
-                    context("when tried to register middleware with the same token") {
-
-                        beforeEach {
-                            store.append(middlewares: [middleware])
-                        }
-
-                        it("does not registers new worker and token") {
-                            expect(store.tokens.count).to(equal(1))
-                            expect(store.middlewares.count).to(equal(1))
-                        }
-                    }
-
-                    context("when handled action") {
-
-                        var lastAction: FluxAction?
-                        var lastState: TestState?
-
-                        beforeEach {
-
-                            middleware.registerHandler(for: ChangeValueAction.self) { (action, state) in
-                                lastAction = action
-                                lastState = state
-                            }
-
-                            store.handle(action: ChangeValueAction(value: "test"), completion: { })
-                        }
-
-                        it("performs action with middleware registered after reducers") {
-                            expect(lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
-                            expect(lastState).to(equal(TestState(value: "test", number: 0)))
-                        }
-                    }
-                }
-
                 context("when unregistered the action") {
 
                     var flag: Bool!
@@ -121,36 +59,33 @@ class FluxStoreTests: QuickSpec {
 
                     context("when performed unregistered action") {
 
-                        it("doesn't change store's state") {
-                            waitUntil { (done) in
-                                store.handle(action: ChangeValueAction(value: "change it!")) {
-                                    expect(store.state.value).to(equal("initial"))
-                                    expect(store.state.number).to(equal(0))
-                                    done()
-                                }
-                            }
+                        beforeEach {
+                            store.handle(action: ChangeValueAction(value: "change it!"), composer: nil)
                         }
 
+                        it("doesn't change store's state") {
+                            expect(store.state.value).to(equal("initial"))
+                            expect(store.state.number).to(equal(0))
+                        }
                     }
 
                 }
 
                 context("when performed well known action") {
 
-                    var didFinish: Bool = false
+                    var composer: TestComposer!
 
                     beforeEach {
-                        store.handle(action: ChangeValueAction(value: "test")) {
-                            didFinish = true
-                        }
+                        composer = TestComposer()
+                        store.handle(action: ChangeValueAction(value: "test"), composer: composer)
                     }
 
                     it("correctly reduces store's state") {
-                        expect(store.state.value).toEventually(equal("test"))
+                        expect(store.state.value).to(equal("test"))
                     }
 
-                    it("finishes operation") {
-                        expect(didFinish).toEventually(beTrue())
+                    it("passes action to composer") {
+                        expect(composer.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
                     }
                 }
 
@@ -169,20 +104,19 @@ class FluxStoreTests: QuickSpec {
 
                     context("when performed another action") {
 
-                        var didFinish: Bool = false
+                        var composer: TestComposer!
 
                         beforeEach {
-                            store.handle(action: IncrementNumberAction(increment: 2)) {
-                                didFinish = true
-                            }
+                            composer = TestComposer()
+                            store.handle(action: IncrementNumberAction(increment: 2), composer: composer)
                         }
 
                         it("correctly reduces store's state") {
                             expect(store.state.number).toEventually(equal(2))
                         }
 
-                        it("finishes operation") {
-                            expect(didFinish).toEventually(beTrue())
+                        it("passes action to composer") {
+                            expect(composer.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 2)))
                         }
                     }
 

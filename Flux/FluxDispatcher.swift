@@ -1,6 +1,6 @@
 //
 //  FluxDispatcher.swift
-//  Flux
+//  ClassyFlux
 //
 //  Created by Natan Zalkin on 31/07/2019.
 //  Copyright © 2019 Natan Zalkin. All rights reserved.
@@ -31,7 +31,6 @@
 
 import Foundation
 import ResolverContainer
-import CustomOperation
 
 
 /// An object that dispatches actions to registered workers.
@@ -81,11 +80,7 @@ open class FluxDispatcher {
     /// - Parameter action: The action to dispatch.
     public func dispatch<Action: FluxAction>(action: Action) {
         operationQueue.addOperation {
-            self.workers.forEach { worker in
-                self.operationQueue.addOperation { completion in
-                    worker.handle(action: action, completion: completion)
-                }
-            }
+            Composer(workers: self.workers).next(action: action)
         }
     }
 
@@ -101,4 +96,20 @@ open class FluxDispatcher {
         dispatch(operation: BlockOperation(block: block))
     }
 
+}
+
+extension FluxDispatcher {
+
+    class Composer: FluxComposer {
+
+        var workers: [FluxWorker]
+
+        init(workers: [FluxWorker]) {
+            self.workers = workers.reversed()
+        }
+
+        func next<Action>(action: Action) where Action : FluxAction {
+            workers.popLast()?.handle(action: action, composer: self)
+        }
+    }
 }

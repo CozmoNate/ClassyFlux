@@ -1,8 +1,8 @@
 //
-//  FluxAction.swift
+//  FluxComposer.swift
 //  ClassyFlux
 //
-//  Created by Natan Zalkin on 31/07/2019.
+//  Created by Natan Zalkin on 19/08/2019.
 //  Copyright © 2019 Natan Zalkin. All rights reserved.
 //
 
@@ -29,16 +29,14 @@
  *
  */
 
-/// A protocol describing abstract action
-public protocol FluxAction {}
 
+import Foundation
 
-extension FluxAction {
+/// The object that composes an actions as a function of previous actions
+public protocol FluxComposer: AnyObject {
 
-    /// Dispatches action with specified dispatcher
-    /// - Parameter dispatcher: The dispatcher that will process the action
-    public func dispatch(with dispatcher: FluxDispatcher = .default) {
-        dispatcher.dispatch(action: self)
-    }
+    /// Passes next action
+    /// - Parameter action: The action to perform next
+    func next<Action: FluxAction>(action: Action)
 
 }

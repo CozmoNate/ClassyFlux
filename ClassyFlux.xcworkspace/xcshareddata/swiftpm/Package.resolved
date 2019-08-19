@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "CustomOperation",
-        "repositoryURL": "https://github.com/kzlekk/CustomOperation.git",
-        "state": {
-          "branch": null,
-          "revision": "36701cac69c118fcc92f1e87956aaa5d217f175e",
-          "version": "1.0.3"
-        }
-      },
-      {
         "package": "Nimble",
         "repositoryURL": "https://github.com/Quick/Nimble.git",
         "state": {

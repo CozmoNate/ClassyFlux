@@ -28,9 +28,7 @@ class FluxDispatcherTests: QuickSpec {
                 var worker: TestWorker!
 
                 beforeEach {
-
                     worker = TestWorker()
-
                     dispatcher.append(workers: [worker])
                 }
 
@@ -93,6 +91,34 @@ class FluxDispatcherTests: QuickSpec {
                     it("perform action on registered worker") {
                         dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
                         expect(flag).to(beTrue())
+                    }
+                }
+
+                context("when registered another worker") {
+
+                    var another: TestWorker!
+
+                    beforeEach {
+                        another = TestWorker()
+                        dispatcher.append(workers: [another])
+                    }
+
+                    it("registers the worker and its token") {
+                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                        expect(dispatcher.tokens.contains(another.token)).to(beTrue())
+                        expect(dispatcher.workers.last).to(beIdenticalTo(another))
+                    }
+
+                    context("when dispatched action") {
+
+                        beforeEach {
+                            ChangeValueAction(value: "test").dispatch(with: dispatcher)
+                        }
+
+                        it("passes the action to last worker") {
+                            dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                            expect(another.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
+                        }
                     }
                 }
             }

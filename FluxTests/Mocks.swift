@@ -16,7 +16,7 @@ struct ChangeValueAction: FluxAction, Equatable {
     let value: String
 }
 
-struct IncrementNumberAction: FluxAction {
+struct IncrementNumberAction: FluxAction, Equatable {
     var increment: Int
 }
 
@@ -25,15 +25,24 @@ struct TestState: Equatable {
     var number: Int
 }
 
+class TestComposer: FluxComposer {
+
+    var lastAction: FluxAction?
+
+    func next<Action>(action: Action) where Action : FluxAction {
+        lastAction = action
+    }
+}
+
 class TestWorker: FluxWorker {
 
     let token = UUID()
 
     var lastAction: FluxAction?
 
-    func handle<Action>(action: Action, completion: @escaping () -> Void) where Action : FluxAction {
+    func handle<Action>(action: Action, composer: FluxComposer?) where Action : FluxAction {
         lastAction = action
-        completion()
+        composer?.next(action: action)
     }
 }
 

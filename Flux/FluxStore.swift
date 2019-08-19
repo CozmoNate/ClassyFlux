@@ -1,6 +1,6 @@
 //
 //  FluxStore.swift
-//  Flux
+//  ClassyFlux
 //
 //  Created by Natan Zalkin on 31/07/2019.
 //  Copyright © 2019 Natan Zalkin. All rights reserved.
@@ -45,7 +45,6 @@ extension Notification.Name {
 open class FluxStore<State> {
 
     public typealias State = State
-    public typealias Middleware = FluxMiddleware<State>
 
     /// A state reducer closure. Returns boolen flag indicating if the state is changed.
     /// - Parameter state: The mutable copy of current state to apply changes.
@@ -79,8 +78,6 @@ open class FluxStore<State> {
         }
     }
 
-    var tokens: Set<UUID>
-    var middlewares: [Middleware]
     let reducers: ResolverContainer
     let syncQueue: DispatchQueue
 
@@ -91,8 +88,6 @@ open class FluxStore<State> {
         token = UUID()
         backingState = initialState
         reducers = ResolverContainer()
-        tokens = Set()
-        middlewares = []
         syncQueue = DispatchQueue(label: "FluxStore.SyncQueue", qos: qos, attributes: .concurrent)
     }
 
@@ -112,29 +107,11 @@ open class FluxStore<State> {
         return reducers.unregister(Reducer.self)
     }
 
-    /// Registers middlewares that handles actions after all reducers finished.
-    /// - Parameter middlewares: The list of middlewares. Dispatched actions will be passed to the middlewares in the same order as they were registered.
-    public func append(middlewares middlewaresToAppend: [Middleware]) {
-        middlewaresToAppend.forEach { middleware in
-            if tokens.insert(middleware.token).inserted {
-                middlewares.append(middleware)
-            }
-        }
-    }
-
-    /// Unregisters middlewares
-    /// - Parameter tokensToRemove: The list of middleware tokens that should be unregistered.
-    public func unregister(tokens uuidsToRemove: [UUID]) {
-        let tokensToRemove = Set<UUID>(uuidsToRemove)
-        tokens = tokens.subtracting(tokensToRemove)
-        middlewares = middlewares.filter { !tokensToRemove.contains($0.token) }
-    }
-
 }
 
 extension FluxStore: FluxWorker {
 
-    public func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
+    public func handle<Action: FluxAction>(action: Action, composer: FluxComposer?) {
 
         typealias Reducer = Reduce<Action>
 
@@ -147,9 +124,7 @@ extension FluxStore: FluxWorker {
             }
         }
 
-        middlewares.forEach { $0.handle(action: action, state: state) }
-
-        completion()
+        composer?.next(action: action)
     }
 
 }

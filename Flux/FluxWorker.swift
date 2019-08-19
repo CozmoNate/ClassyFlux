@@ -1,6 +1,6 @@
 //
 //  FluxWorker.swift
-//  Flux
+//  ClassyFlux
 //
 //  Created by Natan Zalkin on 03/08/2019.
 //  Copyright © 2019 Natan Zalkin. All rights reserved.
@@ -39,7 +39,9 @@ public protocol FluxWorker: AnyObject {
 
     /// Handles the action dispatched. The function can be performed on background thread.
     /// - Parameter action: The action to handle.
-    /// - Parameter completion: The completion that will be called after a worker is finished handling the action.
-    func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void)
+    /// - Parameter continuator: The object that handles next action. Ignore continuator to stop action propagation.
+    func handle<Action: FluxAction>(action: Action, composer: FluxComposer?)
 
 }
+
+
