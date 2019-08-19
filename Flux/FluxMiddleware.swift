@@ -1,8 +1,8 @@
 //
-//  FluxMiddleware.swift
-//  Flux
+//  FluxReducer.swift
+//  ClassyFlux
 //
-//  Created by Natan Zalkin on 03/08/2019.
+//  Created by Natan Zalkin on 19/08/2019.
 //  Copyright © 2019 Natan Zalkin. All rights reserved.
 //
 
@@ -33,13 +33,13 @@ import Foundation
 import ResolverContainer
 
 
-/// An object that can be registered in FluxDispatcher and perform the work in a response to FluxAction send
-open class FluxMiddleware: FluxWorker {
+/// Middleware is an object that handles actions after store finishes running reducers. Middleware receives connected store's state in action handler.
+open class FluxMiddleware<State> {
 
-    /// An action handler closue
-    /// - Parameter action: The action to handle
-    /// - Parameter completion: The closure that should be called upon completion
-    public typealias Handle<Action: FluxAction> = (_ action: Action, _ completion: @escaping () -> Void) -> Void
+    /// A state reducer closure. Returns boolen flag indicating if the state is changed.
+    /// - Parameter action: The action sent.
+    /// - Parameter state: The copy of current state.
+    public typealias Handle<Action: FluxAction> = (Action, State) -> Void
 
     /// A unique identifier of the middleware
     public let token: UUID
@@ -51,15 +51,15 @@ open class FluxMiddleware: FluxWorker {
         handlers = ResolverContainer()
     }
 
-    /// Associates a handler with the actions of specified type
-    /// - Parameter action: The type of the actions to associate with handler
-    /// - Parameter execute: The closure that will be invoked when the action received
-    public func registerHandler<Action: FluxAction>(for action: Action.Type = Action.self, work execute: @escaping Handle<Action>) {
-        handlers.register { execute }
+    /// Associates an action handler with the actions of specified type.
+    /// - Parameter action: The type of the actions to associate with reducer.
+    /// - Parameter reducer: The closure that will be invoked when the action received.
+    public func registerHandler<Action: FluxAction>(for action: Action.Type = Action.self, handler: @escaping Handle<Action>) {
+        handlers.register { handler }
     }
 
-    /// Unregisters handler associated with specified action type. Returns true if handler unregistered successfully. Returns false when no handler was registered for the action type.
-    /// - Parameter action: The action for which the associated handler should be removed
+    /// Unregisters action handler associated with specified action type. Returns true if the handler unregistered successfully. Returns false when no handler was registered for the action type.
+    /// - Parameter action: The action for which the associated handler should be removed.
     public func unregisterHandler<Action: FluxAction>(for action: Action.Type) -> Bool {
 
         typealias Handler = Handle<Action>
@@ -67,16 +67,18 @@ open class FluxMiddleware: FluxWorker {
         return handlers.unregister(Handler.self)
     }
 
-    public func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void) {
+    /// Handles action providing access to current state.
+    /// - Parameter action: The action to handle.
+    /// - Parameter state: Actual state object.
+    public func handle<Action: FluxAction>(action: Action, state: State) {
 
         typealias Handler = Handle<Action>
 
-        guard let handle = try? self.handlers.resolve(Handler.self) else {
-            completion()
+        guard let handle = try? handlers.resolve(Handler.self) else {
             return
         }
 
-        handle(action, completion)
+        handle(action, state)
     }
-
+    
 }

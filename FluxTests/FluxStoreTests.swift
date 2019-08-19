@@ -18,13 +18,15 @@ class FluxStoreTests: QuickSpec {
 
         describe("FluxStore") {
 
-            var store: FluxStore<TestSate>!
+            typealias TestStore = FluxStore<TestState>
+
+            var store: TestStore!
 
             beforeEach {
-                store = FluxStore<TestSate>(initialState: TestSate(value: "initial", number: 0))
+                store = TestStore(initialState: TestState(value: "initial", number: 0))
             }
 
-            context("when registered an action") {
+            context("when registered the action") {
 
                 beforeEach {
                     store.registerReducer { (state, action: ChangeValueAction) in
@@ -39,7 +41,69 @@ class FluxStoreTests: QuickSpec {
                 }
 
                 it("has registered initial ChangeValueAction reducer") {
-                    expect(try? store.reducers.resolve(FluxStore<TestSate>.Reduce<ChangeValueAction>.self)).toNot(beNil())
+                    expect(try? store.reducers.resolve(TestStore.Reduce<ChangeValueAction>.self)).toNot(beNil())
+                }
+
+                context("when registered middleware") {
+
+                    var middleware: TestStore.Middleware!
+
+                    beforeEach {
+
+                        middleware = TestStore.Middleware()
+
+                        store.append(middlewares: [middleware])
+                    }
+
+                    it("registers the middleware and its token") {
+                        expect(store.tokens.contains(middleware.token)).to(beTrue())
+                        expect(store.middlewares.first).to(beIdenticalTo(middleware))
+                    }
+
+                    context("when unregisters middleware by token") {
+
+                        beforeEach {
+                            store.unregister(tokens: [middleware.token])
+                        }
+
+                        it("unregisters the worker and its token") {
+                            expect(store.tokens).to(beEmpty())
+                            expect(store.middlewares).to(beEmpty())
+                        }
+                    }
+
+                    context("when tried to register middleware with the same token") {
+
+                        beforeEach {
+                            store.append(middlewares: [middleware])
+                        }
+
+                        it("does not registers new worker and token") {
+                            expect(store.tokens.count).to(equal(1))
+                            expect(store.middlewares.count).to(equal(1))
+                        }
+                    }
+
+                    context("when handled action") {
+
+                        var lastAction: FluxAction?
+                        var lastState: TestState?
+
+                        beforeEach {
+
+                            middleware.registerHandler(for: ChangeValueAction.self) { (action, state) in
+                                lastAction = action
+                                lastState = state
+                            }
+
+                            store.handle(action: ChangeValueAction(value: "test"), completion: { })
+                        }
+
+                        it("performs action with middleware registered after reducers") {
+                            expect(lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
+                            expect(lastState).to(equal(TestState(value: "test", number: 0)))
+                        }
+                    }
                 }
 
                 context("when unregistered the action") {
@@ -47,12 +111,12 @@ class FluxStoreTests: QuickSpec {
                     var flag: Bool!
 
                     beforeEach {
-                        flag = store.unregisterRedcer(for: ChangeValueAction.self)
+                        flag = store.unregisterReducer(for: ChangeValueAction.self)
                     }
 
                     it("successfully unregistered the reducer") {
                         expect(flag).to(beTrue())
-                        expect(try? store.reducers.resolve(FluxStore<TestSate>.Reduce<ChangeValueAction>.self)).to(beNil())
+                        expect(try? store.reducers.resolve(TestStore.Reduce<ChangeValueAction>.self)).to(beNil())
                     }
 
                     context("when performed unregistered action") {
@@ -100,7 +164,7 @@ class FluxStoreTests: QuickSpec {
                     }
 
                     it("has registered IncrementNumberAction reducer") {
-                        expect(try? store.reducers.resolve(FluxStore<TestSate>.Reduce<IncrementNumberAction>.self)).toNot(beNil())
+                        expect(try? store.reducers.resolve(TestStore.Reduce<IncrementNumberAction>.self)).toNot(beNil())
                     }
 
                     context("when performed another action") {

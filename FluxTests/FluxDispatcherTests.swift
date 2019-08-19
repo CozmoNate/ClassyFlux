@@ -25,26 +25,18 @@ class FluxDispatcherTests: QuickSpec {
 
             context("when registered worker") {
 
-                var worker: FluxMiddleware!
-                var value: String!
+                var worker: TestWorker!
 
                 beforeEach {
 
-                    value = "initial"
+                    worker = TestWorker()
 
-                    worker = FluxMiddleware()
-
-                    worker.registerHandler { (action: ChangeValueAction, done) in
-                        value = action.value
-                        done()
-                    }
-
-                    dispatcher.register(workers: [worker])
+                    dispatcher.append(workers: [worker])
                 }
 
                 it("registers the worker and its token") {
                     dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
-                    expect(dispatcher.tokens.first).to(equal(worker.token))
+                    expect(dispatcher.tokens.contains(worker.token)).to(beTrue())
                     expect(dispatcher.workers.first).to(beIdenticalTo(worker))
                 }
 
@@ -52,12 +44,12 @@ class FluxDispatcherTests: QuickSpec {
 
                     beforeEach {
                         dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
-                        dispatcher.unregister(tokens: [dispatcher.tokens.first!])
+                        dispatcher.unregister(tokens: [worker.token])
                     }
 
                     it("unregisters the worker and its token") {
                         dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
-                        expect(dispatcher.tokens).to(beEmpty())
+                        expect(dispatcher.tokens.contains(worker.token)).to(beFalse())
                         expect(dispatcher.workers).to(beEmpty())
                     }
                 }
@@ -65,7 +57,7 @@ class FluxDispatcherTests: QuickSpec {
                 context("when tried to register worker with the same token") {
 
                     beforeEach {
-                        dispatcher.register(workers: [worker])
+                        dispatcher.append(workers: [worker])
                     }
 
                     it("does not registers new worker and token") {
@@ -81,9 +73,9 @@ class FluxDispatcherTests: QuickSpec {
                         ChangeValueAction(value: "test").dispatch(with: dispatcher)
                     }
 
-                    it("perform action on registered worker") {
+                    it("perform action with worker registered") {
                         dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
-                        expect(value).to(equal("test"))
+                        expect(worker.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
                     }
                 }
 

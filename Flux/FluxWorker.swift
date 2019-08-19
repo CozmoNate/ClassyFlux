@@ -31,16 +31,15 @@
 
 import Foundation
 
-/// An abstract worker that can handle actions
+/// An abstract worker that can handle actions.
 public protocol FluxWorker: AnyObject {
 
-    /// A unique identifier of the worker
+    /// A unique identifier of the worker.
     var token: UUID { get }
 
     /// Handles the action dispatched. The function can be performed on background thread.
-    /// - Parameter action: The action to handle
-    /// - Parameter completion: The completion that will be called after a worker is finished handling the action
+    /// - Parameter action: The action to handle.
+    /// - Parameter completion: The completion that will be called after a worker is finished handling the action.
     func handle<Action: FluxAction>(action: Action, completion: @escaping () -> Void)
 
 }
-

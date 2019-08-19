@@ -12,7 +12,7 @@ import ResolverContainer
 
 @testable import ClassyFlux
 
-struct ChangeValueAction: FluxAction {
+struct ChangeValueAction: FluxAction, Equatable {
     let value: String
 }
 
@@ -20,9 +20,21 @@ struct IncrementNumberAction: FluxAction {
     var increment: Int
 }
 
-struct TestSate {
+struct TestState: Equatable {
     var value: String
     var number: Int
+}
+
+class TestWorker: FluxWorker {
+
+    let token = UUID()
+
+    var lastAction: FluxAction?
+
+    func handle<Action>(action: Action, completion: @escaping () -> Void) where Action : FluxAction {
+        lastAction = action
+        completion()
+    }
 }
 
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
