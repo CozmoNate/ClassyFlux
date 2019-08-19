@@ -39,7 +39,6 @@ public protocol FluxView: View {
     associatedtype Content: View
 
     func calculateProperties() -> Properties
-
     func render(properties: Properties) -> Content
 
 }

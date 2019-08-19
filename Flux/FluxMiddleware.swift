@@ -1,5 +1,5 @@
 //
-//  FluxReducer.swift
+//  FluxMiddleware.swift
 //  ClassyFlux
 //
 //  Created by Natan Zalkin on 19/08/2019.

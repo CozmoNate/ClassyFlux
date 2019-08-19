@@ -44,7 +44,7 @@ open class FluxDispatcher {
     let operationQueue: OperationQueue
 
     /// Initialises the dispatcher with specified quality of service of undelayng dispatch queue.
-    /// - Parameter qos: The QOS of theunderlaying dispatch queue.
+    /// - Parameter qos: The QOS of theunderlying dispatch queue.
     public init(qos: QualityOfService = .userInitiated) {
 
         tokens = Set()

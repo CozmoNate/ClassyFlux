@@ -59,20 +59,39 @@ open class FluxStore<State> {
     public let token: UUID
 
     /// A state of the store.
-    public private(set) var state: State
+    public var state: State {
+        get { syncQueue.sync { backingState } }
+        set { syncQueue.sync(flags: .barrier) { backingState = newValue } }
+    }
+
+    var backingState: State {
+        willSet {
+            if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+                self.objectWillChange.send()
+            }
+        }
+        didSet {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .FluxStoreStateChanged, object: self)
+            }
+        }
+    }
 
     var tokens: Set<UUID>
     var middlewares: [Middleware]
     let reducers: ResolverContainer
+    let syncQueue: DispatchQueue
 
     /// Initialises the store
     /// - Parameter initialState: The initial state of the store
-    public init(initialState: State) {
+    /// - Parameter qos: The QOS of the underlying  sync state queue.
+    public init(initialState: State, qos: DispatchQoS = .userInitiated) {
         token = UUID()
-        state = initialState
+        backingState = initialState
         reducers = ResolverContainer()
         tokens = Set()
         middlewares = []
+        syncQueue = DispatchQueue(label: "FluxStore.SyncQueue", qos: qos, attributes: .concurrent)
     }
 
     /// Associates a reducer with the actions of specified type.
@@ -125,16 +144,7 @@ extension FluxStore: FluxWorker {
         var draft = state
 
         if reduce(&draft, action) {
-
-            if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
-                self.objectWillChange.send()
-            }
-
             state = draft
-
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .FluxStoreStateChanged, object: self)
-            }
         }
 
         middlewares.forEach { $0.handle(action: action, state: state) }
