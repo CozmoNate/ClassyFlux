@@ -39,8 +39,8 @@ public protocol FluxWorker: AnyObject {
 
     /// Handles the action dispatched. The function can be performed on background thread.
     /// - Parameter action: The action to handle.
-    /// - Parameter continuator: The object that handles next action. Ignore continuator to stop action propagation.
-    func handle<Action: FluxAction>(action: Action, composer: FluxComposer?)
+    /// - Parameter composer: The object that composes action stream by passing result action to next worker
+    func handle<Action: FluxAction>(action: Action, composer: () -> FluxComposer)
 
 }
 

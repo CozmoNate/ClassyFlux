@@ -34,7 +34,7 @@ class FluxMiddlewareTests: QuickSpec {
                 beforeEach {
                     middleware.registerHandler { (action: ChangeValueAction, composer) in
                         value = action.value
-                        composer?.next(action: action)
+                        composer()?.next(action: action)
                     }
                 }
 
@@ -61,7 +61,7 @@ class FluxMiddlewareTests: QuickSpec {
 
                         beforeEach {
                             composer = TestComposer()
-                            middleware.handle(action: ChangeValueAction(value: "change it!"), composer: composer)
+                            middleware.handle(action: ChangeValueAction(value: "change it!"), composer: { composer })
                         }
 
                         it("does not change the value") {
@@ -81,7 +81,7 @@ class FluxMiddlewareTests: QuickSpec {
 
                     beforeEach {
                         composer = TestComposer()
-                        middleware.handle(action: ChangeValueAction(value: "change it!"), composer: composer)
+                        middleware.handle(action: ChangeValueAction(value: "change it!"), composer: { composer })
                     }
 
                     it("correctly reduces store's state") {

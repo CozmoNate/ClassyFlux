@@ -109,7 +109,7 @@ extension FluxDispatcher {
         }
 
         func next<Action>(action: Action) where Action : FluxAction {
-            workers.popLast()?.handle(action: action, composer: self)
+            workers.popLast()?.handle(action: action, composer: { self })
         }
     }
 }

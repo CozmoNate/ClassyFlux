@@ -111,7 +111,7 @@ open class FluxStore<State> {
 
 extension FluxStore: FluxWorker {
 
-    public func handle<Action: FluxAction>(action: Action, composer: FluxComposer?) {
+    public func handle<Action: FluxAction>(action: Action, composer: () -> FluxComposer) {
 
         typealias Reducer = Reduce<Action>
 
@@ -124,7 +124,7 @@ extension FluxStore: FluxWorker {
             }
         }
 
-        composer?.next(action: action)
+        composer().next(action: action)
     }
 
 }

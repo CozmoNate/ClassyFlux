@@ -32,7 +32,7 @@
 
 import Foundation
 
-/// The object that composes an actions as a function of previous actions
+/// An object that composes action stream by passing result action to next worker
 public protocol FluxComposer: AnyObject {
 
     /// Passes next action

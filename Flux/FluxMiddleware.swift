@@ -38,7 +38,7 @@ open class FluxMiddleware {
     /// An action handler closue
     /// - Parameter action: The action to handle
     /// - Parameter completion: The closure that should be called upon completion
-    public typealias Handle<Action: FluxAction> = (_ action: Action, _ composer: FluxComposer?) -> Void
+    public typealias Handle<Action: FluxAction> = (_ action: Action, _ composer: () -> FluxComposer?) -> Void
 
     /// A unique identifier of the middleware
     public let token: UUID
@@ -70,12 +70,12 @@ open class FluxMiddleware {
 
 extension FluxMiddleware: FluxWorker {
 
-    public func handle<Action: FluxAction>(action: Action, composer: FluxComposer?) {
+    public func handle<Action: FluxAction>(action: Action, composer: () -> FluxComposer) {
 
         typealias Handler = Handle<Action>
 
         guard let handle = try? self.handlers.resolve(Handler.self) else {
-            composer?.next(action: action)
+            composer().next(action: action)
             return
         }
 
