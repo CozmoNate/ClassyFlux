@@ -34,7 +34,7 @@ class FluxMiddlewareTests: QuickSpec {
                 beforeEach {
                     middleware.registerHandler { (action: ChangeValueAction, composer) in
                         value = action.value
-                        composer()?.next(action: action)
+                        composer().next(action: action)
                     }
                 }
 

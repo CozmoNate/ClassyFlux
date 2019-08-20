@@ -38,7 +38,7 @@ open class FluxMiddleware {
     /// An action handler closue
     /// - Parameter action: The action to handle
     /// - Parameter completion: The closure that should be called upon completion
-    public typealias Handle<Action: FluxAction> = (_ action: Action, _ composer: () -> FluxComposer?) -> Void
+    public typealias Handle<Action: FluxAction> = (_ action: Action, _ composer: () -> FluxComposer) -> Void
 
     /// A unique identifier of the middleware
     public let token: UUID
