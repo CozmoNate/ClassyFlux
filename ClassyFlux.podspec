@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'ClassyFlux'
-  s.version          = '1.7.5'
+  s.version          = '1.7.6'
   s.summary          = 'Flux implementation on Swift'
   s.homepage         = 'https://github.com/kzlekk/ClassyFlux'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -23,6 +23,7 @@ Pod::Spec.new do |s|
       'Flux/FluxDispatcher.swift',
       'Flux/FluxMiddleware.swift',
       'Flux/FluxRepository.swift',
+      'Flux/FluxStore.swift',
       'Flux/FluxState.swift',
       'Flux/FluxWorker.swift']
   end
