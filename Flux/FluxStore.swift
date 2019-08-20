@@ -30,13 +30,15 @@
  */
 
 import Foundation
-import Combine
 import ResolverContainer
 
+#if canImport(Combine)
+import Combine
+#endif
 
 extension Notification.Name {
 
-    /// The notification will be send every time store's state is changed. The notificatin sender will be the store object.
+    /// The notification will be send every time store's state is changed. The notification sender will be the store object.
     static let FluxStoreStateChanged = Notification.Name(rawValue: "FluxStoreStateChanged")
 
 }
@@ -51,25 +53,29 @@ open class FluxStore<State> {
     /// - Parameter action: The action invoked the reducer.
     public typealias Reduce<Action: FluxAction> = (inout State, Action) -> Bool
 
+    #if canImport(Combine)
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     public lazy var objectWillChange = ObservableObjectPublisher()
+    #endif
 
     /// A unique identifier of the store.
     public let token: UUID
 
     /// A state of the store.
     public var state: State {
-        get { syncQueue.sync { backingState } }
+        get { return syncQueue.sync { return backingState } }
         set { syncQueue.sync(flags: .barrier) { backingState = newValue } }
     }
 
     var backingState: State {
         willSet {
+            #if canImport(Combine)
             if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
                 DispatchQueue.main.async {
                     self.objectWillChange.send()
                 }
             }
+            #endif
         }
         didSet {
             DispatchQueue.main.async {
@@ -129,5 +135,7 @@ extension FluxStore: FluxWorker {
 
 }
 
+#if canImport(Combine)
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension FluxStore: ObservableObject {}
+#endif
