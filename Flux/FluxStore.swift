@@ -38,8 +38,8 @@ import Combine
 
 extension Notification.Name {
 
-    /// The notification will be send every time store's state is changed. The notification sender will be the store object.
-    static let FluxStoreStateChanged = Notification.Name(rawValue: "FluxStoreStateChanged")
+    /// The notification will be send every time when store's state is changed. The notification sender will be the store object.
+    public static let FluxStoreChanged = Notification.Name(rawValue: "FluxStoreChanged")
 
 }
 
@@ -79,7 +79,7 @@ open class FluxStore<State> {
         }
         didSet {
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .FluxStoreStateChanged, object: self)
+                NotificationCenter.default.post(name: .FluxStoreChanged, object: self)
             }
         }
     }
