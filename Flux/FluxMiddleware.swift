@@ -35,10 +35,9 @@ import ResolverContainer
 /// An object that can be registered in FluxDispatcher and perform the work in a response to FluxAction send
 open class FluxMiddleware {
 
-    /// An action handler closue
+    /// An action handler closue. When the action returned it will be passed to next worker. Return nil to intercept the action.
     /// - Parameter action: The action to handle
-    /// - Parameter completion: The closure that should be called upon completion
-    public typealias Handle<Action: FluxAction> = (_ action: Action, _ composer: () -> FluxComposer) -> Void
+    public typealias Handle<Action: FluxAction> = (_ action: Action) -> Action?
 
     /// A unique identifier of the middleware
     public let token: UUID
@@ -79,7 +78,11 @@ extension FluxMiddleware: FluxWorker {
             return
         }
 
-        handle(action, composer)
+        guard let action = handle(action) else {
+            return
+        }
+
+        composer().next(action: action)
     }
 
 }
