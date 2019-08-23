@@ -35,8 +35,9 @@ import ResolverContainer
 /// An object that can be registered in FluxDispatcher and perform the work in a response to FluxAction send
 open class FluxMiddleware {
 
-    /// An action handler closue. When the action returned it will be passed to next worker. Return nil to intercept the action.
+    /// An action handler closue. When the action returned it will be passed to next worker.
     /// - Parameter action: The action to handle
+    /// - Returns: Return next action or nil to prevent the action to proppagate to other workers
     public typealias Handle<Action: FluxAction> = (_ action: Action) -> Action?
 
     /// A unique identifier of the middleware
@@ -56,8 +57,9 @@ open class FluxMiddleware {
         handlers.register { execute }
     }
 
-    /// Unregisters handler associated with specified action type. Returns true if handler unregistered successfully. Returns false when no handler was registered for the action type.
+    /// Unregisters handler associated with specified action type.
     /// - Parameter action: The action for which the associated handler should be removed
+    /// - Returns:True if the handler is unregistered successfully. False when no handler was registered for the action type.
     public func unregisterHandler<Action: FluxAction>(for action: Action.Type) -> Bool {
 
         typealias Handler = Handle<Action>

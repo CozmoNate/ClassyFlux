@@ -104,8 +104,9 @@ open class FluxStore<State> {
         reducers.register { reducer }
     }
 
-    /// Unregisters reducer associated with specified action type. Returns true if reducer unregistered successfully. Returns false when no reducer was registered for the action type.
+    /// Unregisters reducer associated with specified action type.
     /// - Parameter action: The action for which the associated reducer should be removed.
+    /// - Returns: True if the reducer is unregistered successfully. False when no reducer was registered for the action type.
     public func unregisterReducer<Action: FluxAction>(for action: Action.Type) -> Bool {
 
         typealias Reducer = Reduce<Action>
