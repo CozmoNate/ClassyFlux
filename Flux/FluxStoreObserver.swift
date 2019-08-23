@@ -37,11 +37,11 @@ import Foundation
 @available(iOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
 @available(tvOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
 @available(watchOS, deprecated:6.0, message:"Use Combine to subscribe to FluxStore directly")
-public class FluxStoreObserver {
+open class FluxStoreObserver {
 
     let observer: NSObjectProtocol
 
-    init<State>(store: FluxStore<State>, changeHandler: @escaping (State) -> Void) {
+    public init<State>(store: FluxStore<State>, changeHandler: @escaping (State) -> Void) {
         observer = NotificationCenter.default
             .addObserver(forName: .FluxStoreChanged, object: store, queue: .main) { notification in
                 guard let store = notification.object as? FluxStore<State> else { return }
