@@ -45,7 +45,7 @@ open class FluxStoreBroker<State> {
     public let token: UUID
 
     /// Current state of the store represented by the broker
-    var state: State {
+    public var state: State {
         return store.state
     }
 
