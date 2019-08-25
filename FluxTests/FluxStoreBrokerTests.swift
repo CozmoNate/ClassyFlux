@@ -51,9 +51,9 @@ class FluxStoreBrokerTests: QuickSpec {
             context("when registered action handler") {
 
                 beforeEach {
-                    broker.registerHandler { (state, action: ChangeValueAction) in
+                    broker.registerHandler { (state, action: ChangeValueAction, composer) in
                         value = action.value
-                        return action
+                        composer.next(action: action)
                     }
                 }
 
@@ -80,7 +80,7 @@ class FluxStoreBrokerTests: QuickSpec {
 
                         beforeEach {
                             composer = TestComposer()
-                            broker.handle(action: ChangeValueAction(value: "change it!"), composer: { composer })
+                            broker.handle(action: ChangeValueAction(value: "change it!"), composer: composer)
                         }
 
                         it("does not change the value") {
@@ -100,7 +100,7 @@ class FluxStoreBrokerTests: QuickSpec {
 
                     beforeEach {
                         composer = TestComposer()
-                        broker.handle(action: ChangeValueAction(value: "change it!"), composer: { composer })
+                        broker.handle(action: ChangeValueAction(value: "change it!"), composer: composer)
                     }
 
                     it("correctly reduces store's state") {

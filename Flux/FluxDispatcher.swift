@@ -80,7 +80,9 @@ open class FluxDispatcher {
     /// - Parameter action: The action to dispatch.
     public func dispatch<Action: FluxAction>(action: Action) {
         operationQueue.addOperation {
-            Composer(workers: self.workers).next(action: action)
+            let composer = StepperComposer(workers: self.workers)
+            composer.next(action: action)
+            composer.discard()
         }
     }
 
@@ -100,16 +102,46 @@ open class FluxDispatcher {
 
 extension FluxDispatcher {
 
-    class Composer: FluxComposer {
+    class StepperComposer: FluxComposer {
 
-        var workers: [FluxWorker]
+        var workers: [FluxWorker]?
 
         init(workers: [FluxWorker]) {
             self.workers = workers.reversed()
         }
 
-        func next<Action>(action: Action) where Action : FluxAction {
-            workers.popLast()?.handle(action: action, composer: { self })
+        func discard() {
+            workers = nil
+        }
+
+        func next<Action: FluxAction>(action: Action) {
+            guard workers != nil else {
+                fatalError("Composer misuse detected. Next action should be called on originator queue only!")
+            }
+            let locker = OnceComposer(composer: self)
+            workers?.popLast()?.handle(action: action, composer: locker)
+            locker.discard()
+        }
+    }
+
+    class OnceComposer: FluxComposer {
+
+        var composer: FluxComposer?
+
+        init(composer: FluxComposer) {
+            self.composer = composer
+        }
+
+        func discard() {
+            composer = nil
+        }
+
+        func next<Action: FluxAction>(action: Action) {
+            guard let composer = composer else {
+                fatalError("Composer misuse detected. Next action should be called only once!")
+            }
+            composer.next(action: action)
+            discard()
         }
     }
 }

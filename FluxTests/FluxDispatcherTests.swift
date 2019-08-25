@@ -68,7 +68,7 @@ class FluxDispatcherTests: QuickSpec {
                 context("when dispatched action") {
 
                     beforeEach {
-                        ChangeValueAction(value: "test").dispatch(with: dispatcher)
+                        dispatcher.dispatch(action: ChangeValueAction(value: "test"))
                     }
 
                     it("perform action with worker registered") {
@@ -112,7 +112,7 @@ class FluxDispatcherTests: QuickSpec {
                     context("when dispatched action") {
 
                         beforeEach {
-                            ChangeValueAction(value: "test").dispatch(with: dispatcher)
+                            dispatcher.dispatch(action: ChangeValueAction(value: "test"))
                         }
 
                         it("passes the action to last worker") {

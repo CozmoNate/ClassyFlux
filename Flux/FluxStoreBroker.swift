@@ -40,7 +40,7 @@ open class FluxStoreBroker<State>: FluxWorker {
     /// - Parameter state: The current state of the linked store
     /// - Parameter action: The action to handle
     /// - Returns: Return next action or nil to prevent the action to proppagate to other workers
-    public typealias Handle<Action: FluxAction> = (_ state: State, _ action: Action) -> Action?
+    public typealias Handle<Action: FluxAction> = (_ state: State, _ action: Action, _ composer: FluxComposer) -> Void
 
     /// A unique identifier of the worker.
     public let token: UUID
@@ -74,20 +74,16 @@ open class FluxStoreBroker<State>: FluxWorker {
         return handlers.unregister(Handler.self)
     }
 
-    public func handle<Action: FluxAction>(action: Action, composer: () -> FluxComposer) {
+    public func handle<Action: FluxAction>(action: Action, composer: FluxComposer) {
 
         typealias Handler = Handle<Action>
 
         guard let handle = try? self.handlers.resolve(Handler.self) else {
-            composer().next(action: action)
+            composer.next(action: action)
             return
         }
 
-        guard let action = handle(store.state, action) else {
-            return
-        }
-
-        composer().next(action: action)
+        handle(store.state, action, composer)
     }
 
 }

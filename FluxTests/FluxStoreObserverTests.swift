@@ -61,7 +61,7 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
             context("when state changed") {
 
                 beforeEach {
-                    store.handle(action: ChangeValueAction(value: "test"), composer: { self })
+                    store.handle(action: ChangeValueAction(value: "test"), composer: self)
                 }
 
                 it("receives changed state") {
@@ -72,7 +72,7 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
                 context("when deallocated") {
                     beforeEach {
                         self.observer = nil
-                        store.handle(action: ChangeValueAction(value: "test 2"), composer: { self })
+                        store.handle(action: ChangeValueAction(value: "test 2"), composer: self)
                     }
 
                     context("when state changed") {

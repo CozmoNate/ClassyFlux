@@ -31,7 +31,7 @@
 
 import Foundation
 
-/// An abstract worker that handles action and pass it to the next worker via FluxComposer
+/// An abstract worker that handles action and passes it to the next workers
 public protocol FluxWorker: AnyObject {
 
     /// A unique identifier of the worker.
@@ -39,7 +39,7 @@ public protocol FluxWorker: AnyObject {
 
     /// Handles the action dispatched. The function can be performed on background thread.
     /// - Parameter action: The action to handle.
-    /// - Parameter composer: The object that composes action stream by passing result action to next worker
-    func handle<Action: FluxAction>(action: Action, composer: () -> FluxComposer)
+    /// - Parameter composer: The object that composes action stream by passing result action to next workers. Do not call to composer to intercept the action.
+    func handle<Action: FluxAction>(action: Action, composer: FluxComposer)
 
 }
