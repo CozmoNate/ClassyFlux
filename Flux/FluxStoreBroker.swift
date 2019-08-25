@@ -44,10 +44,15 @@ open class FluxStoreBroker<State> {
 
     public let token: UUID
 
-    weak var store: FluxStore<State>?
+    /// Current state of the store represented by the broker
+    var state: State {
+        return store.state
+    }
 
+    let store: FluxStore<State>
     let handlers: ResolverContainer
 
+    /// Initialise a broker representing the store provided
     public init(store linked: FluxStore<State>) {
         token = UUID()
         store = linked
@@ -79,7 +84,7 @@ extension FluxStoreBroker: FluxWorker {
 
         typealias Handler = Handle<Action>
 
-        guard let handle = try? self.handlers.resolve(Handler.self), let state = store?.state else {
+        guard let handle = try? self.handlers.resolve(Handler.self) else {
             composer().next(action: action)
             return
         }
