@@ -33,8 +33,8 @@
 import Foundation
 import ResolverContainer
 
-/// A store broker is the middleware that has convenient access to linked store state.
-open class FluxStoreBroker<State> {
+/// A store broker is a middleware that has convenient access to store it represents.
+open class FluxStoreBroker<State>: FluxWorker {
 
     /// An action handler closue. When the action returned it will be passed to next worker.
     /// - Parameter state: The current state of the linked store
@@ -42,26 +42,24 @@ open class FluxStoreBroker<State> {
     /// - Returns: Return next action or nil to prevent the action to proppagate to other workers
     public typealias Handle<Action: FluxAction> = (_ state: State, _ action: Action) -> Action?
 
+    /// A unique identifier of the worker.
     public let token: UUID
 
-    /// Current state of the store represented by the broker
-    public var state: State {
-        return store.state
-    }
+    /// The store represented by the broker.
+    public let store: FluxStore<State>
 
-    let store: FluxStore<State>
     let handlers: ResolverContainer
 
-    /// Initialise a broker representing the store provided
+    /// Initialise a broker representing the store provided.
     public init(store linked: FluxStore<State>) {
         token = UUID()
         store = linked
         handlers = ResolverContainer()
     }
 
-    /// Associates a handler with the actions of specified type
-    /// - Parameter action: The type of the actions to associate with handler
-    /// - Parameter execute: The closure that will be invoked when the action received
+    /// Associates a handler with the actions of specified type.
+    /// - Parameter action: The type of the actions to associate with handler.
+    /// - Parameter execute: The closure that will be invoked when the action received.
     public func registerHandler<Action: FluxAction>(for action: Action.Type = Action.self, work execute: @escaping Handle<Action>) {
         handlers.register { execute }
     }
@@ -75,10 +73,6 @@ open class FluxStoreBroker<State> {
 
         return handlers.unregister(Handler.self)
     }
-    
-}
-
-extension FluxStoreBroker: FluxWorker {
 
     public func handle<Action: FluxAction>(action: Action, composer: () -> FluxComposer) {
 
@@ -89,7 +83,7 @@ extension FluxStoreBroker: FluxWorker {
             return
         }
 
-        guard let action = handle(state, action) else {
+        guard let action = handle(store.state, action) else {
             return
         }
 

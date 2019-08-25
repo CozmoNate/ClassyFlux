@@ -31,7 +31,7 @@
 
 import Foundation
 
-/// An abstract worker that can handle actions.
+/// An abstract worker that handles action and pass it to the next worker via FluxComposer
 public protocol FluxWorker: AnyObject {
 
     /// A unique identifier of the worker.
@@ -43,5 +43,3 @@ public protocol FluxWorker: AnyObject {
     func handle<Action: FluxAction>(action: Action, composer: () -> FluxComposer)
 
 }
-
-

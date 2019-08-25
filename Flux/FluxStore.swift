@@ -44,7 +44,7 @@ extension Notification.Name {
 }
 
 /// An observable container that stores state of specified type and send notifications when the state gets updated.
-open class FluxStore<State> {
+open class FluxStore<State>: FluxWorker {
 
     public typealias State = State
 
@@ -113,9 +113,6 @@ open class FluxStore<State> {
 
         return reducers.unregister(Reducer.self)
     }
-}
-
-extension FluxStore: FluxWorker {
 
     public func handle<Action: FluxAction>(action: Action, composer: () -> FluxComposer) {
 

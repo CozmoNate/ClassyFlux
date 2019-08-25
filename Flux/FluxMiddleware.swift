@@ -33,7 +33,7 @@ import Foundation
 import ResolverContainer
 
 /// An object that can be registered in FluxDispatcher and perform the work in a response to FluxAction send
-open class FluxMiddleware {
+open class FluxMiddleware: FluxWorker {
 
     /// An action handler closue. When the action returned it will be passed to next worker.
     /// - Parameter action: The action to handle
@@ -66,10 +66,6 @@ open class FluxMiddleware {
 
         return handlers.unregister(Handler.self)
     }
-
-}
-
-extension FluxMiddleware: FluxWorker {
 
     public func handle<Action: FluxAction>(action: Action, composer: () -> FluxComposer) {
 
