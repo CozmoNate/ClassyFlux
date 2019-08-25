@@ -29,9 +29,6 @@
  *
  */
 
-
-import Foundation
-
 /// An object that composes action stream by passing result action to next worker
 public protocol FluxComposer: AnyObject {
 

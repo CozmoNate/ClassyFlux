@@ -46,6 +46,23 @@ class TestWorker: FluxWorker {
     }
 }
 
+class TestStore: FluxStore<TestState> {
+
+    init() {
+        super.init(initialState: TestState(value: "initial", number: 0))
+
+        registerReducer { (state, action: ChangeValueAction) in
+            state.value = action.value
+            return true
+        }
+
+        registerReducer { (state, action: IncrementNumberAction) in
+            state.number += action.increment
+            return true
+        }
+    }
+}
+
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 struct TestView: FluxView {
 

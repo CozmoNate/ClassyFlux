@@ -113,7 +113,6 @@ open class FluxStore<State> {
 
         return reducers.unregister(Reducer.self)
     }
-
 }
 
 extension FluxStore: FluxWorker {

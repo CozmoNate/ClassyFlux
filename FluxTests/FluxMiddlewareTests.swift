@@ -21,11 +21,8 @@ class FluxMiddlewareTests: QuickSpec {
             var value: String!
 
             beforeEach {
-
                 value = "initial"
-
                 middleware = FluxMiddleware()
-
             }
 
             context("when registered action handler") {
