@@ -39,7 +39,7 @@ public protocol FluxWorker: AnyObject {
 
     /// Handles the action dispatched. The function can be performed on background thread.
     /// - Parameter action: The action to handle.
-    /// - Parameter composer: The object that composes action stream by passing result action to next workers. Do not call to composer to intercept the action.
+    /// - Parameter composer: An object that passes the action to the next worker. You can ignore composer to stop action propagation to other workers.
     func handle<Action: FluxAction>(action: Action, composer: FluxComposer)
 
 }

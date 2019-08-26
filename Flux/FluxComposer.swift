@@ -29,11 +29,12 @@
  *
  */
 
-/// An object that composes action stream by passing result action to next workers
+/// An object that passes the action to the next workers. It allows to compose
+/// a function where resulting action depends on previous actions.
 public protocol FluxComposer: AnyObject {
 
     /// Passes next action to workers.
-    /// - Parameter action: The action to perform next
+    /// - Parameter action: The action to perform next.
     func next<Action: FluxAction>(action: Action)
 
 }

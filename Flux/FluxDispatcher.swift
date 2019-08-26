@@ -32,8 +32,7 @@
 import Foundation
 import ResolverContainer
 
-
-/// An object that dispatches actions to registered workers.
+/// An object that dispatches actions serially to registered workers.
 open class FluxDispatcher {
 
     public static let `default` = FluxDispatcher()
@@ -114,17 +113,12 @@ extension FluxDispatcher {
             workers = nil
         }
 
-        func next<Action: FluxAction>(action: Action) {
-            guard workers != nil else {
-                fatalError("Composer misuse detected. Next action should be called on originator queue only!")
-            }
-            let locker = OnceComposer(composer: self)
-            workers?.popLast()?.handle(action: action, composer: locker)
-            locker.discard()
+        func next<Action: FluxAction>(action: Action)  {
+            workers?.popLast()?.handle(action: action, composer: ProxyComposer(composer: self))
         }
     }
 
-    class OnceComposer: FluxComposer {
+    class ProxyComposer: FluxComposer {
 
         var composer: FluxComposer?
 
@@ -137,9 +131,7 @@ extension FluxDispatcher {
         }
 
         func next<Action: FluxAction>(action: Action) {
-            guard let composer = composer else {
-                fatalError("Composer misuse detected. Next action should be called only once!")
-            }
+            guard let composer = composer else { return }
             composer.next(action: action)
             discard()
         }
