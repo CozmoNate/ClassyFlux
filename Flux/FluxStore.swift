@@ -39,10 +39,6 @@ import Combine
 extension Notification.Name {
 
     /// The notification will be send every time when store's state is changed. The notification sender will be the store object.
-    @available(OSX, deprecated:10.15, message:"Use Combine to subscribe to FluxStore directly")
-    @available(iOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
-    @available(tvOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
-    @available(watchOS, deprecated:6.0, message:"Use Combine to subscribe to FluxStore directly")
     public static let FluxStoreChanged = Notification.Name(rawValue: "FluxStoreChanged")
 
 }
@@ -109,10 +105,6 @@ open class FluxStore<State>: FluxWorker {
 
     /// Adds an observer that will be invoked each time the store chages its state
     /// - Parameter changeHandler: The closure will be invoked each time the state chages with the actual state object
-    @available(OSX, deprecated:10.15, message:"Use Combine to subscribe to FluxStore directly")
-    @available(iOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
-    @available(tvOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
-    @available(watchOS, deprecated:6.0, message:"Use Combine to subscribe to FluxStore directly")
     public func addObserver(changeHandler: @escaping (State) -> Void) -> Observer {
         return Observer(for: self, changeHandler: changeHandler)
     }
@@ -139,7 +131,7 @@ open class FluxStore<State>: FluxWorker {
     public func append(endwares new: [Endware]) {
         new.forEach { endware in
             if tokens.insert(endware.token).inserted {
-                endware.bless(by: self)
+                endware.store = self
                 endwares.append(endware)
             }
         }

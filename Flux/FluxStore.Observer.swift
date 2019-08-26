@@ -35,10 +35,6 @@ import Foundation
 extension FluxStore {
     
     /// An object that helps to subscribe to store changes. Unregisters observer closure automatically when released from memory.
-    @available(OSX, deprecated:10.15, message:"Use Combine to subscribe to FluxStore directly")
-    @available(iOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
-    @available(tvOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
-    @available(watchOS, deprecated:6.0, message:"Use Combine to subscribe to FluxStore directly")
     open class Observer {
 
         internal let observer: NSObjectProtocol

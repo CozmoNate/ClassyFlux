@@ -50,8 +50,8 @@ extension FluxStore {
         /// A unique identifier of the endware.
         public let token: UUID
 
-        /// The store represented by the broker.
-        public private(set) weak var store: FluxStore<State>?
+        /// The store linked to endware.
+        public internal(set) weak var store: FluxStore<State>?
 
         internal let handlers: ResolverContainer
 
@@ -59,10 +59,6 @@ extension FluxStore {
         public init() {
             token = UUID()
             handlers = ResolverContainer()
-        }
-
-        internal func bless(by store: FluxStore<State>) {
-            self.store = store
         }
 
         /// Associates a handler with the actions of specified type.
