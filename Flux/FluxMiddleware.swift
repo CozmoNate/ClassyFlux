@@ -32,7 +32,7 @@
 import Foundation
 import ResolverContainer
 
-/// An object that can be registered in FluxDispatcher and perform the work in a response to FluxAction send
+/// An object that triggers handlers as a response to specific action dispatched
 open class FluxMiddleware: FluxWorker {
 
     /// An action handler closue. When the action returned it will be passed to next worker.
@@ -41,7 +41,7 @@ open class FluxMiddleware: FluxWorker {
     /// - Returns: Return next action or nil to prevent the action to proppagate to other workers
     public typealias Handle<Action: FluxAction> = (_ action: Action, _ composer: FluxComposer) -> Void
 
-    /// A unique identifier of the middleware
+    /// A unique identifier of the middleware.
     public let token: UUID
 
     let handlers: ResolverContainer

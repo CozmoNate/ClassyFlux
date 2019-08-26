@@ -36,11 +36,11 @@ import Nimble
 
 class FluxStoreObserverTests: QuickSpec, FluxComposer {
 
-    var observer: FluxStoreObserver?
+    var observer: TestStore.Observer?
 
     override func spec() {
 
-        describe("FluxStoreObserver") {
+        describe("FluxStore.Observer") {
 
             var store: FluxStore<TestState>!
             var lastState: TestState?
@@ -53,7 +53,7 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
                     return true
                 }
 
-                self.observer = FluxStoreObserver(store: store) { (state) in
+                self.observer = store.addObserver { (state) in
                     lastState = state
                 }
             }

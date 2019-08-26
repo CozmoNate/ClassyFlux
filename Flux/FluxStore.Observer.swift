@@ -1,5 +1,5 @@
 //
-//  FluxStoreObserver.swift
+//  FluxObserver.swift
 //  ClassyFlux
 //
 //  Created by Natan Zalkin on 23/08/2019.
@@ -32,24 +32,28 @@
 
 import Foundation
 
-/// An object that helps to subscribe to store changes. Unregisters observer closure when released from memory.
-@available(OSX, deprecated:10.15, message:"Use Combine to subscribe to FluxStore directly")
-@available(iOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
-@available(tvOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
-@available(watchOS, deprecated:6.0, message:"Use Combine to subscribe to FluxStore directly")
-open class FluxStoreObserver {
+extension FluxStore {
+    
+    /// An object that helps to subscribe to store changes. Unregisters observer closure automatically when released from memory.
+    @available(OSX, deprecated:10.15, message:"Use Combine to subscribe to FluxStore directly")
+    @available(iOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
+    @available(tvOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
+    @available(watchOS, deprecated:6.0, message:"Use Combine to subscribe to FluxStore directly")
+    open class Observer {
 
-    let observer: NSObjectProtocol
+        internal let observer: NSObjectProtocol
 
-    public init<State>(store: FluxStore<State>, changeHandler: @escaping (State) -> Void) {
-        observer = NotificationCenter.default
-            .addObserver(forName: .FluxStoreChanged, object: store, queue: .main) { notification in
-                guard let store = notification.object as? FluxStore<State> else { return }
-                changeHandler(store.state)
-            }
+        internal init<State>(for store: FluxStore<State>, changeHandler: @escaping (State) -> Void) {
+            observer = NotificationCenter.default
+                .addObserver(forName: .FluxStoreChanged, object: store, queue: .main) { notification in
+                    guard let store = notification.object as? FluxStore<State> else { return }
+                    changeHandler(store.state)
+                }
+        }
+
+        deinit {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
 
-    deinit {
-        NotificationCenter.default.removeObserver(observer)
-    }
 }

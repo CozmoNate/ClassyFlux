@@ -53,7 +53,7 @@ open class FluxDispatcher {
         operationQueue.maxConcurrentOperationCount = 1
     }
 
-    /// Registers workers in dispatcher. If another worker with the same token is already registered, the worker will be ignored.
+    /// Registers workers in the dispatcher. Only one worker with the same token can be registered in the dispatcher.
     /// - Parameter workers: The list of workers to register in the dispatcher. Dispatched actions will be passed to the workers in the same order as they were registered.
     public func append(workers: [FluxWorker]) {
         operationQueue.addOperation {
@@ -65,7 +65,7 @@ open class FluxDispatcher {
         }
     }
 
-    /// Unregisters workers from dispatching actions.
+    /// Unregisters workers from the dispatcher.
     /// - Parameter tokensToRemove: The list of tokens of workers that should be unregistered.
     public func unregister(tokens: [UUID]) {
         operationQueue.addOperation {

@@ -31,13 +31,13 @@
 
 import Foundation
 
-/// An abstract worker that handles action and passes it to the next workers
+/// An object that handles action and passes next action to other workers via action composer
 public protocol FluxWorker: AnyObject {
 
     /// A unique identifier of the worker.
     var token: UUID { get }
 
-    /// Handles the action dispatched. The function can be performed on background thread.
+    /// Handles the action dispatched. The function can be performed on a background thread.
     /// - Parameter action: The action to handle.
     /// - Parameter composer: An object that passes the action to the next worker. You can ignore composer to stop action propagation to other workers.
     func handle<Action: FluxAction>(action: Action, composer: FluxComposer)

@@ -39,11 +39,15 @@ import Combine
 extension Notification.Name {
 
     /// The notification will be send every time when store's state is changed. The notification sender will be the store object.
+    @available(OSX, deprecated:10.15, message:"Use Combine to subscribe to FluxStore directly")
+    @available(iOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
+    @available(tvOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
+    @available(watchOS, deprecated:6.0, message:"Use Combine to subscribe to FluxStore directly")
     public static let FluxStoreChanged = Notification.Name(rawValue: "FluxStoreChanged")
 
 }
 
-/// An observable container that stores state of specified type and send notifications when the state gets updated.
+/// Store contains a state object triggers reducer to modify the state as a response to action dispatched
 open class FluxStore<State>: FluxWorker {
 
     public typealias State = State
@@ -63,11 +67,11 @@ open class FluxStore<State>: FluxWorker {
 
     /// A state of the store.
     public var state: State {
-        get { return syncQueue.sync { return backingState } }
-        set { syncQueue.sync(flags: .barrier) { backingState = newValue } }
+        get { return stateSyncQueue.sync { return backingState } }
+        set { stateSyncQueue.sync(flags: .barrier) { backingState = newValue } }
     }
 
-    var backingState: State {
+    private var backingState: State {
         willSet {
             #if canImport(Combine)
             if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
@@ -84,8 +88,11 @@ open class FluxStore<State>: FluxWorker {
         }
     }
 
-    let reducers: ResolverContainer
-    let syncQueue: DispatchQueue
+    internal let reducers: ResolverContainer
+    internal var tokens: Set<UUID>
+    internal var endwares: [Endware]
+
+    private let stateSyncQueue: DispatchQueue
 
     /// Initialises the store
     /// - Parameter initialState: The initial state of the store
@@ -94,7 +101,20 @@ open class FluxStore<State>: FluxWorker {
         token = UUID()
         backingState = initialState
         reducers = ResolverContainer()
-        syncQueue = DispatchQueue(label: "FluxStore.SyncQueue", qos: qos, attributes: .concurrent)
+        tokens = Set()
+        endwares = []
+        stateSyncQueue = DispatchQueue(label: "FluxStore.StateSyncQueue", qos: qos, attributes: .concurrent)
+    }
+
+
+    /// Adds an observer that will be invoked each time the store chages its state
+    /// - Parameter changeHandler: The closure will be invoked each time the state chages with the actual state object
+    @available(OSX, deprecated:10.15, message:"Use Combine to subscribe to FluxStore directly")
+    @available(iOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
+    @available(tvOS, deprecated:13.0, message:"Use Combine to subscribe to FluxStore directly")
+    @available(watchOS, deprecated:6.0, message:"Use Combine to subscribe to FluxStore directly")
+    public func addObserver(changeHandler: @escaping (State) -> Void) -> Observer {
+        return Observer(for: self, changeHandler: changeHandler)
     }
 
     /// Associates a reducer with the actions of specified type.
@@ -114,6 +134,25 @@ open class FluxStore<State>: FluxWorker {
         return reducers.unregister(Reducer.self)
     }
 
+    /// Registers endwares in the store. Only one endware with the same token can be registered in the store.
+    /// - Parameter workers: The list of endwares to register in the dispatcher. Dispatched actions will be passed to the workers in the same order as they were registered.
+    public func append(endwares new: [Endware]) {
+        new.forEach { endware in
+            if tokens.insert(endware.token).inserted {
+                endware.bless(by: self)
+                endwares.append(endware)
+            }
+        }
+    }
+
+    /// Unregisters endwares from the store.
+    /// - Parameter tokensToRemove: The list of tokens of endwares that should be unregistered.
+    public func unregister(tokens: [UUID]) {
+        let tokensToRemove = Set<UUID>(tokens)
+        self.tokens = self.tokens.subtracting(tokensToRemove)
+        endwares = endwares.filter { !tokensToRemove.contains($0.token) }
+    }
+
     public func handle<Action: FluxAction>(action: Action, composer: FluxComposer) {
 
         typealias Reducer = Reduce<Action>
@@ -126,6 +165,8 @@ open class FluxStore<State>: FluxWorker {
                 state = draft
             }
         }
+
+        endwares.forEach { $0.handle(action: action) }
 
         composer.next(action: action)
     }
