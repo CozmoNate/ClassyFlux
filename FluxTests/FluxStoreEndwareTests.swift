@@ -87,8 +87,8 @@ class FluxEndwareTests: QuickSpec {
                             expect(value).to(beNil())
                         }
 
-                        it("does not call to composer") {
-                            expect(composer.lastAction).to(beNil())
+                        it("calls passes ignored action to the composer") {
+                            expect(composer.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
                         }
                     }
 
