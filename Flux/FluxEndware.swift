@@ -1,8 +1,8 @@
 //
-//  FluxMiddleware.swift
+//  FluxEndware.swift
 //  ClassyFlux
 //
-//  Created by Natan Zalkin on 03/08/2019.
+//  Created by Natan Zalkin on 25/08/2019.
 //  Copyright © 2019 Natan Zalkin. All rights reserved.
 //
 
@@ -29,31 +29,41 @@
  *
  */
 
+
 import Foundation
 import ResolverContainer
 
 /// An object that triggers handlers in a response to specific action dispatched
-open class FluxMiddleware: FluxWorker {
+/// Endware provides easy access to associated store and its state.
+open class FluxEndware<State>: FluxWorker {
+
+    public typealias State = State
 
     /// An action handler closue. When the action returned it will be passed to next worker.
     /// - Parameter action: The action to handle
+    /// - Parameter state: The current state of the linked store
     /// - Parameter composer: An object that passes the action to the next worker. You can ignore composer to stop action propagation to other workers.
     /// - Returns: Return next action or nil to prevent the action to proppagate to other workers
-    public typealias Handle<Action: FluxAction> = (_ action: Action, _ composer: FluxComposer) -> Void
+    public typealias Handle<Action: FluxAction> = (_ action: Action, _ state: State, _ composer: FluxComposer) -> Void
 
-    /// A unique identifier of the middleware.
+    /// A unique identifier of the endware.
     public let token: UUID
 
-    let handlers: ResolverContainer
+    /// The store associated with the endware
+    public let store: FluxStore<State>
 
-    public init() {
+    internal let handlers: ResolverContainer
+
+    /// Initialise a broker representing the store provided.
+    public init(store owner: FluxStore<State>) {
         token = UUID()
+        store = owner
         handlers = ResolverContainer()
     }
 
-    /// Associates a handler with the actions of specified type
-    /// - Parameter action: The type of the actions to associate with handler
-    /// - Parameter execute: The closure that will be invoked when the action received
+    /// Associates a handler with the actions of specified type.
+    /// - Parameter action: The type of the actions to associate with handler.
+    /// - Parameter execute: The closure that will be invoked when the action received.
     public func registerHandler<Action: FluxAction>(for action: Action.Type = Action.self, work execute: @escaping Handle<Action>) {
         handlers.register { execute }
     }
@@ -69,15 +79,12 @@ open class FluxMiddleware: FluxWorker {
     }
 
     public func handle<Action: FluxAction>(action: Action, composer: FluxComposer) {
-
         typealias Handler = Handle<Action>
 
         guard let handle = try? self.handlers.resolve(Handler.self) else {
-            composer.next(action: action)
             return
         }
 
-        handle(action, composer)
+        handle(action, store.state, composer)
     }
-
 }

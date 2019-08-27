@@ -86,7 +86,6 @@ open class FluxStore<State>: FluxWorker {
 
     internal let reducers: ResolverContainer
     internal var tokens: Set<UUID>
-    internal var endwares: [Endware]
 
     private let stateSyncQueue: DispatchQueue
 
@@ -98,7 +97,6 @@ open class FluxStore<State>: FluxWorker {
         backingState = initialState
         reducers = ResolverContainer()
         tokens = Set()
-        endwares = []
         stateSyncQueue = DispatchQueue(label: "FluxStore.StateSyncQueue", qos: qos, attributes: .concurrent)
     }
 
@@ -126,25 +124,6 @@ open class FluxStore<State>: FluxWorker {
         return reducers.unregister(Reducer.self)
     }
 
-    /// Registers endwares in the store. Only one endware with the same token can be registered in the store.
-    /// - Parameter workers: The list of endwares to register in the dispatcher. Dispatched actions will be passed to the workers in the same order as they were registered.
-    public func append(endwares new: [Endware]) {
-        new.forEach { endware in
-            if tokens.insert(endware.token).inserted {
-                endware.store = self
-                endwares.append(endware)
-            }
-        }
-    }
-
-    /// Unregisters endwares from the store.
-    /// - Parameter tokensToRemove: The list of tokens of endwares that should be unregistered.
-    public func unregister(tokens: [UUID]) {
-        let tokensToRemove = Set<UUID>(tokens)
-        self.tokens = self.tokens.subtracting(tokensToRemove)
-        endwares = endwares.filter { !tokensToRemove.contains($0.token) }
-    }
-
     public func handle<Action: FluxAction>(action: Action, composer: FluxComposer) {
 
         typealias Reducer = Reduce<Action>
@@ -158,8 +137,6 @@ open class FluxStore<State>: FluxWorker {
             }
         }
 
-        endwares.forEach { $0.handle(action: action) }
-
         composer.next(action: action)
     }
 
@@ -169,3 +146,25 @@ open class FluxStore<State>: FluxWorker {
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension FluxStore: ObservableObject {}
 #endif
+
+extension FluxStore {
+
+    /// An object that helps to subscribe to store changes. Unregisters observer closure automatically when released from memory.
+    public class Observer {
+
+        internal let observer: NSObjectProtocol
+
+        internal init<State>(for store: FluxStore<State>, changeHandler: @escaping (State) -> Void) {
+            observer = NotificationCenter.default
+                .addObserver(forName: .FluxStoreChanged, object: store, queue: .main) { notification in
+                    guard let store = notification.object as? FluxStore<State> else { return }
+                    changeHandler(store.state)
+                }
+        }
+
+        deinit {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
+
+}

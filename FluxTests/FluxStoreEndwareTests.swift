@@ -1,5 +1,5 @@
 //
-//  FluxStoreBrokerTests.swift
+//  FluxEndwareTests.swift
 //  ClassyFlux
 //
 //  Created by Natan Zalkin on 25/08/2019.
@@ -34,134 +34,84 @@ import Nimble
 
 @testable import ClassyFlux
 
-class FluxStoreEndwareTests: QuickSpec {
+class FluxEndwareTests: QuickSpec {
     override func spec() {
 
         var store: TestStore!
-        var endware: TestStore.Endware!
+        var broker: FluxEndware<TestState>!
         var value: String!
-        
-        describe("FluxStore.Endware") {
+
+        describe("FluxEndware") {
 
             beforeEach {
                 store = TestStore()
-                endware = TestStore.Endware()
+                broker = FluxEndware(store: store)
             }
 
             context("when registered action handler") {
 
                 beforeEach {
-
-                    value = nil
-                    
-                    endware.registerHandler { (state, action: ChangeValueAction) in
+                    broker.registerHandler { (action: ChangeValueAction, state, composer) in
                         value = action.value
+                        composer.next(action: action)
                     }
                 }
 
                 it("has registered ChangeValueAction handler") {
-                    expect(try? endware.handlers.resolve(TestStore.Endware.Handle<ChangeValueAction>.self)).toNot(beNil())
+                    expect(try? broker.handlers.resolve(FluxEndware<TestState>.Handle<ChangeValueAction>.self)).toNot(beNil())
                 }
 
-                context("when registered endware to the store") {
+                context("when unregistered the action") {
+
+                    var flag: Bool!
 
                     beforeEach {
-                        store.append(endwares: [endware])
+                        flag = broker.unregisterHandler(for: ChangeValueAction.self)
                     }
 
-                    it("is added to the store's endware list") {
-                        expect(store.tokens).to(contain(endware.token))
-                        expect(store.endwares.contains(where: { $0 === endware})).to(beTrue())
+                    it("successfully unregistered the action handler") {
+                        expect(flag).to(beTrue())
+                        expect(try? broker.handlers.resolve(FluxEndware<TestState>.Handle<ChangeValueAction>.self)).to(beNil())
                     }
 
-                    context("when the store performed registered action") {
+                    context("when performed unregistered action") {
+
+                        var composer: TestComposer!
 
                         beforeEach {
-                            store.handle(action: ChangeValueAction(value: "change it!"), composer: TestComposer())
-                        }
-
-                        it("correctly calls the action handler") {
-                            expect(value).to(equal("change it!"))
-                        }
-                    }
-
-                    context("when the store performed unregistered action") {
-
-                        beforeEach {
-                            store.handle(action: IncrementNumberAction(increment: 1), composer: TestComposer())
+                            composer = TestComposer()
+                            broker.handle(action: ChangeValueAction(value: "change it!"), composer: composer)
                         }
 
                         it("does not change the value") {
                             expect(value).to(beNil())
                         }
-                    }
 
-                    context("when unregistered endware from the store") {
-
-                        beforeEach {
-                            store.unregister(tokens: [endware.token])
-                        }
-
-                        it("is removed the endware from the endware list") {
-                            expect(store.tokens).to(beEmpty())
-                            expect(store.endwares).to(beEmpty())
+                        it("does not call to composer") {
+                            expect(composer.lastAction).to(beNil())
                         }
                     }
 
-                    context("when unregistered ChangeValueAction handler") {
+                }
 
-                        var flag: Bool!
+                context("when performed registered action") {
 
-                        beforeEach {
-                            flag = endware.unregisterHandler(for: ChangeValueAction.self)
-                        }
+                    var composer: TestComposer!
 
-                        it("successfully unregistered the action handler") {
-                            expect(flag).to(beTrue())
-                            expect(try? endware.handlers.resolve(TestStore.Endware.Handle<ChangeValueAction>.self)).to(beNil())
-                        }
-
-                        context("when the store performed registered action") {
-
-                            beforeEach {
-                                store.handle(action: ChangeValueAction(value: "change it!"), composer: TestComposer())
-                            }
-
-                            it("does not change the value") {
-                                expect(value).to(beNil())
-                            }
-                        }
-
+                    beforeEach {
+                        composer = TestComposer()
+                        broker.handle(action: ChangeValueAction(value: "change it!"), composer: composer)
                     }
 
-                    context("when registered another endware to the store") {
+                    it("correctly reduces store's state") {
+                        expect(value).to(equal("change it!"))
+                    }
 
-                        beforeEach {
-                            let another = TestStore.Endware()
-                            store.append(endwares: [another])
-                        }
-
-                        it("is added to the store's endware list") {
-                            expect(store.tokens).to(contain(endware.token))
-                            expect(store.endwares.contains(where: { $0 === endware})).to(beTrue())
-                        }
-
-                        context("when the store performed registered action") {
-
-                            beforeEach {
-                                store.handle(action: ChangeValueAction(value: "change it!"), composer: TestComposer())
-                            }
-
-                            it("correctly calls the action handler") {
-                                expect(value).to(equal("change it!"))
-                            }
-                        }
+                    it("passes action to composer") {
+                        expect(composer.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
                     }
                 }
             }
-
         }
-
     }
-
 }
