@@ -63,13 +63,36 @@ open class FluxStore<State>: FluxWorker {
 
     /// A state of the store.
     public var state: State {
-        get { return stateSyncQueue.sync { return backingState } }
-        set { stateSyncQueue.sync(flags: .barrier) { backingState = newValue } }
+        get {
+            if Thread.isMainThread {
+                return backingState
+            } else {
+                return DispatchQueue.main.sync { return backingState }
+            }
+        }
+        set {
+            if Thread.isMainThread {
+                backingState = newValue
+            } else {
+                DispatchQueue.main.sync { backingState = newValue }
+            }
+        }
     }
 
-    internal var backingState: State
+    internal var backingState: State {
+        willSet {
+            #if canImport(Combine)
+            if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+                objectWillChange.send()
+            }
+            #endif
+        }
+        didSet {
+            NotificationCenter.default.post(name: .FluxStoreChanged, object: self)
+        }
+    }
+
     internal let reducers: ResolverContainer
-    internal let stateSyncQueue: DispatchQueue
 
     /// Initialises the store
     /// - Parameter initialState: The initial state of the store
@@ -77,9 +100,7 @@ open class FluxStore<State>: FluxWorker {
         token = UUID()
         backingState = initialState
         reducers = ResolverContainer()
-        stateSyncQueue = DispatchQueue(label: "FluxStore.StateSyncQueue", qos: .userInteractive, attributes: .concurrent)
     }
-
 
     /// Adds an observer that will be invoked each time the store chages its state
     /// - Parameter changeHandler: The closure will be invoked each time the state chages with the actual state object
@@ -113,28 +134,7 @@ open class FluxStore<State>: FluxWorker {
             var draft = state
 
             if reduce(&draft, action) {
-
-                #if canImport(Combine)
-                if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
-                    if Thread.isMainThread {
-                        objectWillChange.send()
-                    } else {
-                        DispatchQueue.main.async {
-                            self.objectWillChange.send()
-                        }
-                    }
-                }
-                #endif
-
                 state = draft
-
-                if Thread.isMainThread {
-                    NotificationCenter.default.post(name: .FluxStoreChanged, object: self)
-                } else {
-                    DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: .FluxStoreChanged, object: self)
-                    }
-                }
             }
         }
 
