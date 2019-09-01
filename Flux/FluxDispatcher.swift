@@ -79,7 +79,7 @@ open class FluxDispatcher {
     /// - Parameter action: The action to dispatch.
     public func dispatch<Action: FluxAction>(action: Action) {
         operationQueue.addOperation {
-            let composer = StepperComposer(workers: self.workers)
+            let composer = StackingComposer(workers: self.workers)
             composer.next(action: action)
             composer.discard()
         }
@@ -101,24 +101,24 @@ open class FluxDispatcher {
 
 extension FluxDispatcher {
 
-    class StepperComposer: FluxComposer {
+    class StackingComposer: FluxComposer {
 
-        var workers: [FluxWorker]?
+        var iterator: IndexingIterator<[FluxWorker]>?
 
         init(workers: [FluxWorker]) {
-            self.workers = workers.reversed()
+            iterator = workers.reversed().makeIterator()
         }
 
         func discard() {
-            workers = nil
+            iterator = nil
         }
 
         func next<Action: FluxAction>(action: Action)  {
-            guard workers != nil else {
-                print("FluxComposer misuse error: Next action called after the composer has been discarded!")
+            guard iterator != nil else {
+                print("FluxComposer misuse error: Next action called on the composer that has been discarded!")
                 return
             }
-            workers?.popLast()?.handle(action: action, composer: ProxyComposer(composer: self))
+            iterator?.next()?.handle(action: action, composer: ProxyComposer(composer: self))
         }
     }
 
@@ -136,7 +136,7 @@ extension FluxDispatcher {
 
         func next<Action: FluxAction>(action: Action) {
             guard let composer = composer else {
-                print("FluxComposer misuse error: Next action called after the composer has been discarded!")
+                print("FluxComposer misuse error: Next action called on the composer that has been discarded!")
                 return
             }
             composer.next(action: action)
