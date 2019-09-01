@@ -119,7 +119,7 @@ open class FluxStore<State>: FluxWorker {
                     if Thread.isMainThread {
                         objectWillChange.send()
                     } else {
-                        DispatchQueue.main.sync {
+                        DispatchQueue.main.async {
                             self.objectWillChange.send()
                         }
                     }
