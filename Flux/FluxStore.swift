@@ -67,37 +67,17 @@ open class FluxStore<State>: FluxWorker {
         set { stateSyncQueue.sync(flags: .barrier) { backingState = newValue } }
     }
 
-    private var backingState: State {
-        willSet {
-            #if canImport(Combine)
-            if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
-                DispatchQueue.main.async {
-                    self.objectWillChange.send()
-                }
-            }
-            #endif
-        }
-        didSet {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .FluxStoreChanged, object: self)
-            }
-        }
-    }
-
+    internal var backingState: State
     internal let reducers: ResolverContainer
-    internal var tokens: Set<UUID>
-
-    private let stateSyncQueue: DispatchQueue
+    internal let stateSyncQueue: DispatchQueue
 
     /// Initialises the store
     /// - Parameter initialState: The initial state of the store
-    /// - Parameter qos: The QOS of the underlying  sync state queue.
-    public init(initialState: State, qos: DispatchQoS = .userInitiated) {
+    public init(initialState: State) {
         token = UUID()
         backingState = initialState
         reducers = ResolverContainer()
-        tokens = Set()
-        stateSyncQueue = DispatchQueue(label: "FluxStore.StateSyncQueue", qos: qos, attributes: .concurrent)
+        stateSyncQueue = DispatchQueue(label: "FluxStore.StateSyncQueue", qos: .userInteractive, attributes: .concurrent)
     }
 
 
@@ -133,7 +113,28 @@ open class FluxStore<State>: FluxWorker {
             var draft = state
 
             if reduce(&draft, action) {
+
+                #if canImport(Combine)
+                if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+                    if Thread.isMainThread {
+                        objectWillChange.send()
+                    } else {
+                        DispatchQueue.main.sync {
+                            self.objectWillChange.send()
+                        }
+                    }
+                }
+                #endif
+
                 state = draft
+
+                if Thread.isMainThread {
+                    NotificationCenter.default.post(name: .FluxStoreChanged, object: self)
+                } else {
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: .FluxStoreChanged, object: self)
+                    }
+                }
             }
         }
 

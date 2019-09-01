@@ -41,7 +41,7 @@ open class FluxDispatcher {
     var workers: [FluxWorker]
     let operationQueue: OperationQueue
 
-    /// Initialises the dispatcher with specified quality of service of undelayng dispatch queue.
+    /// Initialises a dispatcher with specified quality of service of underlyng dispatch queue.
     /// - Parameter qos: The QOS of theunderlying dispatch queue.
     public init(qos: QualityOfService = .userInitiated) {
 
@@ -114,6 +114,10 @@ extension FluxDispatcher {
         }
 
         func next<Action: FluxAction>(action: Action)  {
+            guard workers != nil else {
+                print("FluxComposer misuse error: Next action called after the composer has been discarded!")
+                return
+            }
             workers?.popLast()?.handle(action: action, composer: ProxyComposer(composer: self))
         }
     }
@@ -131,7 +135,10 @@ extension FluxDispatcher {
         }
 
         func next<Action: FluxAction>(action: Action) {
-            guard let composer = composer else { return }
+            guard let composer = composer else {
+                print("FluxComposer misuse error: Next action called after the composer has been discarded!")
+                return
+            }
             composer.next(action: action)
             discard()
         }

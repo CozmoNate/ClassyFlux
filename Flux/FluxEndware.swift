@@ -33,7 +33,7 @@
 import Foundation
 import ResolverContainer
 
-/// An object that triggers handlers in a response to specific action dispatched
+/// An object that triggers handlers in a response to specific action dispatched.
 /// Endware provides easy access to associated store and its state.
 open class FluxEndware<State>: FluxWorker {
 
@@ -42,7 +42,9 @@ open class FluxEndware<State>: FluxWorker {
     /// An action handler closue. When the action returned it will be passed to next worker.
     /// - Parameter action: The action to handle
     /// - Parameter state: The current state of the linked store
-    /// - Parameter composer: An object that passes the action to the next worker. You can ignore composer to stop action propagation to other workers.
+    /// - Parameter composer: The object that passes the action to the next worker.
+    ///     You can ignore the composer to stop further action propagation to other workers.
+    ///     If you pass next action to the composer, this should be done synchronously in the same closure.
     /// - Returns: Return next action or nil to prevent the action to proppagate to other workers
     public typealias Handle<Action: FluxAction> = (_ action: Action, _ state: State, _ composer: FluxComposer) -> Void
 
