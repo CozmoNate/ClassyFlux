@@ -62,7 +62,7 @@ open class FluxStore<State>: FluxWorker {
     public let token: UUID
 
     /// A state of the store.
-    public var state: State {
+    public private(set) var state: State {
         get {
             if Thread.isMainThread {
                 return backingState
