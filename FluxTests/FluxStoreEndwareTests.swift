@@ -51,9 +51,8 @@ class FluxEndwareTests: QuickSpec {
             context("when registered action handler") {
 
                 beforeEach {
-                    broker.registerHandler { (action: ChangeValueAction, state, composer) in
+                    broker.registerHandler { (action: ChangeValueAction, state) in
                         value = action.value
-                        composer.next(action: action)
                     }
                 }
 

@@ -46,7 +46,7 @@ open class FluxEndware<State>: FluxWorker {
     ///     You can ignore the composer to stop further action propagation to other workers.
     ///     If you pass next action to the composer, this should be done synchronously in the same closure.
     /// - Returns: Return next action or nil to prevent the action to proppagate to other workers
-    public typealias Handle<Action: FluxAction> = (_ action: Action, _ state: State, _ composer: FluxComposer) -> Void
+    public typealias Handle<Action: FluxAction> = (_ action: Action, _ state: State) -> Void
 
     /// A unique identifier of the endware.
     public let token: UUID
@@ -81,13 +81,15 @@ open class FluxEndware<State>: FluxWorker {
     }
 
     public func handle<Action: FluxAction>(action: Action, composer: FluxComposer) {
+        
+        defer { composer.next(action: action) }
+        
         typealias Handler = Handle<Action>
 
         guard let handle = try? self.handlers.resolve(Handler.self) else {
-            composer.next(action: action)
             return
         }
 
-        handle(action, store.state, composer)
+        handle(action, store.state)
     }
 }

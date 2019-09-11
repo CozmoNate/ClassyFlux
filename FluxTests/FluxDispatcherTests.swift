@@ -94,7 +94,7 @@ class FluxDispatcherTests: QuickSpec {
                     }
                 }
 
-                context("when registered another worker") {
+                context("when registered additional worker") {
 
                     var another: TestWorker!
 
@@ -107,6 +107,7 @@ class FluxDispatcherTests: QuickSpec {
                         dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
                         expect(dispatcher.tokens.contains(another.token)).to(beTrue())
                         expect(dispatcher.workers.last).to(beIdenticalTo(another))
+                        expect(dispatcher.workers.count).to(equal(2))
                     }
 
                     context("when dispatched action") {
