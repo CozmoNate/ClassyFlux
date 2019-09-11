@@ -106,7 +106,7 @@ extension FluxDispatcher {
         var iterator: IndexingIterator<[FluxWorker]>?
 
         init(workers: [FluxWorker]) {
-            iterator = workers.reversed().makeIterator()
+            iterator = workers.makeIterator()
         }
 
         func discard() {
