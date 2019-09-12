@@ -105,10 +105,10 @@ open class FluxStore<State>: FluxWorker {
     }
 
     /// An event called before the state is passed to reducers
-    public func stateWillChange(_ state: State) {}
+    open func stateWillChange(_ state: State) {}
 
     /// An event called after the state is passed to reducers
-    public func stateDidChange(_ state: State) {}
+    open func stateDidChange(_ state: State) {}
 
     /// Adds an observer that will be invoked each time the store chages its state
     /// - Parameter changeHandler: The closure will be invoked each time the state chages with the actual state object
