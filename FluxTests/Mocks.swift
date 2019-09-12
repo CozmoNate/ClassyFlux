@@ -25,6 +25,34 @@ struct TestState: Equatable {
     var number: Int
 }
 
+class TestStore: FluxStore<TestState> {
+
+    var stateBeforeChange: State?
+    var stateAfterChange: State?
+
+    init() {
+        super.init(initialState: TestState(value: "initial", number: 0))
+
+        registerReducer { (state, action: ChangeValueAction) in
+            state.value = action.value
+            return true
+        }
+
+        registerReducer { (state, action: IncrementNumberAction) in
+            state.number += action.increment
+            return true
+        }
+    }
+
+    override func stateWillChange(_ state: TestState) {
+        stateBeforeChange = state
+    }
+
+    override func stateDidChange(_ state: TestState) {
+        stateAfterChange = state
+    }
+}
+
 class TestComposer: FluxComposer {
 
     var lastAction: FluxAction?
@@ -43,23 +71,6 @@ class TestWorker: FluxWorker {
     func handle<Action>(action: Action, composer: FluxComposer) where Action : FluxAction {
         lastAction = action
         composer.next(action: action)
-    }
-}
-
-class TestStore: FluxStore<TestState> {
-
-    init() {
-        super.init(initialState: TestState(value: "initial", number: 0))
-
-        registerReducer { (state, action: ChangeValueAction) in
-            state.value = action.value
-            return true
-        }
-
-        registerReducer { (state, action: IncrementNumberAction) in
-            state.number += action.increment
-            return true
-        }
     }
 }
 

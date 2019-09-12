@@ -18,12 +18,10 @@ class FluxStoreTests: QuickSpec {
 
         describe("FluxStore") {
 
-            typealias TestStore = FluxStore<TestState>
-
             var store: TestStore!
 
             beforeEach {
-                store = TestStore(initialState: TestState(value: "initial", number: 0))
+                store = TestStore()
             }
 
             context("when registered the action") {
@@ -78,6 +76,11 @@ class FluxStoreTests: QuickSpec {
                     beforeEach {
                         composer = TestComposer()
                         store.handle(action: ChangeValueAction(value: "test"), composer: composer)
+                    }
+
+                    it("calls state change events") {
+                        expect(store.stateBeforeChange?.value).to(equal("initial"))
+                        expect(store.stateAfterChange?.value).to(equal("test"))
                     }
 
                     it("correctly reduces store's state") {

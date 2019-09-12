@@ -81,6 +81,7 @@ open class FluxStore<State>: FluxWorker {
 
     internal var backingState: State {
         willSet {
+            stateWillChange(backingState)
             #if canImport(Combine)
             if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
                 objectWillChange.send()
@@ -88,6 +89,7 @@ open class FluxStore<State>: FluxWorker {
             #endif
         }
         didSet {
+            stateDidChange(backingState)
             NotificationCenter.default.post(name: .FluxStoreChanged, object: self)
         }
     }
@@ -101,6 +103,12 @@ open class FluxStore<State>: FluxWorker {
         backingState = initialState
         reducers = ResolverContainer()
     }
+
+    /// An event called before the state is passed to reducers
+    public func stateWillChange(_ state: State) {}
+
+    /// An event called after the state is passed to reducers
+    public func stateDidChange(_ state: State) {}
 
     /// Adds an observer that will be invoked each time the store chages its state
     /// - Parameter changeHandler: The closure will be invoked each time the state chages with the actual state object
