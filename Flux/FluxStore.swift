@@ -36,11 +36,20 @@ import ResolverContainer
 import Combine
 #endif
 
-extension Notification.Name {
+#if canImport(Combine)
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension FluxStore: ObservableObject {}
+#endif
 
-    /// The notification will be send every time when store's state is changed. The notification sender will be the store object.
-    public static let FluxStoreChanged = Notification.Name(rawValue: "FluxStoreChanged")
+public enum FluxStoreEvent {
+    case stateWillChange, stateDidChange
 
+    internal var notificationName: Notification.Name {
+        switch self {
+        case .stateWillChange: return FluxNotificatons.StoreWillChangeNotification
+        case .stateDidChange: return FluxNotificatons.StoreDidChangeNotification
+        }
+    }
 }
 
 /// Store contains a state object triggers reducer to modify the state as a response to action dispatched
@@ -51,11 +60,17 @@ open class FluxStore<State>: FluxWorker {
     /// A state reducer closure. Returns boolen flag indicating if the state is changed.
     /// - Parameter state: The mutable copy of current state to apply changes.
     /// - Parameter action: The action invoked the reducer.
-    public typealias Reduce<Action: FluxAction> = (inout State, Action) -> Bool
+    public typealias Reduce<Action: FluxAction> = (inout State, Action) -> [PartialKeyPath<State>]
 
     #if canImport(Combine)
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     public lazy var objectWillChange = ObservableObjectPublisher()
+
+    @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    public lazy var stateWillChange = PassthroughSubject<(State, [PartialKeyPath<State>]), Never>()
+
+    @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    public lazy var stateDidChange = PassthroughSubject<(State, [PartialKeyPath<State>]), Never>()
     #endif
 
     /// A unique identifier of the store.
@@ -79,21 +94,7 @@ open class FluxStore<State>: FluxWorker {
         }
     }
 
-    internal var backingState: State {
-        willSet {
-            stateWillChange(backingState)
-            #if canImport(Combine)
-            if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
-                objectWillChange.send()
-            }
-            #endif
-        }
-        didSet {
-            stateDidChange(backingState)
-            NotificationCenter.default.post(name: .FluxStoreChanged, object: self)
-        }
-    }
-
+    internal var backingState: State
     internal let reducers: ResolverContainer
 
     /// Initialises the store
@@ -104,16 +105,38 @@ open class FluxStore<State>: FluxWorker {
         reducers = ResolverContainer()
     }
 
-    /// An event called before the state is passed to reducers
-    open func stateWillChange(_ state: State) {}
+    /// An event called before the state is passed to reducers.
+    /// Default implementations sends notifications about state changes.
+    /// If you want to preserve default behaivior you must call super in your custom store class implementation.
+    open func stateWillChange(_ state: State, at keyPaths: [PartialKeyPath<State>]) {
+        #if canImport(Combine)
+        if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+            objectWillChange.send()
+            stateDidChange.send((state, keyPaths))
+        }
+        #endif
 
-    /// An event called after the state is passed to reducers
-    open func stateDidChange(_ state: State) {}
+        NotificationCenter.default.post(name: FluxNotificatons.StoreWillChangeNotification, object: self, userInfo: [FluxNotificatons.ChangedKeyPathsKey: keyPaths])
+    }
+
+    /// An event called after the state is passed to reducers.
+    /// Default implementations sends notifications about state changes.
+    /// If you want to preserve default behaivior you must call super in your custom store class implementation.
+    open func stateDidChange(_ state: State, at keyPaths: [PartialKeyPath<State>]) {
+        #if canImport(Combine)
+        if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+            stateDidChange.send((state, keyPaths))
+        }
+        #endif
+
+        NotificationCenter.default.post(name: FluxNotificatons.StoreDidChangeNotification, object: self, userInfo: [FluxNotificatons.ChangedKeyPathsKey: keyPaths])
+    }
 
     /// Adds an observer that will be invoked each time the store chages its state
+    /// - Parameter queue: The queue to schedule change handler on
     /// - Parameter changeHandler: The closure will be invoked each time the state chages with the actual state object
-    public func addObserver(changeHandler: @escaping (State) -> Void) -> Observer {
-        return Observer(for: self, changeHandler: changeHandler)
+    public func addObserver(for event: FluxStoreEvent, queue: OperationQueue = .main, changeHandler: @escaping (State, [PartialKeyPath<State>]) -> Void) -> Observer {
+        return Observer(for: event, from: self, queue: queue, changeHandler: changeHandler)
     }
 
     /// Associates a reducer with the actions of specified type.
@@ -141,8 +164,12 @@ open class FluxStore<State>: FluxWorker {
 
             var draft = state
 
-            if reduce(&draft, action) {
+            let keyPaths = reduce(&draft, action)
+            
+            if !keyPaths.isEmpty {
+                stateWillChange(state, at: keyPaths)
                 state = draft
+                stateDidChange(state, at: keyPaths)
             }
         }
 
@@ -151,11 +178,6 @@ open class FluxStore<State>: FluxWorker {
 
 }
 
-#if canImport(Combine)
-@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension FluxStore: ObservableObject {}
-#endif
-
 extension FluxStore {
 
     /// An object that helps to subscribe to store changes. Unregisters observer closure automatically when released from memory.
@@ -163,11 +185,15 @@ extension FluxStore {
 
         internal let observer: NSObjectProtocol
 
-        internal init<State>(for store: FluxStore<State>, changeHandler: @escaping (State) -> Void) {
+        internal init<State>(for event: FluxStoreEvent,
+                             from store: FluxStore<State>,
+                             queue: OperationQueue,
+                             changeHandler: @escaping (State, [PartialKeyPath<State>]) -> Void) {
             observer = NotificationCenter.default
-                .addObserver(forName: .FluxStoreChanged, object: store, queue: .main) { notification in
+                .addObserver(forName: event.notificationName, object: store, queue: queue) { notification in
                     guard let store = notification.object as? FluxStore<State> else { return }
-                    changeHandler(store.state)
+                    guard let keyPaths = notification.userInfo?[FluxNotificatons.ChangedKeyPathsKey] as? [PartialKeyPath<State>] else { return }
+                    changeHandler(store.state, keyPaths)
                 }
         }
 

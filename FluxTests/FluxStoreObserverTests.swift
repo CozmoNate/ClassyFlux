@@ -44,17 +44,19 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
 
             var store: FluxStore<TestState>!
             var lastState: TestState?
+            var lastKeyPaths: [PartialKeyPath<TestState>]?
 
             beforeEach {
                 store = FluxStore(initialState: TestState(value: "initial", number: 0))
 
                 store.registerReducer { (state, action: ChangeValueAction) in
                     state.value = action.value
-                    return true
+                    return [\TestState.value]
                 }
 
-                self.observer = store.addObserver { (state) in
+                self.observer = store.addObserver(for: .stateDidChange) { (state, keyPaths) in
                     lastState = state
+                    lastKeyPaths = keyPaths
                 }
             }
 
@@ -66,19 +68,25 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
 
                 it("receives changed state") {
                     expect(lastState?.value).toEventually(equal(store.state.value))
-
+                    expect(lastKeyPaths).toEventually(equal([\TestState.value]))
                 }
 
                 context("when deallocated") {
                     beforeEach {
                         self.observer = nil
-                        store.handle(action: ChangeValueAction(value: "test 2"), composer: self)
                     }
 
                     context("when state changed") {
 
+                        beforeEach {
+                            lastState = TestState(value: "one", number: 1)
+                            lastKeyPaths = [\TestState.number]
+                            store.handle(action: ChangeValueAction(value: "test 2"), composer: self)
+                        }
+
                         it("does not receives changed state") {
-                            expect(lastState?.value).toNotEventually(equal(store.state.value))
+                            expect(lastState?.value).toNotEventually(equal("test 2"))
+                            expect(lastKeyPaths).toNotEventually(equal([\TestState.value]))
                         }
                     }
                 }
@@ -86,6 +94,5 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
         }
     }
 
-    func next<Action>(action: Action) where Action : FluxAction {
-    }
+    func next<Action>(action: Action) where Action : FluxAction {}
 }

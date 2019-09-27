@@ -115,8 +115,7 @@ extension FluxDispatcher {
 
         func next<Action: FluxAction>(action: Action)  {
             guard iterator != nil else {
-                print("FluxComposer misuse error: Next action called on the composer that has been discarded!")
-                return
+                preconditionFailure("Next action called on discarded composer!")
             }
             iterator?.next()?.handle(action: action, composer: ProxyComposer(composer: self))
         }
@@ -136,8 +135,7 @@ extension FluxDispatcher {
 
         func next<Action: FluxAction>(action: Action) {
             guard let composer = composer else {
-                print("FluxComposer misuse error: Next action called on the composer that has been discarded!")
-                return
+                preconditionFailure("Next action called on discarded composer!")
             }
             composer.next(action: action)
             discard()

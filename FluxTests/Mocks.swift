@@ -28,28 +28,32 @@ struct TestState: Equatable {
 class TestStore: FluxStore<TestState> {
 
     var stateBeforeChange: State?
+    var pathsBeforeChange: [PartialKeyPath<TestState>]?
     var stateAfterChange: State?
+    var pathsAfterChange: [PartialKeyPath<TestState>]?
 
     init() {
         super.init(initialState: TestState(value: "initial", number: 0))
 
         registerReducer { (state, action: ChangeValueAction) in
             state.value = action.value
-            return true
+            return [\TestState.value]
         }
 
         registerReducer { (state, action: IncrementNumberAction) in
             state.number += action.increment
-            return true
+            return [\TestState.number]
         }
     }
 
-    override func stateWillChange(_ state: TestState) {
+    override func stateWillChange(_ state: TestState, at keyPaths: [PartialKeyPath<TestState>]) {
         stateBeforeChange = state
+        pathsBeforeChange = keyPaths
     }
 
-    override func stateDidChange(_ state: TestState) {
+    override func stateDidChange(_ state: TestState, at keyPaths: [PartialKeyPath<TestState>]) {
         stateAfterChange = state
+        pathsAfterChange = keyPaths
     }
 }
 

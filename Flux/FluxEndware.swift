@@ -34,7 +34,7 @@ import Foundation
 import ResolverContainer
 
 /// An object that triggers handlers in a response to specific action dispatched.
-/// Endware provides easy access to associated store and its state.
+/// Endware provides an easy access to associated store state.
 open class FluxEndware<State>: FluxWorker {
 
     public typealias State = State

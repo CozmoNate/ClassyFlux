@@ -29,7 +29,7 @@ class FluxStoreTests: QuickSpec {
                 beforeEach {
                     store.registerReducer { (state, action: ChangeValueAction) in
                         state.value = action.value
-                        return true
+                        return [\TestState.value]
                     }
                 }
 
@@ -97,7 +97,7 @@ class FluxStoreTests: QuickSpec {
                     beforeEach {
                         store.registerReducer { (state, action: IncrementNumberAction) in
                             state.number += action.increment
-                            return true
+                            return [\TestState.number]
                         }
                     }
 
