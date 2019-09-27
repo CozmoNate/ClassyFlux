@@ -67,10 +67,10 @@ open class FluxStore<State>: FluxWorker {
     public lazy var objectWillChange = ObservableObjectPublisher()
 
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    public lazy var stateWillChange = PassthroughSubject<(State, [PartialKeyPath<State>]), Never>()
+    public lazy var stateWillChange = PassthroughSubject<(State, Set<PartialKeyPath<State>>), Never>()
 
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    public lazy var stateDidChange = PassthroughSubject<(State, [PartialKeyPath<State>]), Never>()
+    public lazy var stateDidChange = PassthroughSubject<(State, Set<PartialKeyPath<State>>), Never>()
     #endif
 
     /// A unique identifier of the store.
@@ -108,7 +108,7 @@ open class FluxStore<State>: FluxWorker {
     /// An event called before the state is passed to reducers.
     /// Default implementations sends notifications about state changes.
     /// If you want to preserve default behaivior you must call super in your custom store class implementation.
-    open func stateWillChange(_ state: State, at keyPaths: [PartialKeyPath<State>]) {
+    open func stateWillChange(_ state: State, at keyPaths: Set<PartialKeyPath<State>>) {
         #if canImport(Combine)
         if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
             objectWillChange.send()
@@ -122,7 +122,7 @@ open class FluxStore<State>: FluxWorker {
     /// An event called after the state is passed to reducers.
     /// Default implementations sends notifications about state changes.
     /// If you want to preserve default behaivior you must call super in your custom store class implementation.
-    open func stateDidChange(_ state: State, at keyPaths: [PartialKeyPath<State>]) {
+    open func stateDidChange(_ state: State, at keyPaths: Set<PartialKeyPath<State>>) {
         #if canImport(Combine)
         if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
             stateDidChange.send((state, keyPaths))
@@ -135,7 +135,7 @@ open class FluxStore<State>: FluxWorker {
     /// Adds an observer that will be invoked each time the store chages its state
     /// - Parameter queue: The queue to schedule change handler on
     /// - Parameter changeHandler: The closure will be invoked each time the state chages with the actual state object
-    public func addObserver(for event: FluxStoreEvent, queue: OperationQueue = .main, changeHandler: @escaping (State, [PartialKeyPath<State>]) -> Void) -> Observer {
+    public func addObserver(for event: FluxStoreEvent, queue: OperationQueue = .main, changeHandler: @escaping (State, Set<PartialKeyPath<State>>) -> Void) -> Observer {
         return Observer(for: event, from: self, queue: queue, changeHandler: changeHandler)
     }
 
@@ -164,7 +164,7 @@ open class FluxStore<State>: FluxWorker {
 
             var draft = state
 
-            let keyPaths = reduce(&draft, action)
+            let keyPaths = Set(reduce(&draft, action))
             
             if !keyPaths.isEmpty {
                 stateWillChange(state, at: keyPaths)
@@ -188,11 +188,11 @@ extension FluxStore {
         internal init<State>(for event: FluxStoreEvent,
                              from store: FluxStore<State>,
                              queue: OperationQueue,
-                             changeHandler: @escaping (State, [PartialKeyPath<State>]) -> Void) {
+                             changeHandler: @escaping (State, Set<PartialKeyPath<State>>) -> Void) {
             observer = NotificationCenter.default
                 .addObserver(forName: event.notificationName, object: store, queue: queue) { notification in
                     guard let store = notification.object as? FluxStore<State> else { return }
-                    guard let keyPaths = notification.userInfo?[FluxNotificatons.ChangedKeyPathsKey] as? [PartialKeyPath<State>] else { return }
+                    guard let keyPaths = notification.userInfo?[FluxNotificatons.ChangedKeyPathsKey] as? Set<PartialKeyPath<State>> else { return }
                     changeHandler(store.state, keyPaths)
                 }
         }

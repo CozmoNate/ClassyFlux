@@ -28,9 +28,9 @@ struct TestState: Equatable {
 class TestStore: FluxStore<TestState> {
 
     var stateBeforeChange: State?
-    var pathsBeforeChange: [PartialKeyPath<TestState>]?
+    var pathsBeforeChange: Set<PartialKeyPath<TestState>>?
     var stateAfterChange: State?
-    var pathsAfterChange: [PartialKeyPath<TestState>]?
+    var pathsAfterChange: Set<PartialKeyPath<TestState>>?
 
     init() {
         super.init(initialState: TestState(value: "initial", number: 0))
@@ -46,12 +46,12 @@ class TestStore: FluxStore<TestState> {
         }
     }
 
-    override func stateWillChange(_ state: TestState, at keyPaths: [PartialKeyPath<TestState>]) {
+    override func stateWillChange(_ state: TestState, at keyPaths: Set<PartialKeyPath<TestState>>) {
         stateBeforeChange = state
         pathsBeforeChange = keyPaths
     }
 
-    override func stateDidChange(_ state: TestState, at keyPaths: [PartialKeyPath<TestState>]) {
+    override func stateDidChange(_ state: TestState, at keyPaths: Set<PartialKeyPath<TestState>>) {
         stateAfterChange = state
         pathsAfterChange = keyPaths
     }

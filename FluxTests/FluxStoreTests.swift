@@ -61,7 +61,7 @@ class FluxStoreTests: QuickSpec {
                             store.handle(action: ChangeValueAction(value: "change it!"), composer: TestComposer())
                         }
 
-                        it("doesn't change store's state") {
+                        it("doesn't change store state") {
                             expect(store.state.value).to(equal("initial"))
                             expect(store.state.number).to(equal(0))
                         }
@@ -83,7 +83,7 @@ class FluxStoreTests: QuickSpec {
                         expect(store.stateAfterChange?.value).to(equal("test"))
                     }
 
-                    it("correctly reduces store's state") {
+                    it("correctly reduces store state") {
                         expect(store.state.value).to(equal("test"))
                     }
 
@@ -114,7 +114,7 @@ class FluxStoreTests: QuickSpec {
                             store.handle(action: IncrementNumberAction(increment: 2), composer: composer)
                         }
 
-                        it("correctly reduces store's state") {
+                        it("correctly reduces store state") {
                             expect(store.state.number).toEventually(equal(2))
                         }
 

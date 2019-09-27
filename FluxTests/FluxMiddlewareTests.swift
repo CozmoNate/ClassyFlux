@@ -80,7 +80,7 @@ class FluxMiddlewareTests: QuickSpec {
                         middleware.handle(action: ChangeValueAction(value: "change it!"), composer: composer)
                     }
 
-                    it("correctly reduces store's state") {
+                    it("correctly reduces store state") {
                         expect(value).to(equal("change it!"))
                     }
 

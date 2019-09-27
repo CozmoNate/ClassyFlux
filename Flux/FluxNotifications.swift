@@ -42,6 +42,6 @@ public struct FluxNotificatons {
     /// User
     public static let StoreDidChangeNotification = Notification.Name(rawValue: "FluxStoreDidChange")
 
-    /// A key in the UserInfo dictionary of store changed notification pointing to the list of properties which are marked as changed in state.
+    /// A key in the UserInfo dictionary of store changed notification pointing to the set of keypaths describing changed properties of store state object.
     public static let ChangedKeyPathsKey = "ChangedKeyPaths"
 }

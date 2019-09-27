@@ -44,7 +44,7 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
 
             var store: FluxStore<TestState>!
             var lastState: TestState?
-            var lastKeyPaths: [PartialKeyPath<TestState>]?
+            var lastKeyPaths: Set<PartialKeyPath<TestState>>?
 
             beforeEach {
                 store = FluxStore(initialState: TestState(value: "initial", number: 0))
@@ -68,7 +68,7 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
 
                 it("receives changed state") {
                     expect(lastState?.value).toEventually(equal(store.state.value))
-                    expect(lastKeyPaths).toEventually(equal([\TestState.value]))
+                    expect(lastKeyPaths).toEventually(equal(Set([\TestState.value])))
                 }
 
                 context("when deallocated") {
@@ -86,7 +86,7 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
 
                         it("does not receives changed state") {
                             expect(lastState?.value).toNotEventually(equal("test 2"))
-                            expect(lastKeyPaths).toNotEventually(equal([\TestState.value]))
+                            expect(lastKeyPaths).toNotEventually(equal(Set([\TestState.value])))
                         }
                     }
                 }
