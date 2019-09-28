@@ -157,25 +157,35 @@ open class FluxStore<State>: FluxWorker {
     }
 
     public func handle<Action: FluxAction>(action: Action, composer: FluxComposer) {
-
         typealias Reducer = Reduce<Action>
 
-        if let reduce = try? reducers.resolve(Reducer.self) {
+        if let reducer = try? reducers.resolve(Reducer.self) {
 
-            var draft = state
-
-            let keyPaths = Set(reduce(&draft, action))
-            
-            if !keyPaths.isEmpty {
-                stateWillChange(state, at: keyPaths)
-                state = draft
-                stateDidChange(state, at: keyPaths)
+            if Thread.isMainThread {
+                reduceState(with: reducer, apply: action)
+            } else {
+                DispatchQueue.main.sync {
+                    self.reduceState(with: reducer, apply: action)
+                }
             }
+            
         }
 
         composer.next(action: action)
     }
 
+    private func reduceState<Action: FluxAction>(with reducer: Reduce<Action>, apply action: Action) {
+        let originalState = backingState
+        var draftState = originalState
+
+        let keyPaths = Set(reducer(&draftState, action))
+
+        if !keyPaths.isEmpty {
+            stateWillChange(originalState, at: keyPaths)
+            backingState = draftState
+            stateDidChange(backingState, at: keyPaths)
+        }
+    }
 }
 
 extension FluxStore {
