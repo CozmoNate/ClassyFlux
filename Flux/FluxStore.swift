@@ -170,8 +170,11 @@ open class FluxStore<State>: FluxWorker {
     }
 
     public func handle<Action: FluxAction>(action: Action, composer: FluxComposer) {
-        
-        guard let reducer = try? reducers.resolve(Reduce<Action>.self) else { return }
+        defer { composer.next(action: action) }
+
+        guard let reducer = try? reducers.resolve(Reduce<Action>.self) else {
+            return
+        }
 
         if Thread.isMainThread {
             reduceState(with: reducer, applying: action)
@@ -180,8 +183,6 @@ open class FluxStore<State>: FluxWorker {
                 self.reduceState(with: reducer, applying: action)
             }
         }
-        
-        composer.next(action: action)
     }
 
     internal func reduceState<Action: FluxAction>(with reducer: Reduce<Action>, applying action: Action) {

@@ -94,20 +94,25 @@ class FluxDispatcherTests: QuickSpec {
                     }
                 }
 
-                context("when registered additional worker") {
+                context("when registered additional workers") {
 
-                    var another: TestWorker!
+                    var ending: TestWorker!
 
                     beforeEach {
-                        another = TestWorker()
-                        dispatcher.append(workers: [another])
+                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                        let store = TestStore()
+                        ending = TestWorker()
+                        dispatcher.append(workers: [FluxMiddleware(),
+                                                    TestStore(),
+                                                    FluxStore(initialState: TestState(value: "1", number: 1)),
+                                                    FluxEndware(store: store),
+                                                    ending])
+
+                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
                     }
 
                     it("registers the worker and its token") {
-                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
-                        expect(dispatcher.tokens.contains(another.token)).to(beTrue())
-                        expect(dispatcher.workers.last).to(beIdenticalTo(another))
-                        expect(dispatcher.workers.count).to(equal(2))
+                        expect(dispatcher.workers.count).to(equal(6))
                     }
 
                     context("when dispatched action") {
@@ -117,8 +122,7 @@ class FluxDispatcherTests: QuickSpec {
                         }
 
                         it("passes the action to last worker") {
-                            dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
-                            expect(another.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
+                            expect(ending.lastAction as? ChangeValueAction).toEventually(equal(ChangeValueAction(value: "test")))
                         }
                     }
                 }

@@ -72,7 +72,6 @@ class FluxStoreTests: QuickSpec {
                             expect(store.state.number).to(equal(0))
                         }
                     }
-
                 }
 
                 context("when performed well known action") {

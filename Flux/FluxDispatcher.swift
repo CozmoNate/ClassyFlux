@@ -115,7 +115,7 @@ extension FluxDispatcher {
 
         func next<Action: FluxAction>(action: Action)  {
             guard iterator != nil else {
-                preconditionFailure("Next action called on discarded composer!")
+                preconditionFailure("Next action should be called inside the same scope!")
             }
             iterator?.next()?.handle(action: action, composer: ProxyComposer(composer: self))
         }
@@ -135,7 +135,7 @@ extension FluxDispatcher {
 
         func next<Action: FluxAction>(action: Action) {
             guard let composer = composer else {
-                preconditionFailure("Next action called on discarded composer!")
+                preconditionFailure("Next action should be called only once!")
             }
             composer.next(action: action)
             discard()

@@ -41,7 +41,7 @@ public protocol FluxWorker: AnyObject {
     /// - Parameter action: The action to handle.
     /// - Parameter composer: The object that passes the action to the next worker.
     ///     You can ignore the composer to stop further action propagation to other workers.
-    ///     If you pass next action to the composer, this should be done synchronously in the same context.
+    ///     If you pass next action to the composer, this should be done synchronously in the same scope.
     func handle<Action: FluxAction>(action: Action, composer: FluxComposer)
 
 }

@@ -74,16 +74,12 @@ open class FluxEndware<State>: FluxWorker {
     /// - Parameter action: The action for which the associated handler should be removed
     /// - Returns:True if the handler is unregistered successfully. False when no handler was registered for the action type.
     public func unregisterHandler<Action: FluxAction>(for action: Action.Type) -> Bool {
-
-        typealias Handler = Handle<Action>
-
-        return handlers.unregister(Handler.self)
+        return handlers.unregister(Handle<Action>.self)
     }
 
     public func handle<Action: FluxAction>(action: Action, composer: FluxComposer) {
-        
         defer { composer.next(action: action) }
-        
+
         guard let handle = try? self.handlers.resolve(Handle<Action>.self) else {
             return
         }
