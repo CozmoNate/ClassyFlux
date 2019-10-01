@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'ClassyFlux'
-  s.version          = '1.9.2'
+  s.version          = '1.9.3'
   s.summary          = 'Flux implementation on Swift'
   s.homepage         = 'https://github.com/kzlekk/ClassyFlux'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -19,6 +19,7 @@ Pod::Spec.new do |s|
   s.subspec 'Core' do |core|
     core.source_files = [
       'Flux/FluxAction.swift',
+      'Flux/FluxAggregator.swift',
       'Flux/FluxComposer.swift',
       'Flux/FluxDispatcher.swift',
       'Flux/FluxMiddleware.swift',

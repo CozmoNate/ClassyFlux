@@ -31,6 +31,11 @@ class FluxStoreTests: QuickSpec {
                         state.value = action.value
                         return [\TestState.value]
                     }
+                    
+                    store.registerMutator { (state, action: IncrementNumberAction) in
+                        guard action.increment != 0 else { return nil }
+                        return TestState(value: "mutated", number: state.number + action.increment)
+                    }
                 }
 
                 it("has correct initial value") {
@@ -38,8 +43,9 @@ class FluxStoreTests: QuickSpec {
                     expect(store.state.number).to(equal(0))
                 }
 
-                it("has registered initial ChangeValueAction reducer") {
+                it("has registered reducer & mutator") {
                     expect(try? store.reducers.resolve(TestStore.Reduce<ChangeValueAction>.self)).toNot(beNil())
+                    expect(try? store.reducers.resolve(TestStore.Reduce<IncrementNumberAction>.self)).toNot(beNil())
                 }
 
                 context("when unregistered the action") {
@@ -89,6 +95,32 @@ class FluxStoreTests: QuickSpec {
 
                     it("passes action to composer") {
                         expect(composer.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
+                    }
+                }
+                
+                context("when performed action that mutates the whole state") {
+
+                    var composer: TestComposer!
+
+                    beforeEach {
+                        composer = TestComposer()
+                        store.handle(action: IncrementNumberAction(increment: 1), composer: composer)
+                    }
+
+                    it("calls state change events") {
+                        expect(store.stateBeforeChange?.value).to(equal("initial"))
+                        expect(store.stateBeforeChange?.number).to(equal(0))
+                        expect(store.stateAfterChange?.value).to(equal("mutated"))
+                        expect(store.stateAfterChange?.number).to(equal(1))
+                    }
+
+                    it("correctly reduces store state") {
+                        expect(store.state.value).to(equal("mutated"))
+                        expect(store.state.number).to(equal(1))
+                    }
+
+                    it("passes the action to composer") {
+                        expect(composer.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
                     }
                 }
 

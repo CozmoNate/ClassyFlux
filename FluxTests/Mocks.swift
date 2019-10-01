@@ -49,11 +49,13 @@ class TestStore: FluxStore<TestState> {
     override func stateWillChange(_ state: TestState, at keyPaths: Set<PartialKeyPath<TestState>>) {
         stateBeforeChange = state
         pathsBeforeChange = keyPaths
+        super.stateWillChange(state, at: keyPaths)
     }
 
     override func stateDidChange(_ state: TestState, at keyPaths: Set<PartialKeyPath<TestState>>) {
         stateAfterChange = state
         pathsAfterChange = keyPaths
+        super.stateDidChange(state, at: keyPaths)
     }
 }
 

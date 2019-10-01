@@ -46,7 +46,7 @@ open class FluxMiddleware: FluxWorker {
     /// A unique identifier of the middleware.
     public let token: UUID
 
-    let handlers: ResolverContainer
+    internal let handlers: ResolverContainer
 
     public init() {
         token = UUID()

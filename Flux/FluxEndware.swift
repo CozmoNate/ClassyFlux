@@ -84,9 +84,7 @@ open class FluxEndware<State>: FluxWorker {
         
         defer { composer.next(action: action) }
         
-        typealias Handler = Handle<Action>
-
-        guard let handle = try? self.handlers.resolve(Handler.self) else {
+        guard let handle = try? self.handlers.resolve(Handle<Action>.self) else {
             return
         }
 

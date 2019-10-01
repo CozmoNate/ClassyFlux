@@ -57,7 +57,7 @@ open class FluxStore<State>: FluxWorker {
 
     public typealias State = State
 
-    /// A state reducer closure. Returns boolen flag indicating if the state is changed.
+    /// A state reducer closure. Returns the list of keyPaths describing state changed fields.
     /// - Parameter state: The mutable copy of current state to apply changes.
     /// - Parameter action: The action invoked the reducer.
     public typealias Reduce<Action: FluxAction> = (inout State, Action) -> [PartialKeyPath<State>]
@@ -139,10 +139,26 @@ open class FluxStore<State>: FluxWorker {
         return Observer(for: event, from: self, queue: queue, changeHandler: changeHandler)
     }
 
-    /// Associates a reducer with the actions of specified type.
+    /// Associates a reducer with the action of specified type.
     /// - Parameter action: The type of the actions to associate with reducer.
     /// - Parameter reducer: The closure that will be invoked when the action received.
     public func registerReducer<Action: FluxAction>(for action: Action.Type = Action.self, reducer: @escaping Reduce<Action>) {
+        reducers.register { reducer }
+    }
+    
+    /// Associates a mutator with the action of specified type.
+    /// - Parameter action: The type of the actions to associate with reducer.
+    /// - Parameter mutator: The closure that will be invoked when the action received, providing actual state value. Return mutated state or nil, when no changes need to be applied to the state.
+    public func registerMutator<Action: FluxAction>(for action: Action.Type = Action.self, mutator: @escaping (State, Action) -> State?) {
+        
+        let reducer: Reduce<Action> = { (state, action) in
+            guard let mutated = mutator(state, action) else { return []}
+            
+            state = mutated
+            
+            return [\State.self]
+        }
+        
         reducers.register { reducer }
     }
 
@@ -150,31 +166,25 @@ open class FluxStore<State>: FluxWorker {
     /// - Parameter action: The action for which the associated reducer should be removed.
     /// - Returns: True if the reducer is unregistered successfully. False when no reducer was registered for the action type.
     public func unregisterReducer<Action: FluxAction>(for action: Action.Type) -> Bool {
-
-        typealias Reducer = Reduce<Action>
-
-        return reducers.unregister(Reducer.self)
+        return reducers.unregister(Reduce<Action>.self)
     }
 
     public func handle<Action: FluxAction>(action: Action, composer: FluxComposer) {
-        typealias Reducer = Reduce<Action>
+        
+        guard let reducer = try? reducers.resolve(Reduce<Action>.self) else { return }
 
-        if let reducer = try? reducers.resolve(Reducer.self) {
-
-            if Thread.isMainThread {
-                reduceState(with: reducer, apply: action)
-            } else {
-                DispatchQueue.main.sync {
-                    self.reduceState(with: reducer, apply: action)
-                }
+        if Thread.isMainThread {
+            reduceState(with: reducer, applying: action)
+        } else {
+            DispatchQueue.main.sync {
+                self.reduceState(with: reducer, applying: action)
             }
-            
         }
-
+        
         composer.next(action: action)
     }
 
-    private func reduceState<Action: FluxAction>(with reducer: Reduce<Action>, apply action: Action) {
+    internal func reduceState<Action: FluxAction>(with reducer: Reduce<Action>, applying action: Action) {
         let originalState = backingState
         var draftState = originalState
 
