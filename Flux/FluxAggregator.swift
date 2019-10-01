@@ -38,9 +38,15 @@ public class FluxAggregator {
     /// - Parameter state: Actual state value
     public typealias Handle<State> = (_ state: State) -> Void
     
-    internal let storage = ResolverContainer()
-    internal var observers = [UUID: AnyObject]()
-    internal let handlers = ResolverContainer()
+    internal let storage: ResolverContainer
+    internal var observers: [UUID: AnyObject]
+    internal let handlers: ResolverContainer
+
+    public init() {
+        storage = ResolverContainer()
+        observers = [UUID: AnyObject]()
+        handlers = ResolverContainer()
+    }
 
     /// Returns the state value or nil if the state of specified type not aggregated.
     public subscript<State>(_ type: State.Type) -> State? {
