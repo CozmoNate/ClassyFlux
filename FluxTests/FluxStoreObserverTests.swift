@@ -63,7 +63,7 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
             context("when state changed") {
 
                 beforeEach {
-                    store.handle(action: ChangeValueAction(value: "test"), composer: self)
+                    store.handle(action: ChangeValueAction(value: "test"))(self)
                 }
 
                 it("receives changed state") {
@@ -81,7 +81,7 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
                         beforeEach {
                             lastState = TestState(value: "one", number: 1)
                             lastKeyPaths = [\TestState.number]
-                            store.handle(action: ChangeValueAction(value: "test 2"), composer: self)
+                            store.handle(action: ChangeValueAction(value: "test 2"))(self)
                         }
 
                         it("does not receives changed state") {

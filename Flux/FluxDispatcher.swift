@@ -114,31 +114,8 @@ extension FluxDispatcher {
         }
 
         func next<Action: FluxAction>(action: Action)  {
-            guard iterator != nil else {
-                preconditionFailure("Next action should be called inside the same scope!")
-            }
-            iterator?.next()?.handle(action: action, composer: ProxyComposer(composer: self))
+            iterator?.next()?.handle(action: action)(self)
         }
     }
-
-    class ProxyComposer: FluxComposer {
-
-        var composer: FluxComposer?
-
-        init(composer: FluxComposer) {
-            self.composer = composer
-        }
-
-        func discard() {
-            composer = nil
-        }
-
-        func next<Action: FluxAction>(action: Action) {
-            guard let composer = composer else {
-                preconditionFailure("Next action should be called only once!")
-            }
-            composer.next(action: action)
-            discard()
-        }
-    }
+    
 }

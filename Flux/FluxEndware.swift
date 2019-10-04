@@ -77,13 +77,11 @@ open class FluxEndware<State>: FluxWorker {
         return handlers.unregister(Handle<Action>.self)
     }
 
-    public func handle<Action: FluxAction>(action: Action, composer: FluxComposer) {
-        defer { composer.next(action: action) }
-
-        guard let handle = try? self.handlers.resolve(Handle<Action>.self) else {
-            return
+    public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
+        if let handle = try? self.handlers.resolve(Handle<Action>.self) {
+            handle(action, store.state)
         }
 
-        handle(action, store.state)
+        return FluxNextAction(action)
     }
 }

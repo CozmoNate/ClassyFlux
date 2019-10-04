@@ -31,6 +31,16 @@
 
 import Foundation
 
+public typealias FluxPassthroughAction = (FluxComposer) -> Void
+
+public func FluxNextAction<Action: FluxAction>(_ action: Action?) -> FluxPassthroughAction {
+    return {
+        if let action = action {
+            $0.next(action: action)
+        }
+    }
+}
+
 /// An object that handles action and passes next action to other workers via action composer
 public protocol FluxWorker: AnyObject {
 
@@ -39,9 +49,8 @@ public protocol FluxWorker: AnyObject {
 
     /// Handles the action dispatched. The function can be performed on a background thread.
     /// - Parameter action: The action to handle.
-    /// - Parameter composer: The object that passes the action to the next worker.
-    ///     You can ignore the composer to stop further action propagation to other workers.
-    ///     If you pass next action to the composer, this should be done synchronously in the same scope.
-    func handle<Action: FluxAction>(action: Action, composer: FluxComposer)
+    /// - Returns: Next action wrapper. Use FluxNextAction(FluxAction) functor to pass next action.
+    /// Pass nil action to FluxNextAction functor to stop action propagation to subsequent worker.
+    func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction
 
 }

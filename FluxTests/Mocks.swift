@@ -74,9 +74,9 @@ class TestWorker: FluxWorker {
 
     var lastAction: FluxAction?
 
-    func handle<Action>(action: Action, composer: FluxComposer) where Action : FluxAction {
+    func handle<Action>(action: Action) -> FluxPassthroughAction where Action : FluxAction {
         lastAction = action
-        composer.next(action: action)
+        return FluxNextAction(action)
     }
 }
 

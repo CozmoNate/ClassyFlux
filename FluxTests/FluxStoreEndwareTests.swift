@@ -79,7 +79,7 @@ class FluxEndwareTests: QuickSpec {
 
                         beforeEach {
                             composer = TestComposer()
-                            broker.handle(action: ChangeValueAction(value: "change it!"), composer: composer)
+                            broker.handle(action: ChangeValueAction(value: "change it!"))(composer)
                         }
 
                         it("does not change the value") {
@@ -99,7 +99,7 @@ class FluxEndwareTests: QuickSpec {
 
                     beforeEach {
                         composer = TestComposer()
-                        broker.handle(action: ChangeValueAction(value: "change it!"), composer: composer)
+                        broker.handle(action: ChangeValueAction(value: "change it!"))(composer)
                     }
 
                     it("correctly reduces store state") {

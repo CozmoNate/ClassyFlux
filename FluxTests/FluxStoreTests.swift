@@ -64,7 +64,7 @@ class FluxStoreTests: QuickSpec {
                     context("when performed unregistered action") {
 
                         beforeEach {
-                            store.handle(action: ChangeValueAction(value: "change it!"), composer: TestComposer())
+                            store.handle(action: ChangeValueAction(value: "change it!"))(TestComposer())
                         }
 
                         it("doesn't change store state") {
@@ -80,7 +80,7 @@ class FluxStoreTests: QuickSpec {
 
                     beforeEach {
                         composer = TestComposer()
-                        store.handle(action: ChangeValueAction(value: "test"), composer: composer)
+                        store.handle(action: ChangeValueAction(value: "test"))(composer)
                     }
 
                     it("calls state change events") {
@@ -103,7 +103,7 @@ class FluxStoreTests: QuickSpec {
 
                     beforeEach {
                         composer = TestComposer()
-                        store.handle(action: IncrementNumberAction(increment: 1), composer: composer)
+                        store.handle(action: IncrementNumberAction(increment: 1))(composer)
                     }
 
                     it("calls state change events") {
@@ -142,7 +142,7 @@ class FluxStoreTests: QuickSpec {
 
                         beforeEach {
                             composer = TestComposer()
-                            store.handle(action: IncrementNumberAction(increment: 2), composer: composer)
+                            store.handle(action: IncrementNumberAction(increment: 2))(composer)
                         }
 
                         it("correctly reduces store state") {

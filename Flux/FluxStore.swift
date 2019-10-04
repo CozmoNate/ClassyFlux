@@ -169,20 +169,20 @@ open class FluxStore<State>: FluxWorker {
         return reducers.unregister(Reduce<Action>.self)
     }
 
-    public func handle<Action: FluxAction>(action: Action, composer: FluxComposer) {
-        defer { composer.next(action: action) }
-
-        guard let reducer = try? reducers.resolve(Reduce<Action>.self) else {
-            return
-        }
-
-        if Thread.isMainThread {
-            reduceState(with: reducer, applying: action)
-        } else {
-            DispatchQueue.main.sync {
-                self.reduceState(with: reducer, applying: action)
+    public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
+        
+        if let reducer = try? reducers.resolve(Reduce<Action>.self) {
+            
+            if Thread.isMainThread {
+                reduceState(with: reducer, applying: action)
+            } else {
+                DispatchQueue.main.sync {
+                    self.reduceState(with: reducer, applying: action)
+                }
             }
         }
+
+        return FluxNextAction(action)
     }
 
     internal func reduceState<Action: FluxAction>(with reducer: Reduce<Action>, applying action: Action) {

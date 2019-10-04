@@ -40,8 +40,9 @@ open class FluxMiddleware: FluxWorker {
     /// - Parameter composer: The object that passes the action to the next worker.
     ///     You can ignore the composer to stop further action propagation to other workers.
     ///     If you pass next action to the composer, this should be done synchronously in the same closure.
-    /// - Returns: Return next action or nil to prevent the action to proppagate to other workers
-    public typealias Handle<Action: FluxAction> = (_ action: Action, _ composer: FluxComposer) -> Void
+    /// - Returns: Return next action. Use FluxNextAction(FluxAction) functor to pass next action.
+    /// Pass nil action to FluxNextAction functor to stop action propagation to subsequent worker.
+    public typealias Handle<Action: FluxAction> = (_ action: Action) -> FluxPassthroughAction
 
     /// A unique identifier of the middleware.
     public let token: UUID
@@ -67,13 +68,12 @@ open class FluxMiddleware: FluxWorker {
         return handlers.unregister(Handle<Action>.self)
     }
 
-    public func handle<Action: FluxAction>(action: Action, composer: FluxComposer) {
+    public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
         guard let handle = try? self.handlers.resolve(Handle<Action>.self) else {
-            composer.next(action: action)
-            return
+            return FluxNextAction(action)
         }
 
-        handle(action, composer)
+        return handle(action)
     }
 
 }
