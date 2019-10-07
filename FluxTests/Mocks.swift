@@ -25,6 +25,10 @@ struct TestState: Equatable {
     var number: Int
 }
 
+class TestMiddleware: FluxMiddleware {
+    var didIncrement: Bool?
+}
+
 class TestStore: FluxStore<TestState> {
 
     var stateBeforeChange: State?

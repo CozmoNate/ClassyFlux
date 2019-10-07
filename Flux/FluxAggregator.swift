@@ -31,7 +31,7 @@
 
 import ResolverContainer
 
-/// A class that aggregates states from multiple stores and invoke appropriate handlers when the store changes.
+/// A class that aggregates states from multiple stores and invokes appropriate handlers when store changed.
 public class FluxAggregator {
 
     /// State changes handler

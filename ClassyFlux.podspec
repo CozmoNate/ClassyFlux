@@ -1,13 +1,13 @@
 Pod::Spec.new do |s|
   s.name             = 'ClassyFlux'
-  s.version          = '1.10.0'
+  s.version          = '1.10.1'
   s.summary          = 'Flux implementation on Swift'
   s.homepage         = 'https://github.com/kzlekk/ClassyFlux'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Natan Zalkin' => 'natan.zalkin@me.com' }
   s.source           = { :git => 'https://github.com/kzlekk/ClassyFlux.git', :tag => "#{s.version}" }
   s.module_name      = 'ClassyFlux'
-  s.swift_version    = '5.0'
+  s.swift_version    = '5'
 
   s.ios.deployment_target = '11.0'
   s.osx.deployment_target = '10.14'
@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
       'Flux/FluxDispatcher.swift',
       'Flux/FluxMiddleware.swift',
       'Flux/FluxNotifications.swift',
-      'Flux/FluxRepository.swift',
+      'Flux/FluxSelfAccessible.swift',
       'Flux/FluxStore.swift',
       'Flux/FluxEndware.swift',
       'Flux/FluxWorker.swift']
@@ -36,7 +36,9 @@ Pod::Spec.new do |s|
     swiftui.watchos.deployment_target = '6.0'
     swiftui.tvos.deployment_target = '13.0'
     swiftui.dependency 'ClassyFlux/Core'
-    swiftui.source_files = ['Flux/FluxView.swift']
+    swiftui.source_files = [
+        'Flux/FluxView.swift'
+    ]
   end
 
   s.default_subspec = 'Core'

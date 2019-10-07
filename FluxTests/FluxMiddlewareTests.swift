@@ -17,25 +17,67 @@ class FluxMiddlewareTests: QuickSpec {
 
         describe("FluxMiddleware") {
 
-            var middleware: FluxMiddleware!
+            var middleware: TestMiddleware!
             var value: String!
 
             beforeEach {
                 value = "initial"
-                middleware = FluxMiddleware()
+                middleware = TestMiddleware()
             }
 
             context("when registered action handler") {
 
                 beforeEach {
-                    middleware.registerHandler { (action: ChangeValueAction) in
+                    middleware.registerHandler(for: ChangeValueAction.self) { (action) in
                         value = action.value
+                        return FluxNextAction(action)
+                    }
+
+                    middleware.registerHandler(for: IncrementNumberAction.self) { (self, action) in
+                        self.didIncrement = true
                         return FluxNextAction(action)
                     }
                 }
 
-                it("has registered ChangeValueAction performer") {
+                it("has registered action handlers") {
                     expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<ChangeValueAction>.self)).toNot(beNil())
+                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<IncrementNumberAction>.self)).toNot(beNil())
+                }
+
+                context("when performed registered action") {
+
+                    var composer: TestComposer!
+
+                    beforeEach {
+                        composer = TestComposer()
+                        middleware.handle(action: ChangeValueAction(value: "change it!"))(composer)
+                    }
+
+                    it("calls action handler") {
+                        expect(value).to(equal("change it!"))
+                    }
+
+                    it("passes action to composer") {
+                        expect(composer.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
+                    }
+                }
+
+                context("when performed action associated with self-accessible handler") {
+
+                    var composer: TestComposer!
+
+                    beforeEach {
+                        composer = TestComposer()
+                        middleware.handle(action: IncrementNumberAction(increment: 1))(composer)
+                    }
+
+                    it("calls action handler") {
+                        expect(middleware.didIncrement).to(beTruthy())
+                    }
+
+                    it("passes action to composer") {
+                        expect(composer.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
+                    }
                 }
 
                 context("when unregistered the action") {
@@ -69,24 +111,6 @@ class FluxMiddlewareTests: QuickSpec {
                         }
                     }
 
-                }
-
-                context("when performed registered action") {
-
-                    var composer: TestComposer!
-
-                    beforeEach {
-                        composer = TestComposer()
-                        middleware.handle(action: ChangeValueAction(value: "change it!"))(composer)
-                    }
-
-                    it("correctly reduces store state") {
-                        expect(value).to(equal("change it!"))
-                    }
-
-                    it("passes action to composer") {
-                        expect(composer.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
-                    }
                 }
             }
 

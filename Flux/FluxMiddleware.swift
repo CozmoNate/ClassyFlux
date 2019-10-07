@@ -33,13 +33,10 @@ import Foundation
 import ResolverContainer
 
 /// An object that triggers handlers in a response to specific action dispatched
-open class FluxMiddleware: FluxWorker {
+open class FluxMiddleware: FluxWorker, FluxSelfAccessible {
 
     /// An action handler closue. When the action returned it will be passed to next worker.
     /// - Parameter action: The action to handle
-    /// - Parameter composer: The object that passes the action to the next worker.
-    ///     You can ignore the composer to stop further action propagation to other workers.
-    ///     If you pass next action to the composer, this should be done synchronously in the same closure.
     /// - Returns: Return next action. Use FluxNextAction(FluxAction) functor to pass next action.
     /// Pass nil action to FluxNextAction functor to stop action propagation to subsequent worker.
     public typealias Handle<Action: FluxAction> = (_ action: Action) -> FluxPassthroughAction
@@ -74,6 +71,32 @@ open class FluxMiddleware: FluxWorker {
         }
 
         return handle(action)
+    }
+
+}
+
+extension FluxSelfAccessible where Self: FluxMiddleware {
+
+    /// An action handler closue. When the action returned it will be passed to next worker.
+    /// - Parameter self: The reference to self instance
+    /// - Parameter action: The action to handle
+    /// - Returns: Return next action. Use FluxNextAction(FluxAction) functor to pass next action.
+    /// Pass nil action to FluxNextAction functor to stop action propagation to subsequent worker.
+    public typealias SelfAccessibleHandle<Action: FluxAction> = (_ self: Self, _ action: Action) -> FluxPassthroughAction
+
+    /// Associates a handler with the actions of specified type
+    /// - Parameter action: The type of the actions to associate with handler
+    /// - Parameter execute: The closure that will be invoked when the action received
+    public func registerHandler<Action: FluxAction>(for action: Action.Type = Action.self, work execute: @escaping SelfAccessibleHandle<Action>) {
+
+        let handler: Handle<Action> = { [weak self] action in
+            guard let self = self else {
+                return FluxNextAction(action)
+            }
+            return execute(self, action)
+        }
+
+        handlers.register { handler }
     }
 
 }
