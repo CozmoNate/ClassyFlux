@@ -31,3 +31,20 @@
 
 /// A protocol describing an abstract action
 public protocol FluxAction {}
+
+public protocol FluxActionDispatching {
+
+    /// Dispatches an action.
+    /// - Parameter action: The action to dispatch.
+    func dispatch<Action: FluxAction>(action: Action)
+
+}
+
+public extension FluxAction {
+
+    /// Dispatches the action with a dispatcher provided
+    func dispatch(with dispatcher: FluxActionDispatching?) {
+        dispatcher?.dispatch(action: self)
+    }
+
+}

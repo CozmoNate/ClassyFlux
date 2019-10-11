@@ -5,4 +5,5 @@
 [![Build Status](https://travis-ci.com/kzlekk/ClassyFlux.svg?branch=master)](https://travis-ci.com/kzlekk/ClassyFlux)
 [![Coverage Status](https://coveralls.io/repos/github/kzlekk/ClassyFlux/badge.svg?branch=master)](https://coveralls.io/github/kzlekk/ClassyFlux?branch=master)
 
-Flux implementation for use with SwiftUI or UIKit
+Minimalistic Flux implementation in Swift to use with SwiftUI & UIKit.
+

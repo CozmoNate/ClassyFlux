@@ -38,3 +38,17 @@ public protocol FluxComposer: AnyObject {
     func next<Action: FluxAction>(action: Action)
 
 }
+
+public class FluxStackingComposer: FluxComposer {
+
+    internal var iterator: IndexingIterator<[FluxWorker]>?
+
+    public init(workers: [FluxWorker]) {
+        iterator = workers.makeIterator()
+    }
+
+    public func next<Action: FluxAction>(action: Action)  {
+        iterator?.next()?.handle(action: action)(self)
+    }
+
+}

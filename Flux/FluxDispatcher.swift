@@ -33,7 +33,7 @@ import Foundation
 import ResolverContainer
 
 /// An object that dispatches actions serially to registered workers.
-open class FluxDispatcher {
+open class FluxDispatcher: FluxActionDispatching {
 
     public static let `default` = FluxDispatcher()
 
@@ -75,13 +75,11 @@ open class FluxDispatcher {
         }
     }
 
-    /// Dispatches an action to registered workers.
-    /// - Parameter action: The action to dispatch.
+    /// Dispatches an action to workers.
+    /// - Parameter action: The action to dispatch to workers.
     public func dispatch<Action: FluxAction>(action: Action) {
         operationQueue.addOperation {
-            let composer = StackingComposer(workers: self.workers)
-            composer.next(action: action)
-            composer.discard()
+            FluxStackingComposer(workers: self.workers).next(action: action)
         }
     }
 
@@ -97,25 +95,4 @@ open class FluxDispatcher {
         dispatch(operation: BlockOperation(block: block))
     }
 
-}
-
-extension FluxDispatcher {
-
-    class StackingComposer: FluxComposer {
-
-        var iterator: IndexingIterator<[FluxWorker]>?
-
-        init(workers: [FluxWorker]) {
-            iterator = workers.makeIterator()
-        }
-
-        func discard() {
-            iterator = nil
-        }
-
-        func next<Action: FluxAction>(action: Action)  {
-            iterator?.next()?.handle(action: action)(self)
-        }
-    }
-    
 }
