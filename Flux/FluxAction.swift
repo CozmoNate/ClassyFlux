@@ -32,7 +32,7 @@
 /// A protocol describing an abstract action
 public protocol FluxAction {}
 
-public protocol FluxActionDispatching {
+public protocol FluxActionDispatching: AnyObject {
 
     /// Dispatches an action.
     /// - Parameter action: The action to dispatch.

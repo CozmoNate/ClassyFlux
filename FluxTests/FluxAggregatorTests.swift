@@ -73,7 +73,7 @@ class FluxAggregatorTests: QuickSpec {
                     }
                     
                     it("adds the handler into resolver container") {
-                        expect(try? aggregator.handlers.resolve(FluxAggregator.Handle<TestState>.self)).notTo(beNil())
+                        expect(try? aggregator.storage.resolve(FluxAggregator.Handle<TestState>.self)).notTo(beNil())
                     }
                     
                     context("when store chages") {
@@ -92,15 +92,13 @@ class FluxAggregatorTests: QuickSpec {
                     }
                     
                     context("when unregistered the handler") {
-                        var unregistered: Bool!
-                        
+
                         beforeEach {
-                            unregistered = aggregator.unregisterHandler(for: TestState.self)
+                            aggregator.unregisterHandler(for: TestState.self)
                         }
                     
                         it("removes the handler from resolver container") {
-                            expect(unregistered).to(beTruthy())
-                            expect(try? aggregator.handlers.resolve(FluxAggregator.Handle<TestState>.self)).to(beNil())
+                            expect(try? aggregator.storage.resolve(FluxAggregator.Handle<TestState>.self)).to(beNil())
                         }
                     }
                 }
@@ -113,6 +111,18 @@ class FluxAggregatorTests: QuickSpec {
                     
                     it("removes store observer") {
                         expect(aggregator.observers[store.token]).to(beNil())
+                    }
+                }
+
+                context("when unregistered all") {
+
+                    beforeEach {
+                        aggregator.unregisterAll()
+                    }
+
+                    it("removes store observer") {
+                        expect(aggregator.observers).to(beEmpty())
+                        expect(try? aggregator.storage.resolve(TestState.self)).to(beNil())
                     }
                 }
             }

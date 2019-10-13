@@ -50,14 +50,11 @@ class FluxStoreTests: QuickSpec {
 
                 context("when unregistered the action") {
 
-                    var flag: Bool!
-
                     beforeEach {
-                        flag = store.unregisterReducer(for: ChangeValueAction.self)
+                        store.unregisterReducer(for: ChangeValueAction.self)
                     }
 
                     it("successfully unregistered the reducer") {
-                        expect(flag).to(beTrue())
                         expect(try? store.reducers.resolve(TestStore.Reduce<ChangeValueAction>.self)).to(beNil())
                     }
 

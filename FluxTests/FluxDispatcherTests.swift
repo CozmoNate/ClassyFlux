@@ -20,7 +20,7 @@ class FluxDispatcherTests: QuickSpec {
             var dispatcher: FluxDispatcher!
 
             beforeEach {
-                dispatcher = FluxDispatcher()
+                dispatcher = FluxDispatcher(queue: nil)
             }
 
             context("when registered worker") {
@@ -100,19 +100,18 @@ class FluxDispatcherTests: QuickSpec {
 
                     beforeEach {
                         dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
-                        let store = TestStore()
                         ending = TestWorker()
+
                         dispatcher.append(workers: [FluxMiddleware(),
                                                     TestStore(),
                                                     FluxStore(initialState: TestState(value: "1", number: 1)),
-                                                    FluxEndware(store: store),
                                                     ending])
 
                         dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
                     }
 
                     it("registers the worker and its token") {
-                        expect(dispatcher.workers.count).to(equal(6))
+                        expect(dispatcher.workers.count).to(equal(5))
                     }
 
                     context("when dispatched action") {

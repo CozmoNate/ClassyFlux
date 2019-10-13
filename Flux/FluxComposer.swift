@@ -39,6 +39,8 @@ public protocol FluxComposer: AnyObject {
 
 }
 
+/// A composer passing action from one worker to next worker located in the stack (array).
+/// FluxStackingComposer instance can be used only once by calling 'next(action:)' method which will start action propagation to the workers.
 public class FluxStackingComposer: FluxComposer {
 
     internal var iterator: IndexingIterator<[FluxWorker]>?

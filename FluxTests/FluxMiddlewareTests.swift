@@ -28,14 +28,13 @@ class FluxMiddlewareTests: QuickSpec {
             context("when registered action handler") {
 
                 beforeEach {
-                    middleware.registerHandler(for: ChangeValueAction.self) { (action) in
+                    middleware.registerComposer(for: ChangeValueAction.self) { (owner, action) in
                         value = action.value
                         return FluxNextAction(action)
                     }
 
-                    middleware.registerHandler(for: IncrementNumberAction.self) { (self, action) in
-                        self.didIncrement = true
-                        return FluxNextAction(action)
+                    middleware.registerHandler(for: IncrementNumberAction.self) { (owner, action) in
+                        owner.didIncrement = true
                     }
                 }
 
@@ -82,14 +81,11 @@ class FluxMiddlewareTests: QuickSpec {
 
                 context("when unregistered the action") {
 
-                    var flag: Bool!
-
                     beforeEach {
-                        flag = middleware.unregisterHandler(for: ChangeValueAction.self)
+                        middleware.unregisterHandler(for: ChangeValueAction.self)
                     }
 
                     it("successfully unregistered the action handler") {
-                        expect(flag).to(beTrue())
                         expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<ChangeValueAction>.self)).to(beNil())
                     }
 

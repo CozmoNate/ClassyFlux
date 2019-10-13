@@ -44,12 +44,16 @@ extension FluxStore: ObservableObject {}
 public enum FluxStoreEvent {
     case stateWillChange, stateDidChange
 
-    internal var notificationName: Notification.Name {
+    /// A name of the notification send alongside with corresponding store event.
+    public var notificationName: Notification.Name {
         switch self {
-        case .stateWillChange: return FluxNotificatons.StoreWillChangeNotification
-        case .stateDidChange: return FluxNotificatons.StoreDidChangeNotification
+        case .stateWillChange: return Notification.Name(rawValue: "FluxStoreWillChange")
+        case .stateDidChange: return Notification.Name(rawValue: "FluxStoreDidChange")
         }
     }
+
+    /// A key in the UserInfo dictionary of a notification pointing to the set of keypaths describing changed properties of store state object.
+    public static let changedKeyPathsKey = "changedKeyPaths"
 }
 
 /// Store contains a state object triggers reducer to modify the state as a response to action dispatched
@@ -116,7 +120,7 @@ open class FluxStore<State>: FluxWorker {
         }
         #endif
 
-        NotificationCenter.default.post(name: FluxNotificatons.StoreWillChangeNotification, object: self, userInfo: [FluxNotificatons.ChangedKeyPathsKey: keyPaths])
+        NotificationCenter.default.post(name: FluxStoreEvent.stateWillChange.notificationName, object: self, userInfo: [FluxStoreEvent.changedKeyPathsKey: keyPaths])
     }
 
     /// An event called after the state is passed to reducers.
@@ -129,7 +133,7 @@ open class FluxStore<State>: FluxWorker {
         }
         #endif
 
-        NotificationCenter.default.post(name: FluxNotificatons.StoreDidChangeNotification, object: self, userInfo: [FluxNotificatons.ChangedKeyPathsKey: keyPaths])
+        NotificationCenter.default.post(name: FluxStoreEvent.stateDidChange.notificationName, object: self, userInfo: [FluxStoreEvent.changedKeyPathsKey: keyPaths])
     }
 
     /// Adds an observer that will be invoked each time the store chages its state
@@ -164,9 +168,8 @@ open class FluxStore<State>: FluxWorker {
 
     /// Unregisters reducer associated with specified action type.
     /// - Parameter action: The action for which the associated reducer should be removed.
-    /// - Returns: True if the reducer is unregistered successfully. False when no reducer was registered for the action type.
-    public func unregisterReducer<Action: FluxAction>(for action: Action.Type) -> Bool {
-        return reducers.unregister(Reduce<Action>.self)
+    public func unregisterReducer<Action: FluxAction>(for action: Action.Type) {
+        reducers.unregister(Reduce<Action>.self)
     }
 
     public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
@@ -186,6 +189,7 @@ open class FluxStore<State>: FluxWorker {
     }
 
     internal func reduceState<Action: FluxAction>(with reducer: Reduce<Action>, applying action: Action) {
+
         let originalState = backingState
         var draftState = originalState
 
@@ -197,6 +201,7 @@ open class FluxStore<State>: FluxWorker {
             stateDidChange(backingState, at: keyPaths)
         }
     }
+    
 }
 
 extension FluxStore {
@@ -206,14 +211,11 @@ extension FluxStore {
 
         internal let observer: NSObjectProtocol
 
-        internal init<State>(for event: FluxStoreEvent,
-                             from store: FluxStore<State>,
-                             queue: OperationQueue,
-                             changeHandler: @escaping (State, Set<PartialKeyPath<State>>) -> Void) {
+        internal init<State>(for event: FluxStoreEvent, from store: FluxStore<State>, queue: OperationQueue, changeHandler: @escaping (State, Set<PartialKeyPath<State>>) -> Void) {
             observer = NotificationCenter.default
                 .addObserver(forName: event.notificationName, object: store, queue: queue) { notification in
                     guard let store = notification.object as? FluxStore<State> else { return }
-                    guard let keyPaths = notification.userInfo?[FluxNotificatons.ChangedKeyPathsKey] as? Set<PartialKeyPath<State>> else { return }
+                    guard let keyPaths = notification.userInfo?[FluxStoreEvent.changedKeyPathsKey] as? Set<PartialKeyPath<State>> else { return }
                     changeHandler(store.state, keyPaths)
                 }
         }

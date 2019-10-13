@@ -31,7 +31,7 @@
 
 import ResolverContainer
 
-/// A class that aggregates states from multiple stores and invokes appropriate handlers when store changed.
+/// A class that aggregates states from multiple stores and invokes appropriate handlers when the store changes.
 public class FluxAggregator {
 
     /// State changes handler
@@ -40,20 +40,24 @@ public class FluxAggregator {
     
     internal let storage: ResolverContainer
     internal var observers: [UUID: AnyObject]
-    internal let handlers: ResolverContainer
+    internal var changeHandler: ((FluxAggregator) -> Void)?
 
-    public init() {
+    public init(collectHandler: ((FluxAggregator) -> Void)? = nil) {
         storage = ResolverContainer()
         observers = [UUID: AnyObject]()
-        handlers = ResolverContainer()
+        changeHandler = collectHandler
     }
 
-    /// Returns the state value or nil if the state of specified type not aggregated.
-    public subscript<State>(_ type: State.Type) -> State? {
-        return try? storage.resolve(State.self)
+    /// Returns the state value or nil if the state of the specified type is not available.
+    public subscript<State>(_ type: State.Type) -> State {
+        do {
+            return try storage.resolve()
+        } catch {
+            fatalError("Requested unregistered state type: \(String(describing: State.self))")
+        }
     }
     
-    /// Registers store and starts to aggregate that store state changes.
+    /// Registers a store and starts to aggregate that store state changes.
     /// - Parameter store: The store to register. Store will be registered under its token, and can be unregistered later by providing its token.
     /// - Parameter observedKeyPaths: The list of KeyPath describing the fields in particulat state object, which should trigger state change handlers.
     public func register<State>(store: FluxStore<State>, observing observedKeyPaths: Set<PartialKeyPath<State>> = Set(), queue: OperationQueue = .main) {
@@ -66,11 +70,11 @@ public class FluxAggregator {
                 return
             }
 
-            guard let handler = try? self.handlers.resolve(Handle<State>.self) else {
-                return
+            if let handler = try? self.storage.resolve(Handle<State>.self) {
+                handler(state)
             }
             
-            handler(state)
+            self.changeHandler?(self)
         }
     }
     
@@ -82,22 +86,23 @@ public class FluxAggregator {
         }
     }
     
-    /// Unregisters all observers and stop receiving state changed events
-    public func unregisterAll() {
-        observers.removeAll()
-    }
-    
-   /// Associates change handler with the state of specified type.
+    /// Associates change handler with the state of specified type.
     /// - Parameter state: The type of a state object to associate with handler.
     /// - Parameter execute: The closure that will be invoked when the state is changed.
     public func registerHandler<State>(for state: State.Type = State.self, handler: @escaping Handle<State>) {
-        handlers.register { handler }
+        storage.register { handler }
     }
 
     /// Unregisters handler associated with specified state type.
-    /// - Returns:True if the handler is unregistered successfully. False when no handler was registered for the action type.
-    public func unregisterHandler<State>(for state: State.Type) -> Bool {
-        return handlers.unregister(Handle<State>.self)
+    public func unregisterHandler<State>(for state: State.Type) {
+        storage.unregister(Handle<State>.self)
+    }
+
+
+    /// Unregisters all observers and stop receiving state changed events
+    public func unregisterAll() {
+        storage.unregisterAll()
+        observers.removeAll()
     }
     
 }

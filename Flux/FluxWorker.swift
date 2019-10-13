@@ -31,8 +31,10 @@
 
 import Foundation
 
+/// A closure which passes next action to subsequent workers via the composer provided.
 public typealias FluxPassthroughAction = (FluxComposer) -> Void
 
+/// A functor which generates FluxPassthroughAction closure and passes next action to subsequent workers.
 public func FluxNextAction<Action: FluxAction>(_ action: Action?) -> FluxPassthroughAction {
     return {
         if let action = action {
@@ -41,7 +43,7 @@ public func FluxNextAction<Action: FluxAction>(_ action: Action?) -> FluxPassthr
     }
 }
 
-/// An object that handles action and passes next action to other workers via action composer
+/// An object that handles actions and passes next actions to subsequent workers.
 public protocol FluxWorker: AnyObject {
 
     /// A unique identifier of the worker.

@@ -41,15 +41,20 @@ open class FluxDispatcher: FluxActionDispatching {
     var workers: [FluxWorker]
     let operationQueue: OperationQueue
 
-    /// Initialises a dispatcher with specified quality of service of underlyng dispatch queue.
-    /// - Parameter qos: The QOS of theunderlying dispatch queue.
-    public init(qos: QualityOfService = .userInitiated) {
+    /// Initialises a dispatcher.
+    /// - Parameter queue: The queue to be used to dispatch actions. Passed queue will be forcibly configured to run only one operation at a time.
+    public init(queue: OperationQueue? = nil) {
 
         tokens = Set()
         workers = []
 
-        operationQueue = OperationQueue()
-        operationQueue.qualityOfService = qos
+        if let queue = queue {
+            operationQueue = queue
+        } else {
+            operationQueue = OperationQueue()
+            operationQueue.qualityOfService = .userInitiated
+        }
+
         operationQueue.maxConcurrentOperationCount = 1
     }
 
@@ -83,13 +88,13 @@ open class FluxDispatcher: FluxActionDispatching {
         }
     }
 
-    /// Dispatches an operation to run in the same queue as the actions.
+    /// Dispatches an operation to run in the same queue as regular actions.
     /// - Parameter operation: The operation to dispatch.
     public func dispatch(operation: Operation) {
         operationQueue.addOperation(operation)
     }
 
-    /// Dispatches a closure to run in the same queue as the actions.
+    /// Dispatches a closure to run in the same queue as regular actions.
     /// - Parameter operation: The closure to dispatch.
     public func dispatch(block: @escaping () -> Void) {
         dispatch(operation: BlockOperation(block: block))

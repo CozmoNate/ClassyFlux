@@ -33,13 +33,12 @@ import Foundation
 import ResolverContainer
 
 /// An object that triggers handlers in a response to specific action dispatched
-open class FluxMiddleware: FluxWorker, FluxSelfAccessible {
+open class FluxMiddleware: FluxWorker {
 
-    /// An action handler closue. When the action returned it will be passed to next worker.
-    /// - Parameter action: The action to handle
-    /// - Returns: Return next action. Use FluxNextAction(FluxAction) functor to pass next action.
-    /// Pass nil action to FluxNextAction functor to stop action propagation to subsequent worker.
-    public typealias Handle<Action: FluxAction> = (_ action: Action) -> FluxPassthroughAction
+    /// An action handler closure. You can pass different action to subsequent workers, or stop the action to propagate.
+    /// - Parameter action: The action to handle.
+    /// - Returns: The next action. Use FluxNextAction(FluxAction) functor to pass next action. Passing nil action will stop action propagation.
+    public typealias Handle<Action: FluxAction> = (Action) -> FluxPassthroughAction
 
     /// A unique identifier of the middleware.
     public let token: UUID
@@ -51,51 +50,44 @@ open class FluxMiddleware: FluxWorker, FluxSelfAccessible {
         handlers = ResolverContainer()
     }
 
-    /// Associates a handler with the actions of specified type
-    /// - Parameter action: The type of the actions to associate with handler
-    /// - Parameter execute: The closure that will be invoked when the action received
-    public func registerHandler<Action: FluxAction>(for action: Action.Type = Action.self, work execute: @escaping Handle<Action>) {
-        handlers.register { execute }
-    }
-
     /// Unregisters handler associated with specified action type.
     /// - Parameter action: The action for which the associated handler should be removed
-    /// - Returns:True if the handler is unregistered successfully. False when no handler was registered for the action type.
-    public func unregisterHandler<Action: FluxAction>(for action: Action.Type) -> Bool {
-        return handlers.unregister(Handle<Action>.self)
+    public func unregisterHandler<Action: FluxAction>(for action: Action.Type) {
+        handlers.unregister(Handle<Action>.self)
     }
 
     public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
+        
         guard let handle = try? self.handlers.resolve(Handle<Action>.self) else {
             return FluxNextAction(action)
         }
 
         return handle(action)
     }
-
+    
 }
 
-extension FluxSelfAccessible where Self: FluxMiddleware {
+extension FluxWorker where Self: FluxMiddleware {
 
-    /// An action handler closue. When the action returned it will be passed to next worker.
-    /// - Parameter self: The reference to self instance
-    /// - Parameter action: The action to handle
-    /// - Returns: Return next action. Use FluxNextAction(FluxAction) functor to pass next action.
-    /// Pass nil action to FluxNextAction functor to stop action propagation to subsequent worker.
-    public typealias SelfAccessibleHandle<Action: FluxAction> = (_ self: Self, _ action: Action) -> FluxPassthroughAction
-
-    /// Associates a handler with the actions of specified type
-    /// - Parameter action: The type of the actions to associate with handler
-    /// - Parameter execute: The closure that will be invoked when the action received
-    public func registerHandler<Action: FluxAction>(for action: Action.Type = Action.self, work execute: @escaping SelfAccessibleHandle<Action>) {
-
-        let handler: Handle<Action> = { [weak self] action in
-            guard let self = self else {
-                return FluxNextAction(action)
-            }
-            return execute(self, action)
+    /// Associates an action composer with the actions of specified type.
+    /// - Parameter action: The type of the actions to associate with handler.
+    /// - Parameter compose: The closure that will be invoked when the action received.
+    public func registerComposer<Action: FluxAction>(for action: Action.Type, compose: @escaping (_ owner: Self, _ action: Action) -> FluxPassthroughAction) {
+        let handler: Handle<Action> = { [weak self] (action) -> FluxPassthroughAction in
+            if let self = self { return compose(self, action) }
+            return FluxNextAction(action)
         }
+        handlers.register { handler }
+    }
 
+    /// Associates a handler with the actions of specified type.
+    /// - Parameter action: The type of the actions to associate with handler.
+    /// - Parameter execute: The closure that will be invoked when the action received.
+    public func registerHandler<Action: FluxAction>(for action: Action.Type, handle: @escaping (_ owner: Self, _ action: Action) -> Void) {
+        let handler: Handle<Action> = { [weak self] (action) -> FluxPassthroughAction in
+            if let self = self { handle(self, action) }
+            return FluxNextAction(action)
+        }
         handlers.register { handler }
     }
 
