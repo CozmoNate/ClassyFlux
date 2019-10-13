@@ -50,6 +50,24 @@ open class FluxMiddleware: FluxWorker {
         handlers = ResolverContainer()
     }
 
+    /// Associates an action composer with the actions of specified type.
+    /// - Parameter action: The type of the actions to associate with handler.
+    /// - Parameter compose: The closure that will be invoked when the action received.
+    public func registerComposer<Action: FluxAction>(for action: Action.Type, compose handler: @escaping Handle<Action>) {
+        handlers.register { handler }
+    }
+
+    /// Associates a handler with the actions of specified type.
+    /// - Parameter action: The type of the actions to associate with handler.
+    /// - Parameter execute: The closure that will be invoked when the action received.
+    public func registerHandler<Action: FluxAction>(for action: Action.Type, handle: @escaping (Action) -> Void) {
+        let handler: Handle<Action> = { (action) -> FluxPassthroughAction in
+            handle(action)
+            return FluxNextAction(action)
+        }
+        handlers.register { handler }
+    }
+
     /// Unregisters handler associated with specified action type.
     /// - Parameter action: The action for which the associated handler should be removed
     public func unregisterHandler<Action: FluxAction>(for action: Action.Type) {
@@ -67,28 +85,50 @@ open class FluxMiddleware: FluxWorker {
     
 }
 
+extension FluxMiddleware {
+
+    /// Associates an action composer with the actions of specified type.
+    /// - Parameter action: The type of the actions to associate with handler.
+    /// - Parameter compose: The closure that will be invoked when the action received.
+    public func registerComposer<Action: FluxAction>(for action: Action.Type, compose next: @escaping () -> FluxPassthroughAction) {
+        registerComposer(for: Action.self) { (action) -> FluxPassthroughAction in
+            return next()
+        }
+    }
+
+    /// Associates a handler with the actions of specified type.
+    /// - Parameter action: The type of the actions to associate with handler.
+    /// - Parameter execute: The closure that will be invoked when the action received.
+    public func registerHandler<Action: FluxAction>(for action: Action.Type, handle: @escaping () -> Void) {
+        registerHandler(for: Action.self) { (action) -> Void in
+            handle()
+        }
+    }
+
+}
+
 extension FluxWorker where Self: FluxMiddleware {
 
     /// Associates an action composer with the actions of specified type.
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter compose: The closure that will be invoked when the action received.
     public func registerComposer<Action: FluxAction>(for action: Action.Type, compose: @escaping (_ owner: Self, _ action: Action) -> FluxPassthroughAction) {
-        let handler: Handle<Action> = { [weak self] (action) -> FluxPassthroughAction in
-            if let self = self { return compose(self, action) }
-            return FluxNextAction(action)
+        registerComposer(for: Action.self) { [weak self] (action) -> FluxPassthroughAction in
+            if let self = self {
+                return compose(self, action)
+            } else {
+                return FluxNextAction(action)
+            }
         }
-        handlers.register { handler }
     }
 
     /// Associates a handler with the actions of specified type.
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter execute: The closure that will be invoked when the action received.
     public func registerHandler<Action: FluxAction>(for action: Action.Type, handle: @escaping (_ owner: Self, _ action: Action) -> Void) {
-        let handler: Handle<Action> = { [weak self] (action) -> FluxPassthroughAction in
+        registerHandler(for: Action.self) { [weak self] (action) -> Void in
             if let self = self { handle(self, action) }
-            return FluxNextAction(action)
         }
-        handlers.register { handler }
     }
 
 }

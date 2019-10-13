@@ -25,10 +25,10 @@ class FluxMiddlewareTests: QuickSpec {
                 middleware = TestMiddleware()
             }
 
-            context("when registered action handler") {
+            context("when registered action handlers") {
 
                 beforeEach {
-                    middleware.registerComposer(for: ChangeValueAction.self) { (owner, action) in
+                    middleware.registerComposer(for: ChangeValueAction.self) { (_, action) in
                         value = action.value
                         return FluxNextAction(action)
                     }
@@ -61,7 +61,7 @@ class FluxMiddlewareTests: QuickSpec {
                     }
                 }
 
-                context("when performed action associated with self-accessible handler") {
+                context("when performed another action") {
 
                     var composer: TestComposer!
 
@@ -106,10 +106,60 @@ class FluxMiddlewareTests: QuickSpec {
                             expect(composer.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
                         }
                     }
-
                 }
             }
 
+            context("when registered basic handler") {
+
+                var didCallHandler: Bool?
+
+                beforeEach {
+                    middleware.registerComposer(for: ChangeValueAction.self) {
+                        return FluxNextAction(ChangeValueAction(value: "Transformed!"))
+                    }
+
+                    middleware.registerHandler(for: IncrementNumberAction.self) {
+                        didCallHandler = true
+                    }
+                }
+
+                it("has registered action handler") {
+                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<ChangeValueAction>.self)).toNot(beNil())
+                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<IncrementNumberAction>.self)).toNot(beNil())
+                }
+
+                context("when performed first action") {
+
+                    var composer: TestComposer!
+
+                    beforeEach {
+                        composer = TestComposer()
+                        middleware.handle(action: ChangeValueAction(value: "change it!"))(composer)
+                    }
+
+                    it("passes correct action to composer") {
+                        expect(composer.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "Transformed!")))
+                    }
+                }
+
+                context("when performed second action") {
+
+                    var composer: TestComposer!
+
+                    beforeEach {
+                        composer = TestComposer()
+                        middleware.handle(action: IncrementNumberAction(increment: 1))(composer)
+                    }
+
+                    it("calls action handler") {
+                        expect(didCallHandler).to(beTruthy())
+                    }
+
+                    it("passes the same action to composer") {
+                        expect(composer.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
+                    }
+                }
+            }
         }
     }
 }
