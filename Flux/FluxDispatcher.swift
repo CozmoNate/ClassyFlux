@@ -30,7 +30,6 @@
  */
 
 import Foundation
-import ResolverContainer
 
 /// An object that dispatches actions serially to registered workers.
 open class FluxDispatcher: FluxActionDispatching {
