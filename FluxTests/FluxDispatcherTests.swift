@@ -11,16 +11,26 @@ import Nimble
 
 @testable import ClassyFlux
 
+extension OperationQueue: FluxScheduler {
+    public func schedule(block: @escaping () -> Void) {
+        addOperation(block)
+    }
+}
+
 class FluxDispatcherTests: QuickSpec {
 
     override func spec() {
-
         describe("FluxDispatcher") {
 
+            var scheduler: OperationQueue!
             var dispatcher: FluxDispatcher!
 
             beforeEach {
-                dispatcher = FluxDispatcher(queue: nil)
+                scheduler = OperationQueue()
+                scheduler.qualityOfService = .userInitiated
+                scheduler.maxConcurrentOperationCount = 1
+
+                dispatcher = FluxDispatcher(scheduler: scheduler)
             }
 
             context("when registered worker") {
@@ -33,7 +43,7 @@ class FluxDispatcherTests: QuickSpec {
                 }
 
                 it("registers the worker and its token") {
-                    dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                    scheduler.waitUntilAllOperationsAreFinished()
                     expect(dispatcher.tokens.contains(worker.token)).to(beTrue())
                     expect(dispatcher.workers.first).to(beIdenticalTo(worker))
                 }
@@ -41,12 +51,12 @@ class FluxDispatcherTests: QuickSpec {
                 context("when unregisters worker by token") {
 
                     beforeEach {
-                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                        scheduler.waitUntilAllOperationsAreFinished()
                         dispatcher.unregister(tokens: [worker.token])
                     }
 
                     it("unregisters the worker and its token") {
-                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                        scheduler.waitUntilAllOperationsAreFinished()
                         expect(dispatcher.tokens.contains(worker.token)).to(beFalse())
                         expect(dispatcher.workers).to(beEmpty())
                     }
@@ -59,7 +69,7 @@ class FluxDispatcherTests: QuickSpec {
                     }
 
                     it("does not registers new worker and token") {
-                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                        scheduler.waitUntilAllOperationsAreFinished()
                         expect(dispatcher.tokens.count).to(equal(1))
                         expect(dispatcher.workers.count).to(equal(1))
                     }
@@ -72,25 +82,8 @@ class FluxDispatcherTests: QuickSpec {
                     }
 
                     it("perform action with worker registered") {
-                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                        scheduler.waitUntilAllOperationsAreFinished()
                         expect(worker.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
-                    }
-                }
-
-                context("when dispatched block") {
-
-                    var flag: Bool!
-
-                    beforeEach {
-                        flag = false
-                        dispatcher.dispatch {
-                            flag = true
-                        }
-                    }
-
-                    it("perform action on registered worker") {
-                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
-                        expect(flag).to(beTrue())
                     }
                 }
 
@@ -99,7 +92,7 @@ class FluxDispatcherTests: QuickSpec {
                     var ending: TestWorker!
 
                     beforeEach {
-                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                        scheduler.waitUntilAllOperationsAreFinished()
                         ending = TestWorker()
 
                         dispatcher.append(workers: [FluxMiddleware(),
@@ -107,7 +100,7 @@ class FluxDispatcherTests: QuickSpec {
                                                     FluxStore(initialState: TestState(value: "1", number: 1)),
                                                     ending])
 
-                        dispatcher.operationQueue.waitUntilAllOperationsAreFinished()
+                        scheduler.waitUntilAllOperationsAreFinished()
                     }
 
                     it("registers the worker and its token") {

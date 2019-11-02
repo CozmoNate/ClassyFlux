@@ -1,8 +1,8 @@
 //
-//  FluxWorker.swift
+//  FluxScheduler.swift
 //  ClassyFlux
 //
-//  Created by Natan Zalkin on 03/08/2019.
+//  Created by Natan Zalkin on 02/11/2019.
 //  Copyright © 2019 Natan Zalkin. All rights reserved.
 //
 
@@ -31,28 +31,19 @@
 
 import Foundation
 
-/// A closure which passes next action to subsequent workers via the composer provided.
-public typealias FluxPassthroughAction = (FluxComposer) -> Void
+/// A protocol that defines how to execute a closure.
+public protocol FluxScheduler {
+    
+    /// Shedules a block
+    /// - Parameter block: The closure to execute
+    func schedule(block: @escaping () -> Void)
 
-/// A functor which generates FluxPassthroughAction closure and passes next action to subsequent workers.
-public func FluxNextAction<Action: FluxAction>(_ action: Action?) -> FluxPassthroughAction {
-    return {
-        if let action = action {
-            $0.next(action: action)
-        }
-    }
 }
 
-/// A protocol that defines how the actions can be handled and how to pass next action to subsequent workers.
-public protocol FluxWorker: AnyObject {
-
-    /// A unique identifier of the worker.
-    var token: UUID { get }
-
-    /// Handles the action dispatched. The function can be performed on a background thread.
-    /// - Parameter action: The action to handle.
-    /// - Returns: Next action wrapper. Use FluxNextAction(FluxAction) functor to pass next action.
-    /// Pass nil action to FluxNextAction functor to stop action propagation to subsequent worker.
-    func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction
-
+extension DispatchQueue: FluxScheduler {
+    
+    public func schedule(block: @escaping () -> Void) {
+        async(execute: block)
+    }
+    
 }

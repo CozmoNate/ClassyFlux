@@ -31,36 +31,29 @@
 
 import Foundation
 
-/// An object that dispatches actions serially to registered workers.
+/// An object that dispatches actions to registered workers.
 open class FluxDispatcher: FluxActionDispatching {
 
     public static let `default` = FluxDispatcher()
 
-    var tokens: Set<UUID>
-    var workers: [FluxWorker]
-    let operationQueue: OperationQueue
+    internal var tokens: Set<UUID>
+    internal var workers: [FluxWorker]
+    internal let scheduler: FluxScheduler
 
     /// Initialises a dispatcher.
-    /// - Parameter queue: The queue to be used to dispatch actions. Passed queue will be forcibly configured to run only one operation at a time.
-    public init(queue: OperationQueue? = nil) {
+    /// - Parameter scheduler: The scheduler that will run the actions
+    public init(scheduler: FluxScheduler? = nil) {
 
         tokens = Set()
         workers = []
-
-        if let queue = queue {
-            operationQueue = queue
-        } else {
-            operationQueue = OperationQueue()
-            operationQueue.qualityOfService = .userInitiated
-        }
-
-        operationQueue.maxConcurrentOperationCount = 1
+        
+        self.scheduler = scheduler ?? DispatchQueue(label: "FluxDispatcher.SerialQueue", qos: .userInitiated)
     }
 
     /// Registers workers in the dispatcher. Only one worker with the same token can be registered in the dispatcher.
     /// - Parameter workers: The list of workers to register in the dispatcher. Dispatched actions will be passed to the workers in the same order as they were registered.
     public func append(workers: [FluxWorker]) {
-        operationQueue.addOperation {
+        scheduler.schedule {
             workers.forEach { worker in
                 if self.tokens.insert(worker.token).inserted {
                     self.workers.append(worker)
@@ -72,7 +65,7 @@ open class FluxDispatcher: FluxActionDispatching {
     /// Unregisters workers from the dispatcher.
     /// - Parameter tokensToRemove: The list of tokens of workers that should be unregistered.
     public func unregister(tokens: [UUID]) {
-        operationQueue.addOperation {
+        scheduler.schedule {
             let tokensToRemove = Set<UUID>(tokens)
             self.tokens = self.tokens.subtracting(tokensToRemove)
             self.workers = self.workers.filter { !tokensToRemove.contains($0.token) }
@@ -82,21 +75,9 @@ open class FluxDispatcher: FluxActionDispatching {
     /// Dispatches an action to workers.
     /// - Parameter action: The action to dispatch to workers.
     public func dispatch<Action: FluxAction>(action: Action) {
-        operationQueue.addOperation {
+        scheduler.schedule {
             FluxStackingComposer(workers: self.workers).next(action: action)
         }
-    }
-
-    /// Dispatches an operation to run in the same queue as regular actions.
-    /// - Parameter operation: The operation to dispatch.
-    public func dispatch(operation: Operation) {
-        operationQueue.addOperation(operation)
-    }
-
-    /// Dispatches a closure to run in the same queue as regular actions.
-    /// - Parameter operation: The closure to dispatch.
-    public func dispatch(block: @escaping () -> Void) {
-        dispatch(operation: BlockOperation(block: block))
     }
 
 }
