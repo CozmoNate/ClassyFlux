@@ -97,7 +97,7 @@ struct TestView: FluxView {
         return Properties(value: testValue)
     }
 
-    func render(properties: Properties) -> some View {
+    func render(with properties: Properties) -> some View {
         Text(properties.value)
     }
 }

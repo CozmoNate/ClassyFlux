@@ -1,13 +1,13 @@
 Pod::Spec.new do |s|
   s.name             = 'ClassyFlux'
-  s.version          = '1.12.1'
+  s.version          = '1.12.2'
   s.summary          = 'Flux implementation on Swift'
   s.homepage         = 'https://github.com/kzlekk/ClassyFlux'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Natan Zalkin' => 'natan.zalkin@me.com' }
   s.source           = { :git => 'https://github.com/kzlekk/ClassyFlux.git', :tag => "#{s.version}" }
   s.module_name      = 'ClassyFlux'
-  s.swift_version    = '5'
+  s.swift_version    = '5.0'
 
   s.ios.deployment_target = '11.0'
   s.osx.deployment_target = '10.14'

@@ -34,7 +34,7 @@ class FluxViewTests: QuickSpec {
             }
 
             it("correctly renders body") {
-                expect(view.render(properties: TestView.Properties(value: "Test"))).to(beAKindOf(Text.self))
+                expect(view.render(with: TestView.Properties(value: "Test"))).to(beAKindOf(Text.self))
             }
 
             it("renders view regarding properties calculated") {

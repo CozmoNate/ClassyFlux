@@ -38,7 +38,7 @@ public protocol FluxView: View {
     associatedtype Content: View
 
     func calculateProperties() -> Properties
-    func render(properties: Properties) -> Content
+    func render(with properties: Properties) -> Content
 
 }
 
@@ -46,7 +46,8 @@ public protocol FluxView: View {
 public extension FluxView {
 
     var body: Content {
-        render(properties: self.calculateProperties())
+        let properties = calculateProperties()
+        return render(with: properties)
     }
 
 }
