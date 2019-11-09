@@ -34,7 +34,7 @@ import Foundation
 /// A closure which passes next action to subsequent workers via the composer provided.
 public typealias FluxPassthroughAction = (FluxComposer) -> Void
 
-/// A functor which generates FluxPassthroughAction closure and passes next action to subsequent workers.
+/// A functor which generates FluxPassthroughAction closure allowing to pass next action to subsequent workers.
 public func FluxNextAction<Action: FluxAction>(_ action: Action?) -> FluxPassthroughAction {
     return {
         if let action = action {
@@ -46,8 +46,13 @@ public func FluxNextAction<Action: FluxAction>(_ action: Action?) -> FluxPassthr
 /// A protocol that defines how the actions can be handled and how to pass next action to subsequent workers.
 public protocol FluxWorker: AnyObject {
 
-    /// A unique identifier of the worker.
+    /// A unique identifier.
     var token: UUID { get }
+    
+    /// A priority of handling an action.
+    /// The priority is used by a dispatcher to determine which worker should handle an action first.
+    /// The smaller the value the higher the priority with the 0 is highest priority possible.
+    var priority: UInt { get }
 
     /// Handles the action dispatched. The function can be performed on a background thread.
     /// - Parameter action: The action to handle.

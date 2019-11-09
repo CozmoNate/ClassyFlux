@@ -51,22 +51,21 @@ public class FluxAggregator {
 
     /// Returns the state value or nil if the state of the specified type is not available.
     public subscript<State>(_ type: State.Type) -> State {
-        do {
-            return try storage.resolve()
-        } catch {
+        guard let store = try? storage.resolve(FluxStore<State>.self) else {
             fatalError("Requested unregistered state type: \(String(describing: State.self))")
         }
+            
+        return store.state
     }
     
     /// Registers a store and starts to aggregate that store state changes.
     /// - Parameter store: The store to register. Store will be registered under its token, and can be unregistered later by providing its token.
     /// - Parameter observedKeyPaths: The list of KeyPath describing the fields in particulat state object, which should trigger state change handlers.
     public func register<State>(store: FluxStore<State>, observing observedKeyPaths: Set<PartialKeyPath<State>> = Set(), queue: OperationQueue = .main) {
-        storage.register(instance: store.state)
+        
+        storage.register(instance: store as FluxStore<State>)
 
         observers[store.token] = store.addObserver(for: .stateDidChange, queue: queue) { [unowned self] state, changedKeyPaths in
-            self.storage.register(instance: state)
-
             guard observedKeyPaths.isEmpty || !observedKeyPaths.isDisjoint(with: changedKeyPaths) else {
                 return
             }

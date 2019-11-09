@@ -11,26 +11,17 @@ import Nimble
 
 @testable import ClassyFlux
 
-extension OperationQueue: FluxScheduler {
-    public func schedule(block: @escaping () -> Void) {
-        addOperation(block)
-    }
-}
-
 class FluxDispatcherTests: QuickSpec {
 
     override func spec() {
         describe("FluxDispatcher") {
 
-            var scheduler: OperationQueue!
+            var scheduler: DispatchQueue!
             var dispatcher: FluxDispatcher!
 
             beforeEach {
-                scheduler = OperationQueue()
-                scheduler.qualityOfService = .userInitiated
-                scheduler.maxConcurrentOperationCount = 1
-
-                dispatcher = FluxDispatcher(scheduler: scheduler)
+                scheduler = DispatchQueue(label: "Test", attributes: .concurrent)
+                dispatcher = FluxDispatcher(queue: scheduler)
             }
 
             context("when registered worker") {
@@ -38,12 +29,12 @@ class FluxDispatcherTests: QuickSpec {
                 var worker: TestWorker!
 
                 beforeEach {
-                    worker = TestWorker()
-                    dispatcher.append(workers: [worker])
+                    worker = TestWorker(priority: 0)
+                    dispatcher.register(workers: [worker])
                 }
 
                 it("registers the worker and its token") {
-                    scheduler.waitUntilAllOperationsAreFinished()
+                    scheduler.sync {}
                     expect(dispatcher.tokens.contains(worker.token)).to(beTrue())
                     expect(dispatcher.workers.first).to(beIdenticalTo(worker))
                 }
@@ -51,12 +42,12 @@ class FluxDispatcherTests: QuickSpec {
                 context("when unregisters worker by token") {
 
                     beforeEach {
-                        scheduler.waitUntilAllOperationsAreFinished()
+                        scheduler.sync {}
                         dispatcher.unregister(tokens: [worker.token])
                     }
 
                     it("unregisters the worker and its token") {
-                        scheduler.waitUntilAllOperationsAreFinished()
+                        scheduler.sync {}
                         expect(dispatcher.tokens.contains(worker.token)).to(beFalse())
                         expect(dispatcher.workers).to(beEmpty())
                     }
@@ -65,11 +56,11 @@ class FluxDispatcherTests: QuickSpec {
                 context("when tried to register worker with the same token") {
 
                     beforeEach {
-                        dispatcher.append(workers: [worker])
+                        dispatcher.register(workers: [worker])
                     }
 
                     it("does not registers new worker and token") {
-                        scheduler.waitUntilAllOperationsAreFinished()
+                        scheduler.sync {}
                         expect(dispatcher.tokens.count).to(equal(1))
                         expect(dispatcher.workers.count).to(equal(1))
                     }
@@ -82,39 +73,85 @@ class FluxDispatcherTests: QuickSpec {
                     }
 
                     it("perform action with worker registered") {
-                        scheduler.waitUntilAllOperationsAreFinished()
+                        scheduler.sync {}
                         expect(worker.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
                     }
                 }
 
                 context("when registered additional workers") {
 
-                    var ending: TestWorker!
+                    var first: FluxMiddleware!
+                    var second: TestWorker!
+                    var third: FluxStore<TestState>!
+                    var fouth: FluxStore<TestState>!
 
-                    beforeEach {
-                        scheduler.waitUntilAllOperationsAreFinished()
-                        ending = TestWorker()
-
-                        dispatcher.append(workers: [FluxMiddleware(),
-                                                    TestStore(),
-                                                    FluxStore(initialState: TestState(value: "1", number: 1)),
-                                                    ending])
-
-                        scheduler.waitUntilAllOperationsAreFinished()
-                    }
-
-                    it("registers the worker and its token") {
-                        expect(dispatcher.workers.count).to(equal(5))
-                    }
-
-                    context("when dispatched action") {
-
+                    context("when workers have different priorities") {
                         beforeEach {
-                            ChangeValueAction(value: "test").dispatch(with: dispatcher)
+                            scheduler.sync {}
+                            
+                            first = FluxMiddleware(priority: 2)
+                            second = TestWorker(priority: 3)
+                            third = TestStore(priority: 1)
+                            fouth = FluxStore(priority: 0, initialState: TestState(value: "1", number: 1))
+                            
+                            dispatcher.register(workers: [first, second, third, fouth])
+                            
+                            scheduler.sync {}
                         }
-
-                        it("passes the action to last worker") {
-                            expect(ending.lastAction as? ChangeValueAction).toEventually(equal(ChangeValueAction(value: "test")))
+                        
+                        it("registers the worker and its token") {
+                            expect(dispatcher.workers.count).to(equal(5))
+                            expect(dispatcher.workers[0]).to(beIdenticalTo(worker))
+                            expect(dispatcher.workers[1]).to(beIdenticalTo(fouth))
+                            expect(dispatcher.workers[2]).to(beIdenticalTo(third))
+                            expect(dispatcher.workers[3]).to(beIdenticalTo(first))
+                            expect(dispatcher.workers[4]).to(beIdenticalTo(second))
+                        }
+                        
+                        context("when dispatched action") {
+                            
+                            beforeEach {
+                                ChangeValueAction(value: "test").dispatch(with: dispatcher)
+                            }
+                            
+                            it("passes the action to last worker") {
+                                expect(second.lastAction as? ChangeValueAction).toEventually(equal(ChangeValueAction(value: "test")))
+                            }
+                        }
+                    }
+                    
+                    context("when workers have the same priority") {
+                        beforeEach {
+                            scheduler.sync {}
+                            
+                            first = FluxMiddleware(priority: 0)
+                            second = TestWorker(priority: 0)
+                            third = TestStore(priority: 0)
+                            fouth = FluxStore(priority: 0, initialState: TestState(value: "1", number: 1))
+                            
+                            dispatcher.register(workers: [first, second, third, fouth])
+                            
+                            scheduler.sync {}
+                        }
+                        
+                        it("registers the worker and its token") {
+                            expect(dispatcher.workers.count).to(equal(5))
+                            expect(dispatcher.workers[0]).to(beIdenticalTo(worker))
+                            expect(dispatcher.workers[1]).to(beIdenticalTo(first))
+                            expect(dispatcher.workers[2]).to(beIdenticalTo(second))
+                            expect(dispatcher.workers[3]).to(beIdenticalTo(third))
+                            expect(dispatcher.workers[4]).to(beIdenticalTo(fouth))
+                        }
+                        
+                        context("when dispatched action") {
+                            
+                            beforeEach {
+                                ChangeValueAction(value: "test").dispatch(with: dispatcher)
+                            }
+                            
+                            it("passes the action to last worker") {
+                                expect(second.lastAction as? ChangeValueAction).toEventually(equal(ChangeValueAction(value: "test")))
+                            }
                         }
                     }
                 }

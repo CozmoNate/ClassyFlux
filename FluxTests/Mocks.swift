@@ -35,9 +35,10 @@ class TestStore: FluxStore<TestState> {
     var pathsBeforeChange: Set<PartialKeyPath<TestState>>?
     var stateAfterChange: State?
     var pathsAfterChange: Set<PartialKeyPath<TestState>>?
+    
 
-    init() {
-        super.init(initialState: TestState(value: "initial", number: 0))
+    init(priority: UInt = 0) {
+        super.init(priority: priority, initialState: TestState(value: "initial", number: 0))
 
         registerReducer { (state, action: ChangeValueAction) in
             state.value = action.value
@@ -73,10 +74,15 @@ class TestComposer: FluxComposer {
 }
 
 class TestWorker: FluxWorker {
-
+    
     let token = UUID()
-
+    let priority: UInt
+    
     var lastAction: FluxAction?
+
+    init(priority: UInt) {
+        self.priority = priority
+    }
 
     func handle<Action>(action: Action) -> FluxPassthroughAction where Action : FluxAction {
         lastAction = action

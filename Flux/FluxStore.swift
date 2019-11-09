@@ -77,8 +77,8 @@ open class FluxStore<State>: FluxWorker {
     public lazy var stateDidChange = PassthroughSubject<(State, Set<PartialKeyPath<State>>), Never>()
     #endif
 
-    /// A unique identifier of the store.
     public let token: UUID
+    public let priority: UInt
 
     /// A state of the store.
     public private(set) var state: State {
@@ -103,8 +103,9 @@ open class FluxStore<State>: FluxWorker {
 
     /// Initialises the store
     /// - Parameter initialState: The initial state of the store
-    public init(initialState: State) {
+    public init(priority aPriority: UInt = 0, initialState: State) {
         token = UUID()
+        priority = aPriority
         backingState = initialState
         reducers = ResolverContainer()
     }
