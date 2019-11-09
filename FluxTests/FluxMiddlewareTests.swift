@@ -114,11 +114,11 @@ class FluxMiddlewareTests: QuickSpec {
                 var didCallHandler: Bool?
 
                 beforeEach {
-                    middleware.registerComposer(for: ChangeValueAction.self) {
+                    middleware.registerComposer(for: ChangeValueAction.self) { _ in
                         return FluxNextAction(ChangeValueAction(value: "Transformed!"))
                     }
 
-                    middleware.registerHandler(for: IncrementNumberAction.self) {
+                    middleware.registerHandler(for: IncrementNumberAction.self) { _ in
                         didCallHandler = true
                     }
                 }

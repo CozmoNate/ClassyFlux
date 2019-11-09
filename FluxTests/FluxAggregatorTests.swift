@@ -103,14 +103,15 @@ class FluxAggregatorTests: QuickSpec {
                     }
                 }
                 
-                context("when unregistered the store") {
+                context("when unregistered the state") {
                     
                     beforeEach {
-                        aggregator.unregister(tokens: [store.token])
+                        aggregator.unregister(state: TestState.self)
                     }
                     
                     it("removes store observer") {
                         expect(aggregator.observers[store.token]).to(beNil())
+                        expect(try? aggregator.storage.resolve(TestState.self)).to(beNil())
                     }
                 }
 

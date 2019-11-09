@@ -51,7 +51,7 @@ open class FluxMiddleware: FluxWorker {
         handlers = ResolverContainer()
     }
 
-    /// Associates an action composer with the actions of specified type.
+    /// Associates an action handler with the actions of specified type with an option to prevent current action propagation and/or pass another action to next workers.
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter compose: The closure that will be invoked when the action received.
     public func registerComposer<Action: FluxAction>(for action: Action.Type, compose handler: @escaping Handle<Action>) {
@@ -68,7 +68,7 @@ open class FluxMiddleware: FluxWorker {
         }
         handlers.register { handler }
     }
-
+    
     /// Unregisters handler associated with specified action type.
     /// - Parameter action: The action for which the associated handler should be removed
     public func unregisterHandler<Action: FluxAction>(for action: Action.Type) {
@@ -86,31 +86,9 @@ open class FluxMiddleware: FluxWorker {
     
 }
 
-extension FluxMiddleware {
-
-    /// Associates an action composer with the actions of specified type.
-    /// - Parameter action: The type of the actions to associate with handler.
-    /// - Parameter compose: The closure that will be invoked when the action received.
-    public func registerComposer<Action: FluxAction>(for action: Action.Type, compose next: @escaping () -> FluxPassthroughAction) {
-        registerComposer(for: Action.self) { (action) -> FluxPassthroughAction in
-            return next()
-        }
-    }
-
-    /// Associates a handler with the actions of specified type.
-    /// - Parameter action: The type of the actions to associate with handler.
-    /// - Parameter execute: The closure that will be invoked when the action received.
-    public func registerHandler<Action: FluxAction>(for action: Action.Type, handle: @escaping () -> Void) {
-        registerHandler(for: Action.self) { (action) -> Void in
-            handle()
-        }
-    }
-
-}
-
 extension FluxWorker where Self: FluxMiddleware {
 
-    /// Associates an action composer with the actions of specified type.
+    /// Associates an action handler with the actions of specified type with an option to prevent current action propagation and/or pass another action to next workers.
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter compose: The closure that will be invoked when the action received.
     public func registerComposer<Action: FluxAction>(for action: Action.Type, compose: @escaping (_ owner: Self, _ action: Action) -> FluxPassthroughAction) {

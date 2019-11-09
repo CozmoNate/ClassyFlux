@@ -43,7 +43,8 @@ public class FluxAggregator {
     internal var observers: [UUID: AnyObject]
     internal var changeHandler: ((FluxAggregator) -> Void)?
 
-    public init(collectHandler: ((FluxAggregator) -> Void)? = nil) {
+    /// Initializes an aggregator instance with optional block what called each time when one of registered store changed.
+    public init(changeHandler collectHandler: ((FluxAggregator) -> Void)? = nil) {
         storage = ResolverContainer()
         observers = [UUID: AnyObject]()
         changeHandler = collectHandler
@@ -77,15 +78,7 @@ public class FluxAggregator {
             self.changeHandler?(self)
         }
     }
-    
-    /// Unregisters stores registerd under tokens provided
-    /// - Parameter tokens: The list of store tokens.
-    public func unregister(tokens: [UUID]) {
-        tokens.forEach {
-            observers.removeValue(forKey: $0)
-        }
-    }
-    
+
     /// Associates change handler with the state of specified type.
     /// - Parameter state: The type of a state object to associate with handler.
     /// - Parameter execute: The closure that will be invoked when the state is changed.
@@ -98,7 +91,15 @@ public class FluxAggregator {
         storage.unregister(Handle<State>.self)
     }
 
-
+    /// Unregisters store and handler associated with specified state type.
+    /// - Parameter state: The type of a state object.
+    public func unregister<State>(state: State.Type) {
+        if let store = storage.unregister(FluxStore<State>.self) {
+            observers.removeValue(forKey: store.token)
+        }
+        unregisterHandler(for: state)
+    }
+ 
     /// Unregisters all observers and stop receiving state changed events
     public func unregisterAll() {
         storage.unregisterAll()
