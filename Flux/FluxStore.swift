@@ -143,6 +143,19 @@ open class FluxStore<State>: FluxWorker {
     public func addObserver(for event: FluxStoreEvent, queue: OperationQueue = .main, changeHandler: @escaping (State, Set<PartialKeyPath<State>>) -> Void) -> Observer {
         return Observer(for: event, from: self, queue: queue, changeHandler: changeHandler)
     }
+    
+    /// Adds an observer that will be invoked each time the store chages its state
+    /// - Parameter queue: The queue to schedule change handler on
+    /// - Parameter observingKeyPaths: The list of KeyPath describing the fields in particular state object which should trigger state change handlers.
+    /// - Parameter changeHandler: The closure will be invoked each time the state chages with the actual state object
+    public func addObserver(for event: FluxStoreEvent, observing observingKeyPaths: Set<PartialKeyPath<State>>, queue: OperationQueue = .main, changeHandler: @escaping (State) -> Void) -> Observer {
+        return Observer(for: event, from: self, queue: queue) { state, changedKeyPaths in
+            if changedKeyPaths.isDisjoint(with: observingKeyPaths) {
+                return
+            }
+            changeHandler(state)
+        }
+    }
 
     /// Associates a reducer with the action of specified type.
     /// - Parameter action: The type of the actions to associate with reducer.

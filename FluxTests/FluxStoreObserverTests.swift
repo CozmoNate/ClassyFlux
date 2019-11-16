@@ -37,7 +37,8 @@ import Nimble
 class FluxStoreObserverTests: QuickSpec, FluxComposer {
 
     var observer: TestStore.Observer?
-
+    var anotherObserver: TestStore.Observer?
+    
     override func spec() {
 
         describe("FluxStore.Observer") {
@@ -45,7 +46,8 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
             var store: FluxStore<TestState>!
             var lastState: TestState?
             var lastKeyPaths: Set<PartialKeyPath<TestState>>?
-
+            var lastValue: String?
+            
             beforeEach {
                 store = FluxStore(initialState: TestState(value: "initial", number: 0))
 
@@ -58,8 +60,12 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
                     lastState = state
                     lastKeyPaths = keyPaths
                 }
+                
+                self.anotherObserver = store.addObserver(for: .stateDidChange, observing: [\TestState.value]) { (state) in
+                    lastValue = state.value
+                }
             }
-
+            
             context("when state changed") {
 
                 beforeEach {
@@ -67,13 +73,15 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
                 }
 
                 it("receives changed state") {
-                    expect(lastState?.value).toEventually(equal(store.state.value))
+                    expect(lastState?.value).toEventually(equal("test"))
                     expect(lastKeyPaths).toEventually(equal(Set([\TestState.value])))
+                    expect(lastValue).toEventually(equal("test"))
                 }
 
                 context("when deallocated") {
                     beforeEach {
                         self.observer = nil
+                        self.anotherObserver = nil
                     }
 
                     context("when state changed") {
@@ -81,12 +89,15 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
                         beforeEach {
                             lastState = TestState(value: "one", number: 1)
                             lastKeyPaths = [\TestState.number]
+                            lastValue = "ups"
                             store.handle(action: ChangeValueAction(value: "test 2"))(self)
+                            
                         }
 
                         it("does not receives changed state") {
                             expect(lastState?.value).toNotEventually(equal("test 2"))
                             expect(lastKeyPaths).toNotEventually(equal(Set([\TestState.value])))
+                            expect(lastValue).toNotEventually(equal("test 2"))
                         }
                     }
                 }
