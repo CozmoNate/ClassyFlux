@@ -89,21 +89,3 @@ class TestWorker: FluxWorker {
         return FluxNextAction(action)
     }
 }
-
-@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-struct TestView: FluxView {
-
-    struct Properties {
-        let value: String
-    }
-
-    let testValue: String
-
-    func calculateProperties() -> TestView.Properties {
-        return Properties(value: testValue)
-    }
-
-    func render(with properties: Properties) -> some View {
-        Text(properties.value)
-    }
-}

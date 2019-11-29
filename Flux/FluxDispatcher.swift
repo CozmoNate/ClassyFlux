@@ -42,7 +42,7 @@ open class FluxDispatcher: FluxActionDispatching {
 
     /// Initialises a dispatcher.
     /// - Parameter queue: The queue that will run the actions. Actions will be dispatched and run serially regardless of type of the queue.
-    public init(queue scheduler: DispatchQueue = DispatchQueue(label: "FluxDispatcher.SerialQueue", qos: .userInitiated)) {
+    public init(queue scheduler: DispatchQueue = DispatchQueue(label: "FluxDispatcher.Queue", qos: .default)) {
         tokens = Set()
         workers = []
         queue = scheduler

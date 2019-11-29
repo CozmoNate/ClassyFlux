@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'ClassyFlux'
-  s.version          = '1.15.1'
+  s.version          = '1.16.0'
   s.summary          = 'Flux implementation on Swift'
   s.homepage         = 'https://github.com/kzlekk/ClassyFlux'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -16,8 +16,7 @@ Pod::Spec.new do |s|
 
   s.dependency 'ResolverContainer'
 
-  s.subspec 'Core' do |core|
-    core.source_files = [
+  s.source_files = [
       'Flux/FluxAction.swift',
       'Flux/FluxAggregator.swift',
       'Flux/FluxComposer.swift',
@@ -26,19 +25,5 @@ Pod::Spec.new do |s|
       'Flux/FluxObserver.swift',
       'Flux/FluxStore.swift',
       'Flux/FluxWorker.swift']
-  end
-
-  s.subspec 'SwiftUI' do |swiftui|
-    swiftui.ios.deployment_target = '13.0'
-    swiftui.osx.deployment_target = '10.15'
-    swiftui.watchos.deployment_target = '6.0'
-    swiftui.tvos.deployment_target = '13.0'
-    swiftui.dependency 'ClassyFlux/Core'
-    swiftui.source_files = [
-        'Flux/FluxView.swift'
-    ]
-  end
-
-  s.default_subspec = 'Core'
 
 end
