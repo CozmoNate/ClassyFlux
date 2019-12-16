@@ -117,7 +117,7 @@ open class FluxStore<State>: FluxWorker {
         #if canImport(Combine)
         if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
             objectWillChange.send()
-            stateDidChange.send((state, keyPaths))
+            stateWillChange.send((state, keyPaths))
         }
         #endif
 
