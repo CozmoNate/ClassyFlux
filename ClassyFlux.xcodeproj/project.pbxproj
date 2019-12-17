@@ -446,7 +446,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.17.0;
+				MARKETING_VERSION = 1.17.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.ClassyFlux;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = macosx;
@@ -473,7 +473,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.17.0;
+				MARKETING_VERSION = 1.17.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.ClassyFlux;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = macosx;

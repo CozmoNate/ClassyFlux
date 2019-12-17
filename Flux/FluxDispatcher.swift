@@ -29,6 +29,8 @@
  *
  */
 
+import Foundation
+
 /// An object that dispatches actions to registered workers.
 /// Actions will be dispatched on the same thread there the dispatcher is called.
 open class FluxDispatcher: FluxActionDispatching {
