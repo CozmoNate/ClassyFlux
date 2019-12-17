@@ -34,7 +34,7 @@ public protocol FluxAction {}
 
 public protocol FluxActionDispatching: AnyObject {
 
-    /// Dispatches an action.
+    /// Dispatches an action to workers.
     /// - Parameter action: The action to dispatch.
     func dispatch<Action: FluxAction>(action: Action)
 

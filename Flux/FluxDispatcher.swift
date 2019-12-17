@@ -2,7 +2,7 @@
 //  FluxDispatcher.swift
 //  ClassyFlux
 //
-//  Created by Natan Zalkin on 31/07/2019.
+//  Created by Natan Zalkin on 17/12/2019.
 //  Copyright © 2019 Natan Zalkin. All rights reserved.
 //
 
@@ -29,60 +29,123 @@
  *
  */
 
-import Foundation
-
 /// An object that dispatches actions to registered workers.
+/// Actions will be dispatched on the same thread there the dispatcher is called.
 open class FluxDispatcher: FluxActionDispatching {
-
-    public static let `default` = FluxDispatcher()
 
     internal var tokens: Set<UUID>
     internal var workers: [FluxWorker]
-    internal let queue: DispatchQueue
 
     /// Initialises a dispatcher.
-    /// - Parameter queue: The queue that will run the actions. Actions will be dispatched and run serially regardless of type of the queue.
-    public init(queue scheduler: DispatchQueue = DispatchQueue(label: "FluxDispatcher.Queue", qos: .default)) {
+    public init() {
         tokens = Set()
         workers = []
-        queue = scheduler
     }
 
     /// Registers workers in the dispatcher. Only one worker with the same token can be registered in the dispatcher.
     /// - Parameter workers: The list of workers to register in the dispatcher. Dispatched actions will be passed to the workers in the same order as they were registered.
-    public func register(workers: [FluxWorker]) {
-        queue.async(flags: .barrier) {
-            workers.forEach { worker in
-                if self.tokens.insert(worker.token).inserted {
-                    let sortedIndex = self.workers.sortedIndex(of: worker)
-                    self.workers.insert(worker, at: sortedIndex)
-                }
+    public func register(workers workersToInsert: [FluxWorker]) {
+        workersToInsert.forEach { worker in
+            if tokens.insert(worker.token).inserted {
+                let sortedIndex = workers.sortedIndex(of: worker)
+                workers.insert(worker, at: sortedIndex)
             }
         }
     }
 
     /// Unregisters workers from the dispatcher.
     /// - Parameter tokensToRemove: The list of tokens of workers that should be unregistered.
-    public func unregister(tokens: [UUID]) {
-        queue.async(flags: .barrier) {
-            let tokensToRemove = Set<UUID>(tokens)
-            self.tokens = self.tokens.subtracting(tokensToRemove)
-            self.workers = self.workers.filter { !tokensToRemove.contains($0.token) }
-        }
+    public func unregister(tokens tokensToRemove: [UUID]) {
+        tokens.subtract(Set(tokensToRemove))
+        workers.removeAll { tokensToRemove.contains($0.token) }
     }
 
     /// Dispatches an action to workers.
     /// - Parameter action: The action to dispatch to workers.
     public func dispatch<Action: FluxAction>(action: Action) {
-        queue.async(flags: .barrier) {
-            FluxStackingComposer(workers: self.workers).next(action: action)
+        FluxStackingComposer(workers: workers).next(action: action)
+    }
+
+}
+
+// MARK: - Main Tthread Dispatcher
+
+public extension FluxDispatcher {
+    
+    /// An object that dispatches actions to registered workers on main thread.
+    class Interactive: FluxDispatcher {
+        
+        /// Registers workers in the dispatcher. Only one worker with the same token can be registered in the dispatcher.
+        /// - Parameter workers: The list of workers to register in the dispatcher. Dispatched actions will be passed to the workers in the same order as they were registered.
+        override public func register(workers workersToInsert: [FluxWorker]) {
+            scheduleOnMain { super.register(workers: workersToInsert) }
+        }
+        
+        /// Unregisters workers from the dispatcher.
+        /// - Parameter tokensToRemove: The list of tokens of workers that should be unregistered.
+        override public func unregister(tokens tokensToRemove: [UUID]) {
+            scheduleOnMain { super.unregister(tokens: tokensToRemove) }
+        }
+        
+        /// Dispatches an action to workers.
+        /// - Parameter action: The action to dispatch to workers.
+        override public func dispatch<Action: FluxAction>(action: Action) {
+            scheduleOnMain { super.dispatch(action: action) }
+        }
+        
+        func scheduleOnMain(execute action: @escaping () -> Void) {
+            if Thread.isMainThread {
+                action()
+            } else {
+                DispatchQueue.main.async(execute: action)
+            }
         }
     }
 
 }
 
+// MARK: - Background Dispatcher
+
+public extension FluxDispatcher {
+    
+    /// An object that dispatches actions to registered workers on background thread.
+    class Background: FluxDispatcher {
+
+        internal let queue: DispatchQueue
+
+        /// Initialises a dispatcher.
+        /// - Parameter queue: The queue that will run the actions. Actions will be dispatched and run serially regardless of type of the queue.
+        public init(queue scheduler: DispatchQueue = DispatchQueue(label: "FluxDispatcher.Queue", qos: .default)) {
+            queue = scheduler
+            super.init()
+        }
+
+        /// Registers workers in the dispatcher. Only one worker with the same token can be registered in the dispatcher.
+        /// - Parameter workers: The list of workers to register in the dispatcher. Dispatched actions will be passed to the workers in the same order as they were registered.
+        override public func register(workers workersToRegister: [FluxWorker]) {
+            queue.async(flags: .barrier) { super.register(workers: workersToRegister) }
+        }
+
+        /// Unregisters workers from the dispatcher.
+        /// - Parameter tokensToRemove: The list of tokens of workers that should be unregistered.
+        override public func unregister(tokens tokensToUnregister: [UUID]) {
+            queue.async(flags: .barrier) { super.unregister(tokens: tokensToUnregister) }
+        }
+
+        /// Dispatches an action to workers.
+        /// - Parameter action: The action to dispatch to workers.
+        override public func dispatch<Action: FluxAction>(action: Action) {
+            queue.async(flags: .barrier) { super.dispatch(action: action) }
+        }
+    }
+    
+}
+
+// MARK: - Utility Methods
+
 extension RandomAccessCollection where Element == FluxWorker {
 
+    /// Index where the worker should be inserted to keep the collection sorted
     func sortedIndex(of target: Element) -> Index {
 
         var sequence = self[...]

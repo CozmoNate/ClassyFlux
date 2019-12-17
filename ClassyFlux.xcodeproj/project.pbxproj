@@ -9,12 +9,14 @@
 /* Begin PBXBuildFile section */
 		2F55DB4E234331B300A1B6ED /* FluxAggregator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F55DB4D234331B300A1B6ED /* FluxAggregator.swift */; };
 		2F55DB5123433BCE00A1B6ED /* FluxAggregatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F55DB4F2343324500A1B6ED /* FluxAggregatorTests.swift */; };
+		2FD962C523A8797F008DF9E3 /* FluxDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD962C423A8797F008DF9E3 /* FluxDispatcher.swift */; };
+		2FD962CA23A87ED0008DF9E3 /* FluxInteractiveDispatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD962C823A87EA6008DF9E3 /* FluxInteractiveDispatcherTests.swift */; };
+		2FD962CC23A87EE5008DF9E3 /* FluxBackgroundDispatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD962CB23A87EE5008DF9E3 /* FluxBackgroundDispatcherTests.swift */; };
 		7E0DC17B230FCD43009B8319 /* FluxStoreObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA48E056230FC701009ABA6F /* FluxStoreObserverTests.swift */; };
 		7E1509FE2301D24F00E497D7 /* ResolverContainer in Frameworks */ = {isa = PBXBuildFile; productRef = 7E1509FD2301D24F00E497D7 /* ResolverContainer */; };
 		7E24883522F5DA9800517865 /* Quick in Frameworks */ = {isa = PBXBuildFile; productRef = 7E24883422F5DA9800517865 /* Quick */; };
 		7E24883822F5DAA300517865 /* Nimble in Frameworks */ = {isa = PBXBuildFile; productRef = 7E24883722F5DAA300517865 /* Nimble */; };
 		7E24883D22F5DACC00517865 /* FluxStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E24883922F5DACC00517865 /* FluxStore.swift */; };
-		7E24883E22F5DACC00517865 /* FluxDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E24883A22F5DACC00517865 /* FluxDispatcher.swift */; };
 		7E24883F22F5DACC00517865 /* FluxAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E24883B22F5DACC00517865 /* FluxAction.swift */; };
 		7E46BA0722F747AA00162C03 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E46BA0622F747AA00162C03 /* Mocks.swift */; };
 		7E46BA0922F7482600162C03 /* FluxMiddlewareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E46BA0822F7482600162C03 /* FluxMiddlewareTests.swift */; };
@@ -41,8 +43,10 @@
 /* Begin PBXFileReference section */
 		2F55DB4D234331B300A1B6ED /* FluxAggregator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxAggregator.swift; sourceTree = "<group>"; };
 		2F55DB4F2343324500A1B6ED /* FluxAggregatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxAggregatorTests.swift; sourceTree = "<group>"; };
+		2FD962C423A8797F008DF9E3 /* FluxDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxDispatcher.swift; sourceTree = "<group>"; };
+		2FD962C823A87EA6008DF9E3 /* FluxInteractiveDispatcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxInteractiveDispatcherTests.swift; sourceTree = "<group>"; };
+		2FD962CB23A87EE5008DF9E3 /* FluxBackgroundDispatcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxBackgroundDispatcherTests.swift; sourceTree = "<group>"; };
 		7E24883922F5DACC00517865 /* FluxStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FluxStore.swift; sourceTree = "<group>"; };
-		7E24883A22F5DACC00517865 /* FluxDispatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FluxDispatcher.swift; sourceTree = "<group>"; };
 		7E24883B22F5DACC00517865 /* FluxAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FluxAction.swift; sourceTree = "<group>"; };
 		7E4674C8230BB3FD004F99F3 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		7E46BA0622F747AA00162C03 /* Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mocks.swift; sourceTree = "<group>"; };
@@ -113,7 +117,7 @@
 				7E24883B22F5DACC00517865 /* FluxAction.swift */,
 				7E6FC52F230B2B7E0078609F /* FluxComposer.swift */,
 				7EBB251022F5FB4800FF9632 /* FluxWorker.swift */,
-				7E24883A22F5DACC00517865 /* FluxDispatcher.swift */,
+				2FD962C423A8797F008DF9E3 /* FluxDispatcher.swift */,
 				AA2AB05E230A9177002CF10D /* FluxMiddleware.swift */,
 				7E24883922F5DACC00517865 /* FluxStore.swift */,
 				2F55DB4D234331B300A1B6ED /* FluxAggregator.swift */,
@@ -127,6 +131,8 @@
 			isa = PBXGroup;
 			children = (
 				7EA2A6E522F41A7000104CCA /* FluxDispatcherTests.swift */,
+				2FD962C823A87EA6008DF9E3 /* FluxInteractiveDispatcherTests.swift */,
+				2FD962CB23A87EE5008DF9E3 /* FluxBackgroundDispatcherTests.swift */,
 				7E46BA0822F7482600162C03 /* FluxMiddlewareTests.swift */,
 				7E4E252722F73D68002C0C09 /* FluxStoreTests.swift */,
 				AA48E056230FC701009ABA6F /* FluxStoreObserverTests.swift */,
@@ -265,8 +271,8 @@
 				7E24883D22F5DACC00517865 /* FluxStore.swift in Sources */,
 				2F55DB4E234331B300A1B6ED /* FluxAggregator.swift in Sources */,
 				7E24883F22F5DACC00517865 /* FluxAction.swift in Sources */,
+				2FD962C523A8797F008DF9E3 /* FluxDispatcher.swift in Sources */,
 				AA2AB05F230A9177002CF10D /* FluxMiddleware.swift in Sources */,
-				7E24883E22F5DACC00517865 /* FluxDispatcher.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,9 +283,11 @@
 				7E0DC17B230FCD43009B8319 /* FluxStoreObserverTests.swift in Sources */,
 				2F55DB5123433BCE00A1B6ED /* FluxAggregatorTests.swift in Sources */,
 				7E46BA0922F7482600162C03 /* FluxMiddlewareTests.swift in Sources */,
+				2FD962CA23A87ED0008DF9E3 /* FluxInteractiveDispatcherTests.swift in Sources */,
 				7E4E252822F73D68002C0C09 /* FluxStoreTests.swift in Sources */,
 				7EA2A6E622F41A7000104CCA /* FluxDispatcherTests.swift in Sources */,
 				7E46BA0722F747AA00162C03 /* Mocks.swift in Sources */,
+				2FD962CC23A87EE5008DF9E3 /* FluxBackgroundDispatcherTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -438,7 +446,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.16.1;
+				MARKETING_VERSION = 1.17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.ClassyFlux;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = macosx;
@@ -465,7 +473,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.16.1;
+				MARKETING_VERSION = 1.17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.ClassyFlux;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = macosx;

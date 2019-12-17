@@ -1,25 +1,50 @@
 //
-//  FluxDispatcherTests.swift
-//  FluxTests
+//  FluxBackgroundDispatcherTests.swift
+//  ClassyFlux
 //
-//  Created by Natan Zalkin on 02/08/2019.
+//  Created by Natan Zalkin on 17/12/2019.
 //  Copyright © 2019 Natan Zalkin. All rights reserved.
 //
+
+/*
+ * Copyright (c) 2019 Natan Zalkin
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
 
 import Quick
 import Nimble
 
 @testable import ClassyFlux
 
-class FluxDispatcherTests: QuickSpec {
+class FluxBackgroundDispatcherTests: QuickSpec {
 
     override func spec() {
-        describe("FluxDispatcher") {
+        describe("FluxDispatcher.Background") {
 
-            var dispatcher: FluxDispatcher!
+            var scheduler: DispatchQueue!
+            var dispatcher: FluxDispatcher.Background!
 
             beforeEach {
-                dispatcher = FluxDispatcher()
+                scheduler = DispatchQueue(label: "Test", attributes: .concurrent)
+                dispatcher = FluxDispatcher.Background(queue: scheduler)
             }
 
             context("when registered worker") {
@@ -32,6 +57,7 @@ class FluxDispatcherTests: QuickSpec {
                 }
 
                 it("registers the worker and its token") {
+                    scheduler.sync {}
                     expect(dispatcher.tokens.contains(worker.token)).to(beTrue())
                     expect(dispatcher.workers.first).to(beIdenticalTo(worker))
                 }
@@ -39,10 +65,12 @@ class FluxDispatcherTests: QuickSpec {
                 context("when unregisters worker by token") {
 
                     beforeEach {
+                        scheduler.sync {}
                         dispatcher.unregister(tokens: [worker.token])
                     }
 
                     it("unregisters the worker and its token") {
+                        scheduler.sync {}
                         expect(dispatcher.tokens.contains(worker.token)).to(beFalse())
                         expect(dispatcher.workers).to(beEmpty())
                     }
@@ -55,6 +83,7 @@ class FluxDispatcherTests: QuickSpec {
                     }
 
                     it("does not registers new worker and token") {
+                        scheduler.sync {}
                         expect(dispatcher.tokens.count).to(equal(1))
                         expect(dispatcher.workers.count).to(equal(1))
                     }
@@ -67,6 +96,7 @@ class FluxDispatcherTests: QuickSpec {
                     }
 
                     it("perform action with worker registered") {
+                        scheduler.sync {}
                         expect(worker.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
                     }
                 }
@@ -80,12 +110,16 @@ class FluxDispatcherTests: QuickSpec {
 
                     context("when workers have different priorities") {
                         beforeEach {
+                            scheduler.sync {}
+                            
                             first = FluxMiddleware(priority: 2)
                             second = TestWorker(priority: 3)
                             third = TestStore(priority: 1)
                             fouth = FluxStore(priority: 0, initialState: TestState(value: "1", number: 1))
                             
                             dispatcher.register(workers: [first, second, third, fouth])
+                            
+                            scheduler.sync {}
                         }
                         
                         it("registers the worker and its token") {
@@ -111,12 +145,16 @@ class FluxDispatcherTests: QuickSpec {
                     
                     context("when workers have the same priority") {
                         beforeEach {
+                            scheduler.sync {}
+                            
                             first = FluxMiddleware(priority: 0)
                             second = TestWorker(priority: 0)
                             third = TestStore(priority: 0)
                             fouth = FluxStore(priority: 0, initialState: TestState(value: "1", number: 1))
                             
                             dispatcher.register(workers: [first, second, third, fouth])
+                            
+                            scheduler.sync {}
                         }
                         
                         it("registers the worker and its token") {
