@@ -1,8 +1,8 @@
 //
-//  FluxDispatcher.swift
+//  FluxInteractiveDispatcher.swift
 //  ClassyFlux
 //
-//  Created by Natan Zalkin on 31/07/2019.
+//  Created by Natan Zalkin on 17/12/2019.
 //  Copyright © 2019 Natan Zalkin. All rights reserved.
 //
 
@@ -31,66 +31,33 @@
 
 import Foundation
 
-/// An object that dispatches actions to registered workers.
-/// Actions will be dispatched on the same thread there the dispatcher is called.
-open class FluxDispatcher: FluxActionDispatching {
-
-    internal var tokens: Set<UUID>
-    internal var workers: [FluxWorker]
-
-    /// Initialises a dispatcher.
-    public init() {
-        tokens = Set()
-        workers = []
-    }
+/// An object that dispatches actions to registered workers on the main thread.
+final public class FluxInteractiveDispatcher: FluxDispatcher {
 
     /// Registers workers in the dispatcher. Only one worker with the same token can be registered in the dispatcher.
     /// - Parameter workers: The list of workers to register in the dispatcher. Dispatched actions will be passed to the workers in the same order as they were registered.
-    public func register(workers workersToInsert: [FluxWorker]) {
-        workersToInsert.forEach { worker in
-            if tokens.insert(worker.token).inserted {
-                let sortedIndex = workers.sortedIndex(of: worker)
-                workers.insert(worker, at: sortedIndex)
-            }
-        }
+    override public func register(workers workersToInsert: [FluxWorker]) {
+        scheduleOnMain { super.register(workers: workersToInsert) }
     }
 
     /// Unregisters workers from the dispatcher.
     /// - Parameter tokensToRemove: The list of tokens of workers that should be unregistered.
-    public func unregister(tokens tokensToRemove: [UUID]) {
-        tokens.subtract(Set(tokensToRemove))
-        workers.removeAll { tokensToRemove.contains($0.token) }
+    override public func unregister(tokens tokensToRemove: [UUID]) {
+        scheduleOnMain { super.unregister(tokens: tokensToRemove) }
     }
 
     /// Dispatches an action to workers.
     /// - Parameter action: The action to dispatch to workers.
-    public func dispatch<Action: FluxAction>(action: Action) {
-        FluxStackingComposer(workers: workers).next(action: action)
+    override public func dispatch<Action: FluxAction>(action: Action) {
+        scheduleOnMain { super.dispatch(action: action) }
     }
 
-}
-
-// MARK: - Utility Methods
-
-internal extension RandomAccessCollection where Element == FluxWorker {
-
-    /// Index where the worker should be inserted to keep the collection sorted
-    func sortedIndex(of target: Element) -> Index {
-
-        var sequence = self[...]
-
-        while !sequence.isEmpty {
-
-            let middleIndex = sequence.index(sequence.startIndex, offsetBy: sequence.count / 2)
-
-            if target.priority < sequence[middleIndex].priority {
-                sequence = sequence[..<middleIndex]
-            } else {
-                sequence = sequence[sequence.index(after: middleIndex)...]
-            }
+    private func scheduleOnMain(execute action: @escaping () -> Void) {
+        if Thread.isMainThread {
+            action()
+        } else {
+            DispatchQueue.main.async(execute: action)
         }
-
-        return sequence.startIndex
     }
 
 }

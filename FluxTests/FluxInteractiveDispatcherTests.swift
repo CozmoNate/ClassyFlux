@@ -37,12 +37,12 @@ import Nimble
 class FluxInteractiveDispatcherTests: QuickSpec {
 
     override func spec() {
-        describe("FluxDispatcher.Interactive") {
+        describe("FluxInteractiveDispatcher") {
 
-            var dispatcher: FluxDispatcher.Interactive!
+            var dispatcher: FluxInteractiveDispatcher!
 
             beforeEach {
-                dispatcher = FluxDispatcher.Interactive()
+                dispatcher = FluxInteractiveDispatcher()
             }
 
             context("when registered worker") {

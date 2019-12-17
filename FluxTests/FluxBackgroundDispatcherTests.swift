@@ -37,14 +37,14 @@ import Nimble
 class FluxBackgroundDispatcherTests: QuickSpec {
 
     override func spec() {
-        describe("FluxDispatcher.Background") {
+        describe("FluxBackgroundDispatcher") {
 
             var scheduler: DispatchQueue!
-            var dispatcher: FluxDispatcher.Background!
+            var dispatcher: FluxBackgroundDispatcher!
 
             beforeEach {
                 scheduler = DispatchQueue(label: "Test", attributes: .concurrent)
-                dispatcher = FluxDispatcher.Background(queue: scheduler)
+                dispatcher = FluxBackgroundDispatcher(queue: scheduler)
             }
 
             context("when registered worker") {
