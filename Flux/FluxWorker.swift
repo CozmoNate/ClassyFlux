@@ -31,14 +31,14 @@
 
 import Foundation
 
-/// A closure which passes next action to subsequent workers via the composer provided.
-public typealias FluxPassthroughAction = (FluxComposer) -> Void
+/// A closure which passes next action to subsequent workers.
+public typealias FluxPassthroughAction = (FluxIterator) -> Void
 
 /// A functor which generates FluxPassthroughAction closure allowing to pass next action to subsequent workers.
 public func FluxNextAction<Action: FluxAction>(_ action: Action?) -> FluxPassthroughAction {
-    return {
+    return { iterator in
         if let action = action {
-            $0.next(action: action)
+            iterator.next(action: action)
         }
     }
 }

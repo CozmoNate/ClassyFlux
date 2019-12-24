@@ -32,7 +32,7 @@
 import Foundation
 
 /// An object that dispatches actions to registered workers on a background thread.
-final public class FluxBackgroundDispatcher: FluxDispatcher {
+final public class FluxBackgroundDispatcher: FluxSynchronousDispatcher {
 
     internal let queue: DispatchQueue
 

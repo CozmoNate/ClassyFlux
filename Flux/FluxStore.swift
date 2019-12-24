@@ -41,23 +41,13 @@ import Combine
 extension FluxStore: ObservableObject {}
 #endif
 
-public enum FluxStoreEvent {
-    case stateWillChange, stateDidChange
-
-    /// A name of the notification send alongside with corresponding store event.
-    public var notificationName: Notification.Name {
-        switch self {
-        case .stateWillChange: return Notification.Name(rawValue: "FluxStoreWillChange")
-        case .stateDidChange: return Notification.Name(rawValue: "FluxStoreDidChange")
-        }
-    }
-
-    /// A key in the UserInfo dictionary of a notification pointing to the set of keypaths describing changed properties of store state object.
-    public static let changedKeyPathsKey = "changedKeyPaths"
-}
-
 /// Store contains a state object triggers reducer to modify the state as a response to action dispatched
 open class FluxStore<State>: FluxWorker {
+    
+    public struct Change {
+        let state: State
+        let keyPaths: Set<PartialKeyPath<State>>
+    }
 
     public typealias State = State
 
@@ -71,10 +61,10 @@ open class FluxStore<State>: FluxWorker {
     public lazy var objectWillChange = ObservableObjectPublisher()
 
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    public lazy var stateWillChange = PassthroughSubject<(State, Set<PartialKeyPath<State>>), Never>()
+    public lazy var stateWillChange = PassthroughSubject<Change, Never>()
 
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    public lazy var stateDidChange = PassthroughSubject<(State, Set<PartialKeyPath<State>>), Never>()
+    public lazy var stateDidChange = PassthroughSubject<Change, Never>()
     #endif
 
     public let token: UUID
@@ -117,11 +107,11 @@ open class FluxStore<State>: FluxWorker {
         #if canImport(Combine)
         if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
             objectWillChange.send()
-            stateWillChange.send((state, keyPaths))
+            stateWillChange.send(Change(state: state, keyPaths: keyPaths))
         }
         #endif
 
-        NotificationCenter.default.post(name: FluxStoreEvent.stateWillChange.notificationName, object: self, userInfo: [FluxStoreEvent.changedKeyPathsKey: keyPaths])
+        NotificationCenter.default.post(name: FluxStoreEvent.stateWillChange.notificationName, object: self, userInfo: [FluxStoreNotificationKeyPathsKey: keyPaths])
     }
 
     /// An event called after the state is passed to reducers.
@@ -130,11 +120,11 @@ open class FluxStore<State>: FluxWorker {
     open func stateDidChange(_ state: State, at keyPaths: Set<PartialKeyPath<State>>) {
         #if canImport(Combine)
         if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
-            stateDidChange.send((state, keyPaths))
+            stateDidChange.send(Change(state: state, keyPaths: keyPaths))
         }
         #endif
 
-        NotificationCenter.default.post(name: FluxStoreEvent.stateDidChange.notificationName, object: self, userInfo: [FluxStoreEvent.changedKeyPathsKey: keyPaths])
+        NotificationCenter.default.post(name: FluxStoreEvent.stateDidChange.notificationName, object: self, userInfo: [FluxStoreNotificationKeyPathsKey: keyPaths])
     }
 
     /// Adds an observer that will be invoked each time the store chages its state
@@ -203,20 +193,39 @@ open class FluxStore<State>: FluxWorker {
     }
 
     internal func reduceState<Action: FluxAction>(with reducer: Reduce<Action>, applying action: Action) {
-
-        let originalState = backingState
-        var draftState = originalState
-
+        
+        var draftState = backingState
         let keyPaths = Set(reducer(&draftState, action))
 
         if !keyPaths.isEmpty {
-            stateWillChange(originalState, at: keyPaths)
+            stateWillChange(backingState, at: keyPaths)
             backingState = draftState
             stateDidChange(backingState, at: keyPaths)
         }
     }
     
 }
+
+public enum FluxStoreEvent {
+    case stateWillChange, stateDidChange
+
+    /// A name of the notification send alongside with corresponding store event.
+    public var notificationName: Notification.Name {
+        switch self {
+        case .stateWillChange: return FluxStoreWillChangeNotification
+        case .stateDidChange: return FluxStoreDidChangeNotification
+        }
+    }
+}
+
+/// A name of the notification send alongside with corresponding store event.
+public let FluxStoreWillChangeNotification = Notification.Name(rawValue: "FluxStoreWillChange")
+
+/// A name of the notification send alongside with corresponding store event.
+public let FluxStoreDidChangeNotification = Notification.Name(rawValue: "FluxStoreDidChange")
+
+/// A key in the UserInfo dictionary of a notification pointing to the set of keypaths describing changed properties of store state object.
+public let FluxStoreNotificationKeyPathsKey = "changedKeyPaths"
 
 extension FluxStore {
 
@@ -229,7 +238,7 @@ extension FluxStore {
             observer = NotificationCenter.default
                 .addObserver(forName: event.notificationName, object: store, queue: queue) { notification in
                     guard let store = notification.object as? FluxStore<State> else { return }
-                    guard let keyPaths = notification.userInfo?[FluxStoreEvent.changedKeyPathsKey] as? Set<PartialKeyPath<State>> else { return }
+                    guard let keyPaths = notification.userInfo?[FluxStoreNotificationKeyPathsKey] as? Set<PartialKeyPath<State>> else { return }
                     changeHandler(store.state, keyPaths)
                 }
         }

@@ -11,15 +11,15 @@ import Nimble
 
 @testable import ClassyFlux
 
-class FluxDispatcherTests: QuickSpec {
+class FluxSynchronousDispatcherTests: QuickSpec {
 
     override func spec() {
-        describe("FluxDispatcher") {
+        describe("FluxSynchronousDispatcher") {
 
-            var dispatcher: FluxDispatcher!
+            var dispatcher: FluxSynchronousDispatcher!
 
             beforeEach {
-                dispatcher = FluxDispatcher()
+                dispatcher = FluxSynchronousDispatcher()
             }
 
             context("when registered worker") {

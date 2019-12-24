@@ -64,10 +64,29 @@ class TestStore: FluxStore<TestState> {
     }
 }
 
-class TestComposer: FluxComposer {
+class TestDispatcher: FluxDispatcher {
 
     var lastAction: FluxAction?
+    var lastWorkers: [FluxWorker]?
+    var lastTokens: [UUID]?
 
+    func register(workers: [FluxWorker]) {
+        lastWorkers = workers
+    }
+    
+    func unregister(tokens: [UUID]) {
+        lastTokens = tokens
+    }
+    
+    func dispatch<Action>(action: Action) where Action : FluxAction {
+        lastAction = action
+    }
+}
+
+class TestIterator: FluxIterator {
+
+    var lastAction: FluxAction?
+    
     func next<Action>(action: Action) where Action : FluxAction {
         lastAction = action
     }

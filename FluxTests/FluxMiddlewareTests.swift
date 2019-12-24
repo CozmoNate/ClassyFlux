@@ -45,11 +45,11 @@ class FluxMiddlewareTests: QuickSpec {
 
                 context("when performed registered action") {
 
-                    var composer: TestComposer!
+                    var iterator: TestIterator!
 
                     beforeEach {
-                        composer = TestComposer()
-                        middleware.handle(action: ChangeValueAction(value: "change it!"))(composer)
+                        iterator = TestIterator()
+                        middleware.handle(action: ChangeValueAction(value: "change it!"))(iterator)
                     }
 
                     it("calls action handler") {
@@ -57,17 +57,17 @@ class FluxMiddlewareTests: QuickSpec {
                     }
 
                     it("passes action to composer") {
-                        expect(composer.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
+                        expect(iterator.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
                     }
                 }
 
                 context("when performed another action") {
 
-                    var composer: TestComposer!
+                    var iterator: TestIterator!
 
                     beforeEach {
-                        composer = TestComposer()
-                        middleware.handle(action: IncrementNumberAction(increment: 1))(composer)
+                        iterator = TestIterator()
+                        middleware.handle(action: IncrementNumberAction(increment: 1))(iterator)
                     }
 
                     it("calls action handler") {
@@ -75,7 +75,7 @@ class FluxMiddlewareTests: QuickSpec {
                     }
 
                     it("passes action to composer") {
-                        expect(composer.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
+                        expect(iterator.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
                     }
                 }
 
@@ -91,11 +91,11 @@ class FluxMiddlewareTests: QuickSpec {
 
                     context("when performed unregistered action") {
 
-                        var composer: TestComposer!
+                        var iterator: TestIterator!
 
                         beforeEach {
-                            composer = TestComposer()
-                            middleware.handle(action: ChangeValueAction(value: "change it!"))(composer)
+                            iterator = TestIterator()
+                            middleware.handle(action: ChangeValueAction(value: "change it!"))(iterator)
                         }
 
                         it("does not change the value") {
@@ -103,7 +103,7 @@ class FluxMiddlewareTests: QuickSpec {
                         }
 
                         it("passes action to composer") {
-                            expect(composer.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
+                            expect(iterator.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
                         }
                     }
                 }
@@ -130,25 +130,25 @@ class FluxMiddlewareTests: QuickSpec {
 
                 context("when performed first action") {
 
-                    var composer: TestComposer!
+                    var iterator: TestIterator!
 
                     beforeEach {
-                        composer = TestComposer()
-                        middleware.handle(action: ChangeValueAction(value: "change it!"))(composer)
+                        iterator = TestIterator()
+                        middleware.handle(action: ChangeValueAction(value: "change it!"))(iterator)
                     }
 
                     it("passes correct action to composer") {
-                        expect(composer.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "Transformed!")))
+                        expect(iterator.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "Transformed!")))
                     }
                 }
 
                 context("when performed second action") {
 
-                    var composer: TestComposer!
+                    var iterator: TestIterator!
 
                     beforeEach {
-                        composer = TestComposer()
-                        middleware.handle(action: IncrementNumberAction(increment: 1))(composer)
+                        iterator = TestIterator()
+                        middleware.handle(action: IncrementNumberAction(increment: 1))(iterator)
                     }
 
                     it("calls action handler") {
@@ -156,7 +156,7 @@ class FluxMiddlewareTests: QuickSpec {
                     }
 
                     it("passes the same action to composer") {
-                        expect(composer.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
+                        expect(iterator.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
                     }
                 }
             }

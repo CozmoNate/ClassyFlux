@@ -34,7 +34,7 @@ import Nimble
 
 @testable import ClassyFlux
 
-class FluxStoreObserverTests: QuickSpec, FluxComposer {
+class FluxStoreObserverTests: QuickSpec {
 
     var observer: TestStore.Observer?
     var anotherObserver: TestStore.Observer?
@@ -69,7 +69,7 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
             context("when state changed") {
 
                 beforeEach {
-                    store.handle(action: ChangeValueAction(value: "test"))(self)
+                    store.handle(action: ChangeValueAction(value: "test"))(TestIterator())
                 }
 
                 it("receives changed state") {
@@ -90,7 +90,7 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
                             lastState = TestState(value: "one", number: 1)
                             lastKeyPaths = [\TestState.number]
                             lastValue = "ups"
-                            store.handle(action: ChangeValueAction(value: "test 2"))(self)
+                            store.handle(action: ChangeValueAction(value: "test 2"))(TestIterator())
                             
                         }
 
@@ -104,6 +104,4 @@ class FluxStoreObserverTests: QuickSpec, FluxComposer {
             }
         }
     }
-
-    func next<Action>(action: Action) where Action : FluxAction {}
 }

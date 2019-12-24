@@ -79,7 +79,7 @@ class FluxAggregatorTests: QuickSpec {
                     context("when store chages") {
                         
                         beforeEach {
-                            store.handle(action: ChangeValueAction(value: "aggregate"))(TestComposer())
+                            store.handle(action: ChangeValueAction(value: "aggregate"))(TestIterator())
                         }
                         
                         it("invokes change handler on aggregator") {

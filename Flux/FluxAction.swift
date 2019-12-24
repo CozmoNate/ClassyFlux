@@ -32,18 +32,10 @@
 /// A protocol describing an abstract action
 public protocol FluxAction {}
 
-public protocol FluxActionDispatching: AnyObject {
-
-    /// Dispatches an action to workers.
-    /// - Parameter action: The action to dispatch.
-    func dispatch<Action: FluxAction>(action: Action)
-
-}
-
 public extension FluxAction {
 
     /// Dispatches the action with a dispatcher provided
-    func dispatch(with dispatcher: FluxActionDispatching?) {
+    func dispatch(with dispatcher: FluxDispatcher?) {
         dispatcher?.dispatch(action: self)
     }
 

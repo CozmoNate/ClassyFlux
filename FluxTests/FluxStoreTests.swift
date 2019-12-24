@@ -11,7 +11,6 @@ import Nimble
 
 @testable import ClassyFlux
 
-@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 class FluxStoreTests: QuickSpec {
 
     override func spec() {
@@ -61,7 +60,7 @@ class FluxStoreTests: QuickSpec {
                     context("when performed unregistered action") {
 
                         beforeEach {
-                            store.handle(action: ChangeValueAction(value: "change it!"))(TestComposer())
+                            store.handle(action: ChangeValueAction(value: "change it!"))(TestIterator())
                         }
 
                         it("doesn't change store state") {
@@ -73,11 +72,11 @@ class FluxStoreTests: QuickSpec {
 
                 context("when performed well known action") {
 
-                    var composer: TestComposer!
+                    var iterator: TestIterator!
 
                     beforeEach {
-                        composer = TestComposer()
-                        store.handle(action: ChangeValueAction(value: "test"))(composer)
+                        iterator = TestIterator()
+                        store.handle(action: ChangeValueAction(value: "test"))(iterator)
                     }
 
                     it("calls state change events") {
@@ -90,17 +89,17 @@ class FluxStoreTests: QuickSpec {
                     }
 
                     it("passes action to composer") {
-                        expect(composer.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
+                        expect(iterator.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
                     }
                 }
                 
                 context("when performed action that mutates the whole state") {
 
-                    var composer: TestComposer!
+                    var iterator: TestIterator!
 
                     beforeEach {
-                        composer = TestComposer()
-                        store.handle(action: IncrementNumberAction(increment: 1))(composer)
+                        iterator = TestIterator()
+                        store.handle(action: IncrementNumberAction(increment: 1))(iterator)
                     }
 
                     it("calls state change events") {
@@ -116,7 +115,7 @@ class FluxStoreTests: QuickSpec {
                     }
 
                     it("passes the action to composer") {
-                        expect(composer.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
+                        expect(iterator.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
                     }
                 }
 
@@ -135,11 +134,11 @@ class FluxStoreTests: QuickSpec {
 
                     context("when performed another action") {
 
-                        var composer: TestComposer!
+                        var iterator: TestIterator!
 
                         beforeEach {
-                            composer = TestComposer()
-                            store.handle(action: IncrementNumberAction(increment: 2))(composer)
+                            iterator = TestIterator()
+                            store.handle(action: IncrementNumberAction(increment: 2))(iterator)
                         }
 
                         it("correctly reduces store state") {
@@ -147,7 +146,7 @@ class FluxStoreTests: QuickSpec {
                         }
 
                         it("passes action to composer") {
-                            expect(composer.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 2)))
+                            expect(iterator.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 2)))
                         }
                     }
 

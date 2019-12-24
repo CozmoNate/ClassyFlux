@@ -1,8 +1,8 @@
 //
-//  FluxComposer.swift
+//  FluxIterator.swift
 //  ClassyFlux
 //
-//  Created by Natan Zalkin on 19/08/2019.
+//  Created by Natan Zalkin on 24/12/2019.
 //  Copyright © 2019 Natan Zalkin. All rights reserved.
 //
 
@@ -29,28 +29,11 @@
  *
  */
 
-/// An object that passes the action to the next workers. It allows to compose
-/// a function where resulting action depends on previous actions.
-public protocol FluxComposer: AnyObject {
-
-    /// Passes next action to workers.
+/// A protocol describing object that passes an action to next worker.
+public protocol FluxIterator: AnyObject {
+    
+    /// Passes latest action to the next worker.
     /// - Parameter action: The action to perform next.
     func next<Action: FluxAction>(action: Action)
-
-}
-
-/// A composer passing action from one worker to next worker located in the stack (array).
-/// FluxStackingComposer instance can be used only once by calling 'next(action:)' method which will start action propagation to the workers.
-public class FluxStackingComposer: FluxComposer {
-
-    internal var iterator: IndexingIterator<[FluxWorker]>?
-
-    public init(workers: [FluxWorker]) {
-        iterator = workers.makeIterator()
-    }
-
-    public func next<Action: FluxAction>(action: Action)  {
-        iterator?.next()?.handle(action: action)(self)
-    }
 
 }

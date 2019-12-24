@@ -31,8 +31,8 @@
 
 import Foundation
 
-/// An object that dispatches actions to registered workers on the main thread.
-final public class FluxInteractiveDispatcher: FluxDispatcher {
+/// Am object that dispatches actions to registered workers on the main thread.
+final public class FluxInteractiveDispatcher: FluxSynchronousDispatcher {
 
     /// Registers workers in the dispatcher. Only one worker with the same token can be registered in the dispatcher.
     /// - Parameter workers: The list of workers to register in the dispatcher. Dispatched actions will be passed to the workers in the same order as they were registered.
@@ -53,7 +53,7 @@ final public class FluxInteractiveDispatcher: FluxDispatcher {
     }
 
     private func scheduleOnMain(execute action: @escaping () -> Void) {
-        if Thread.isMainThread {
+        if Thread.isMainThread && !isDispatching {
             action()
         } else {
             DispatchQueue.main.async(execute: action)
