@@ -29,6 +29,7 @@
  *
  */
 
+import Foundation
 import ResolverContainer
 
 /// A class that aggregates states from multiple stores and invokes appropriate handlers when the store changes.
