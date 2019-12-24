@@ -29,7 +29,6 @@
  *
  */
 
-import Foundation
 import ResolverContainer
 
 /// A class that aggregates states from multiple stores and invokes appropriate handlers when the store changes.
@@ -40,13 +39,13 @@ public class FluxAggregator {
     public typealias Handle<State> = (_ state: State) -> Void
     
     internal let storage: ResolverContainer
-    internal var observers: [UUID: AnyObject]
+    internal var observers: [AnyHashable: AnyObject]
     internal var changeHandler: ((FluxAggregator) -> Void)?
 
     /// Initializes an aggregator instance with optional block what called each time when one of registered store changed.
     public init(changeHandler collectHandler: ((FluxAggregator) -> Void)? = nil) {
         storage = ResolverContainer()
-        observers = [UUID: AnyObject]()
+        observers = [AnyHashable: AnyObject]()
         changeHandler = collectHandler
     }
 

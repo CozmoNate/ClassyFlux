@@ -51,7 +51,7 @@ final public class FluxBackgroundDispatcher: FluxSynchronousDispatcher {
 
     /// Unregisters workers from the dispatcher.
     /// - Parameter tokensToRemove: The list of tokens of workers that should be unregistered.
-    override public func unregister(tokens tokensToUnregister: [UUID]) {
+    override public func unregister(tokens tokensToUnregister: [AnyHashable]) {
         queue.async(flags: .barrier) { super.unregister(tokens: tokensToUnregister) }
     }
 

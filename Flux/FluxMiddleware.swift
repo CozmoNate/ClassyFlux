@@ -40,7 +40,7 @@ open class FluxMiddleware: FluxWorker {
     /// - Returns: The next action. Use FluxNextAction(FluxAction) functor to pass next action. Passing nil action will stop action propagation.
     public typealias Handle<Action: FluxAction> = (Action) -> FluxPassthroughAction
 
-    public let token: UUID
+    public let token: AnyHashable
     public let priority: UInt
 
     internal let handlers: ResolverContainer

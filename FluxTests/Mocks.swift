@@ -68,13 +68,13 @@ class TestDispatcher: FluxDispatcher {
 
     var lastAction: FluxAction?
     var lastWorkers: [FluxWorker]?
-    var lastTokens: [UUID]?
+    var lastTokens: [AnyHashable]?
 
     func register(workers: [FluxWorker]) {
         lastWorkers = workers
     }
     
-    func unregister(tokens: [UUID]) {
+    func unregister(tokens: [AnyHashable]) {
         lastTokens = tokens
     }
     
@@ -94,7 +94,7 @@ class TestIterator: FluxIterator {
 
 class TestWorker: FluxWorker {
     
-    let token = UUID()
+    let token: AnyHashable = UUID()
     let priority: UInt
     
     var lastAction: FluxAction?

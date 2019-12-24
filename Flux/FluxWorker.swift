@@ -29,8 +29,6 @@
  *
  */
 
-import Foundation
-
 /// A closure which passes next action to subsequent workers.
 public typealias FluxPassthroughAction = (FluxIterator) -> Void
 
@@ -47,7 +45,7 @@ public func FluxNextAction<Action: FluxAction>(_ action: Action?) -> FluxPassthr
 public protocol FluxWorker: AnyObject {
 
     /// A unique identifier.
-    var token: UUID { get }
+    var token: AnyHashable { get }
     
     /// A priority of handling an action.
     /// The priority is used by a dispatcher to determine which worker should handle an action first.

@@ -67,7 +67,7 @@ open class FluxStore<State>: FluxWorker {
     public lazy var stateDidChange = PassthroughSubject<Change, Never>()
     #endif
 
-    public let token: UUID
+    public let token: AnyHashable
     public let priority: UInt
 
     /// A state of the store.

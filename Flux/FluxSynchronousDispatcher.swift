@@ -34,7 +34,7 @@ import Foundation
 /// An object that dispatches actions to registered workers synchronously on the same thread.
 open class FluxSynchronousDispatcher: FluxDispatcher {
 
-    internal var tokens: Set<UUID>
+    internal var tokens: Set<AnyHashable>
     internal var workers: [FluxWorker]
     internal let iterator = Iterator()
     
@@ -55,7 +55,7 @@ open class FluxSynchronousDispatcher: FluxDispatcher {
         }
     }
 
-    public func unregister(tokens tokensToRemove: [UUID]) {
+    public func unregister(tokens tokensToRemove: [AnyHashable]) {
         tokens.subtract(Set(tokensToRemove))
         workers.removeAll { tokensToRemove.contains($0.token) }
     }

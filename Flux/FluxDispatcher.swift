@@ -38,7 +38,7 @@ public protocol FluxDispatcher: AnyObject {
     
     /// Unregisters workers from the dispatcher.
     /// - Parameter tokens: The list of tokens of workers that should be unregistered.
-    func unregister(tokens: [UUID])
+    func unregister(tokens: [AnyHashable])
     
     /// Passes the action to workers.
     /// - Parameter action: The action to pass.

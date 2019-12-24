@@ -42,7 +42,7 @@ final public class FluxInteractiveDispatcher: FluxSynchronousDispatcher {
 
     /// Unregisters workers from the dispatcher.
     /// - Parameter tokensToRemove: The list of tokens of workers that should be unregistered.
-    override public func unregister(tokens tokensToRemove: [UUID]) {
+    override public func unregister(tokens tokensToRemove: [AnyHashable]) {
         scheduleOnMain { super.unregister(tokens: tokensToRemove) }
     }
 
