@@ -45,8 +45,8 @@ extension FluxStore: ObservableObject {}
 open class FluxStore<State>: FluxWorker {
     
     public struct Change {
-        let state: State
-        let keyPaths: Set<PartialKeyPath<State>>
+        public let state: State
+        public let keyPaths: Set<PartialKeyPath<State>>
     }
 
     public typealias State = State
