@@ -9,6 +9,40 @@ Simple yet fully-featured Flux pattern implemented in Swift
 
 ## Brief Documentation
 
+
+### FluxAction
+
+FluxAction usually a plain object that carries information describing the context of particular user action or system event. Actions dispatched via FluxDispatcher implementation and broadcasted to all the workers registered in the dispatcher. FluxStore could modify its state in response to actions. FluxMiddleware could start asynchronous work and report back by broadcasting another actions.  
+
+Example declaration:
+
+```swift
+enum Action {
+    struct UpdateName: FluxAction {
+        let name: String
+    }
+}
+```
+Usage example:
+
+```swift
+Action.UpdateName(name: "Great Name").dispatch(with: dispatcher)
+```
+
+### FluxDispatcher
+
+FluxDispatcher dispatches an actions to the mix of workers, which could be stores, middlewares or even other dispatchers.  Actions dispatched from one worker to another and can be modified and/or replaced by the workers. Be careful of the order of the workers, it is important and can cause behavioural artefacts if not configured correctly.  
+
+Usage example:
+
+```swift
+let dispatcher = InteractiveDispatcher() 
+
+dispatcher.register(workers: [SomeStore(), SomeMiddleware(dispatcher: dispatcher), AnalyticsLogger()])
+
+SomeAction(value: Value()).dispatch(with: dispatcher)
+```
+
 ### FluxStore
 
 FluxStore is a container that manages the underlaying state, broadcasts notifications about state changes. FluxStore is ObservableObject and can be used directly in SwiftUI view to render a state. State can be modified by sending relevant action to the dispatcher, where FluxStore instance is registered. FluxStore syncs state changes on main queue.
@@ -56,20 +90,6 @@ class SomeMiddleware: FluxMiddleware {
         }
     }
 }
-```
-
-### FluxDispatcher
-
-FluxDispatcher dispatches an actions to the mix of workers, which could be stores, middlewares or even other dispatchers.  Actions dispatched from one worker to another and can be modified and/or replaced by the workers. Be careful of the order of the workers, it is important and can cause behavioural artefacts if not configured correctly.  
-
-Example usage:
-
-```swift
-let dispatcher = InteractiveDispatcher() 
-
-dispatcher.register(workers: [SomeStore(), SomeMiddleware(dispatcher: dispatcher), AnalyticsLogger()])
-
-SomeAction(value: Value()).dispatch(with: dispatcher)
 ```
 
 ## Author
