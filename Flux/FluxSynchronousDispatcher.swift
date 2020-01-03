@@ -30,9 +30,20 @@
  */
 
 import Foundation
+#if canImport(Combine)
+import Combine
+#endif
 
 /// An object that dispatches actions to registered workers synchronously on the same thread.
 open class FluxSynchronousDispatcher: FluxDispatcher {
+    
+    #if canImport(Combine)
+    @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    public lazy var willDispatchAction = PassthroughSubject<FluxAction, Never>()
+
+    @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    public lazy var didDispatchAction = PassthroughSubject<FluxAction, Never>()
+    #endif
 
     internal var tokens: Set<AnyHashable>
     internal var workers: [FluxWorker]
@@ -61,8 +72,18 @@ open class FluxSynchronousDispatcher: FluxDispatcher {
     }
 
     public func dispatch<Action: FluxAction>(action: Action) {
+        #if canImport(Combine)
+        if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+            willDispatchAction.send(action)
+        }
+        #endif
         iterator.load(workers: workers)
         iterator.next(action: action)
+        #if canImport(Combine)
+        if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+            didDispatchAction.send(action)
+        }
+        #endif
     }
     
 }
