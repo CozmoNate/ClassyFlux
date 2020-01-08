@@ -20,6 +20,8 @@ struct IncrementNumberAction: FluxAction, Equatable {
     var increment: Int
 }
 
+struct EmptyAction: FluxAction, Equatable {}
+
 struct TestState: Equatable {
     var value: String
     var number: Int
@@ -27,6 +29,7 @@ struct TestState: Equatable {
 
 class TestMiddleware: FluxMiddleware {
     var didIncrement: Bool?
+    var didIntercept: Bool?
 }
 
 class TestStore: FluxStore<TestState> {
@@ -105,6 +108,6 @@ class TestWorker: FluxWorker {
 
     func handle<Action>(action: Action) -> FluxPassthroughAction where Action : FluxAction {
         lastAction = action
-        return FluxNextAction(action)
+        return FluxNext(action)
     }
 }

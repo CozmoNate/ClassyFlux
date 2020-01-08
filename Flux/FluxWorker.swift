@@ -33,12 +33,12 @@
 public typealias FluxPassthroughAction = (FluxIterator) -> Void
 
 /// A functor which generates FluxPassthroughAction closure allowing to pass next action to subsequent workers.
-public func FluxNextAction<Action: FluxAction>(_ action: Action?) -> FluxPassthroughAction {
-    return { iterator in
-        if let action = action {
-            iterator.next(action: action)
-        }
-    }
+public func FluxNext<Action: FluxAction>(_ action: Action) -> FluxPassthroughAction {
+    return { $0.next(action: action) }
+}
+
+public func FluxVoid() -> FluxPassthroughAction {
+    return { _ in }
 }
 
 /// A protocol that defines how the actions can be handled and how to pass next action to subsequent workers.

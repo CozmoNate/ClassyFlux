@@ -58,13 +58,24 @@ open class FluxMiddleware: FluxWorker {
         handlers.register { handler }
     }
 
+    /// Associates an action interceptor with the actions of specified type. Interceptor will stop action propagation to next workers
+    /// - Parameter action: The type of the actions to associate with handler.
+    /// - Parameter intercept: The closure that will be invoked when the action received.
+    public func registerInterceptor<Action: FluxAction>(for action: Action.Type, intercept: @escaping (Action) -> Void) {
+        let handler: Handle<Action> = { (action) -> FluxPassthroughAction in
+            intercept(action)
+            return FluxVoid()
+        }
+        handlers.register { handler }
+    }
+    
     /// Associates a handler with the actions of specified type.
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter execute: The closure that will be invoked when the action received.
     public func registerHandler<Action: FluxAction>(for action: Action.Type, handle: @escaping (Action) -> Void) {
         let handler: Handle<Action> = { (action) -> FluxPassthroughAction in
             handle(action)
-            return FluxNextAction(action)
+            return FluxNext(action)
         }
         handlers.register { handler }
     }
@@ -77,7 +88,7 @@ open class FluxMiddleware: FluxWorker {
 
     public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
         guard let handle = try? self.handlers.resolve(Handle<Action>.self) else {
-            return FluxNextAction(action)
+            return FluxNext(action)
         }
 
         return handle(action)
@@ -87,7 +98,7 @@ open class FluxMiddleware: FluxWorker {
 
 extension FluxWorker where Self: FluxMiddleware {
 
-    /// Associates an action handler with the actions of specified type with an option to prevent current action propagation and/or pass another action to next workers.
+    /// Associates an action handler with the actions of specified type with an option pass another action to next workers.
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter compose: The closure that will be invoked when the action received.
     public func registerComposer<Action: FluxAction>(for action: Action.Type, compose: @escaping (_ owner: Self, _ action: Action) -> FluxPassthroughAction) {
@@ -95,7 +106,21 @@ extension FluxWorker where Self: FluxMiddleware {
             if let self = self {
                 return compose(self, action)
             } else {
-                return FluxNextAction(action)
+                return FluxNext(action)
+            }
+        }
+    }
+    
+    /// Associates an action interceptor with the actions of specified type. Interceptor will stop action propagation to next workers
+    /// - Parameter action: The type of the actions to associate with handler.
+    /// - Parameter intercept: The closure that will be invoked when the action received.
+    public func registerInterceptor<Action: FluxAction>(for action: Action.Type, intercept: @escaping (_ owner: Self, _ action: Action) -> Void) {
+        registerComposer(for: Action.self) { [weak self] (action) -> FluxPassthroughAction in
+            if let self = self {
+                intercept(self, action)
+                return FluxVoid()
+            } else {
+                return FluxNext(action)
             }
         }
     }

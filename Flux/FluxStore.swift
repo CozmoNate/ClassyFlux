@@ -166,7 +166,7 @@ open class FluxStore<State>: FluxWorker {
             reduceState(with: reducer, applying: action)
         }
 
-        return FluxNextAction(action)
+        return FluxNext(action)
     }
 
     internal func reduceState<Action: FluxAction>(with reducer: Reduce<Action>, applying action: Action) {

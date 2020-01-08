@@ -30,17 +30,22 @@ class FluxMiddlewareTests: QuickSpec {
                 beforeEach {
                     middleware.registerComposer(for: ChangeValueAction.self) { (_, action) in
                         value = action.value
-                        return FluxNextAction(action)
+                        return FluxNext(action)
                     }
 
                     middleware.registerHandler(for: IncrementNumberAction.self) { (owner, action) in
                         owner.didIncrement = true
+                    }
+                    
+                    middleware.registerInterceptor(for: EmptyAction.self) { (owner, action) in
+                        owner.didIntercept = true
                     }
                 }
 
                 it("has registered action handlers") {
                     expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<ChangeValueAction>.self)).toNot(beNil())
                     expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<IncrementNumberAction>.self)).toNot(beNil())
+                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<EmptyAction>.self)).toNot(beNil())
                 }
 
                 context("when performed registered action") {
@@ -76,6 +81,24 @@ class FluxMiddlewareTests: QuickSpec {
 
                     it("passes action to composer") {
                         expect(iterator.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
+                    }
+                }
+                
+                context("when performed third action") {
+
+                    var iterator: TestIterator!
+
+                    beforeEach {
+                        iterator = TestIterator()
+                        middleware.handle(action: EmptyAction())(iterator)
+                    }
+
+                    it("calls action handler") {
+                        expect(middleware.didIntercept).to(beTruthy())
+                    }
+
+                    it("does not pass the action to composer") {
+                        expect(iterator.lastAction).to(beNil())
                     }
                 }
 
@@ -115,7 +138,7 @@ class FluxMiddlewareTests: QuickSpec {
 
                 beforeEach {
                     middleware.registerComposer(for: ChangeValueAction.self) { _ in
-                        return FluxNextAction(ChangeValueAction(value: "Transformed!"))
+                        return FluxNext(ChangeValueAction(value: "Transformed!"))
                     }
 
                     middleware.registerHandler(for: IncrementNumberAction.self) { _ in
