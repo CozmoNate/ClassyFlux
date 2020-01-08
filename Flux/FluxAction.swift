@@ -36,6 +36,9 @@ public protocol FluxAction {}
 
 public protocol FluxActionDispatching {
 
+    /// A flag indicating if dispatcher dispatches an action at the moment.
+    var isDispatching: Bool { get }
+    
     /// Passes the action to workers.
     /// - Parameter action: The action to pass.
     func dispatch<Action: FluxAction>(action: Action)
@@ -47,7 +50,7 @@ public extension FluxAction {
     /// Dispatches the action on the main thread with specified or default dispatcher.
     /// Action will be dispatched synchronously when called from the main thread.
     func dispatch(with dispatcher: FluxActionDispatching = FluxDispatcher.default) {
-        if Thread.isMainThread {
+        if Thread.isMainThread && !dispatcher.isDispatching {
             dispatcher.dispatch(action: self)
         } else {
             DispatchQueue.main.async {
