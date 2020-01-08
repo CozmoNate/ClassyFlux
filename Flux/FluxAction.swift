@@ -29,6 +29,8 @@
  *
  */
 
+import Foundation
+
 /// A protocol describing an abstract action
 public protocol FluxAction {}
 
