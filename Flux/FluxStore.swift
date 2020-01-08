@@ -67,28 +67,14 @@ open class FluxStore<State>: FluxWorker {
     public lazy var stateDidChange = PassthroughSubject<Change, Never>()
     #endif
 
+
     public let token: AnyHashable
+
     public let priority: UInt
 
     /// A state of the store.
-    public private(set) var state: State {
-        get {
-            if Thread.isMainThread {
-                return backingState
-            } else {
-                return DispatchQueue.main.sync { return backingState }
-            }
-        }
-        set {
-            if Thread.isMainThread {
-                backingState = newValue
-            } else {
-                DispatchQueue.main.sync { backingState = newValue }
-            }
-        }
-    }
+    public private(set) var state: State
 
-    internal var backingState: State
     internal let reducers: ResolverContainer
 
     /// Initialises the store
@@ -96,7 +82,7 @@ open class FluxStore<State>: FluxWorker {
     public init(priority aPriority: UInt = 0, initialState: State) {
         token = UUID()
         priority = aPriority
-        backingState = initialState
+        state = initialState
         reducers = ResolverContainer()
     }
 
@@ -158,7 +144,6 @@ open class FluxStore<State>: FluxWorker {
     /// - Parameter action: The type of the actions to associate with reducer.
     /// - Parameter mutator: The closure that will be invoked when the action received, providing actual state value. Return mutated state or nil, when no changes need to be applied to the state.
     public func registerMutator<Action: FluxAction>(for action: Action.Type = Action.self, mutator: @escaping (State, Action) -> State?) {
-        
         let reducer: Reduce<Action> = { (state, action) in
             guard let mutated = mutator(state, action) else { return []}
             
@@ -177,30 +162,21 @@ open class FluxStore<State>: FluxWorker {
     }
 
     public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
-        
         if let reducer = try? reducers.resolve(Reduce<Action>.self) {
-            
-            if Thread.isMainThread {
-                reduceState(with: reducer, applying: action)
-            } else {
-                DispatchQueue.main.sync {
-                    self.reduceState(with: reducer, applying: action)
-                }
-            }
+            reduceState(with: reducer, applying: action)
         }
 
         return FluxNextAction(action)
     }
 
     internal func reduceState<Action: FluxAction>(with reducer: Reduce<Action>, applying action: Action) {
-        
-        var draftState = backingState
+        var draftState = state
         let keyPaths = Set(reducer(&draftState, action))
 
         if !keyPaths.isEmpty {
-            stateWillChange(backingState, at: keyPaths)
-            backingState = draftState
-            stateDidChange(backingState, at: keyPaths)
+            stateWillChange(state, at: keyPaths)
+            state = draftState
+            stateDidChange(state, at: keyPaths)
         }
     }
     

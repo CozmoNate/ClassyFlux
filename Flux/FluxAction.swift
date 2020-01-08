@@ -32,11 +32,26 @@
 /// A protocol describing an abstract action
 public protocol FluxAction {}
 
+public protocol FluxActionDispatching {
+
+    /// Passes the action to workers.
+    /// - Parameter action: The action to pass.
+    func dispatch<Action: FluxAction>(action: Action)
+
+}
+
 public extension FluxAction {
 
-    /// Dispatches the action with a dispatcher provided
-    func dispatch(with dispatcher: FluxDispatcher?) {
-        dispatcher?.dispatch(action: self)
+    /// Dispatches the action on the main thread with specified or default dispatcher.
+    /// Action will be dispatched synchronously when called from the main thread.
+    func dispatch(with dispatcher: FluxActionDispatching = FluxDispatcher.default) {
+        if Thread.isMainThread {
+            dispatcher.dispatch(action: self)
+        } else {
+            DispatchQueue.main.async {
+                dispatcher.dispatch(action: self)
+            }
+        }
     }
 
 }

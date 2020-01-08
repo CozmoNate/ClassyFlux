@@ -70,15 +70,15 @@ class TestDispatcher: FluxDispatcher {
     var lastWorkers: [FluxWorker]?
     var lastTokens: [AnyHashable]?
 
-    func register(workers: [FluxWorker]) {
+    override func register(workers: [FluxWorker]) {
         lastWorkers = workers
     }
     
-    func unregister(tokens: [AnyHashable]) {
+    override func unregister(tokens: [AnyHashable]) {
         lastTokens = tokens
     }
     
-    func dispatch<Action>(action: Action) where Action : FluxAction {
+    override func dispatch<Action>(action: Action) where Action : FluxAction {
         lastAction = action
     }
 }

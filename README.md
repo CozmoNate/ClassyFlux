@@ -23,10 +23,10 @@ enum Action {
     }
 }
 ```
-Usage example:
+Example of sending the action with the default dispatcher:
 
 ```swift
-Action.UpdateName(name: "Great Name").dispatch(with: dispatcher)
+Action.UpdateName(name: "Great Name").dispatch()
 ```
 
 ### FluxDispatcher
@@ -36,7 +36,7 @@ FluxDispatcher dispatches an actions to the mix of workers, which could be store
 Usage example:
 
 ```swift
-let dispatcher = InteractiveDispatcher() 
+let dispatcher = FluxDispatcher() 
 
 dispatcher.register(workers: [SomeStore(), SomeMiddleware(dispatcher: dispatcher), AnalyticsLogger()])
 

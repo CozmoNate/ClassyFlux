@@ -76,7 +76,6 @@ open class FluxMiddleware: FluxWorker {
     }
 
     public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
-        
         guard let handle = try? self.handlers.resolve(Handle<Action>.self) else {
             return FluxNextAction(action)
         }
