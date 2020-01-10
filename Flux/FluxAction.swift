@@ -46,17 +46,35 @@ public protocol FluxActionDispatching {
 }
 
 public extension FluxAction {
-
-    /// Dispatches the action on the main thread with specified or default dispatcher.
-    /// Action will be dispatched synchronously when called from the main thread.
-    func dispatch(with dispatcher: FluxActionDispatching = FluxDispatcher.default) {
-        if Thread.isMainThread && !dispatcher.isDispatching {
+    
+    /// Dispatches the action with the dispatcher on specified queue.
+    /// Action will be dispatched synchronously when called from the same queue and dispatcher isn't dispatching previous action.
+    /// Otherwise will dispatch the action asynchronously to run on specified queue inside barrier block.
+    func dispatch(with dispatcher: FluxActionDispatching = FluxDispatcher.default, queue: DispatchQueue = .main) {
+        if DispatchQueue.isRunning(on: queue) && !dispatcher.isDispatching {
             dispatcher.dispatch(action: self)
         } else {
-            DispatchQueue.main.async {
+            queue.async(flags: .barrier) {
                 dispatcher.dispatch(action: self)
             }
         }
     }
 
+}
+
+internal let FluxQueueIdentifierKey = DispatchSpecificKey<UUID>()
+
+internal extension DispatchQueue {
+    
+    static func isRunning(on queue: DispatchQueue) -> Bool {
+        var identifier: UUID! = queue.getSpecific(key: FluxQueueIdentifierKey)
+        
+        if identifier == nil {
+            identifier = UUID()
+            queue.setSpecific(key: FluxQueueIdentifierKey, value: identifier)
+        }
+        
+        return DispatchQueue.getSpecific(key: FluxQueueIdentifierKey) == identifier
+    }
+    
 }
