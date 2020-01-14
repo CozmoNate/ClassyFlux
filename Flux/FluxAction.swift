@@ -34,23 +34,12 @@ import Foundation
 /// A protocol describing an abstract action
 public protocol FluxAction {}
 
-public protocol FluxActionDispatching {
-
-    /// A flag indicating if dispatcher dispatches an action at the moment.
-    var isDispatching: Bool { get }
-    
-    /// Passes the action to workers.
-    /// - Parameter action: The action to pass.
-    func dispatch<Action: FluxAction>(action: Action)
-
-}
-
 public extension FluxAction {
     
     /// Dispatches the action with the dispatcher on specified queue.
     /// Action will be dispatched synchronously when called from the same queue and dispatcher isn't dispatching previous action.
     /// Otherwise will dispatch the action asynchronously to run on specified queue inside barrier block.
-    func dispatch(with dispatcher: FluxActionDispatching = FluxDispatcher.default, queue: DispatchQueue = .main) {
+    func dispatch(with dispatcher: FluxDispatching = FluxDispatcher.default, queue: DispatchQueue = .main) {
         if DispatchQueue.isRunning(on: queue) && !dispatcher.isDispatching {
             dispatcher.dispatch(action: self)
         } else {
@@ -68,12 +57,10 @@ internal extension DispatchQueue {
     
     static func isRunning(on queue: DispatchQueue) -> Bool {
         var identifier: UUID! = queue.getSpecific(key: FluxQueueIdentifierKey)
-        
         if identifier == nil {
             identifier = UUID()
             queue.setSpecific(key: FluxQueueIdentifierKey, value: identifier)
         }
-        
         return DispatchQueue.getSpecific(key: FluxQueueIdentifierKey) == identifier
     }
     

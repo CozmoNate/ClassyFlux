@@ -30,7 +30,7 @@ class FluxMiddlewareTests: QuickSpec {
                 beforeEach {
                     middleware.registerComposer(for: ChangeValueAction.self) { (_, action) in
                         value = action.value
-                        return FluxNext(action)
+                        return .next(action)
                     }
 
                     middleware.registerHandler(for: IncrementNumberAction.self) { (owner, action) in
@@ -50,11 +50,11 @@ class FluxMiddlewareTests: QuickSpec {
 
                 context("when performed registered action") {
 
-                    var iterator: TestIterator!
+                    var iterator: TestPipeline!
 
                     beforeEach {
-                        iterator = TestIterator()
-                        middleware.handle(action: ChangeValueAction(value: "change it!"))(iterator)
+                        iterator = TestPipeline()
+                        middleware.handle(action: ChangeValueAction(value: "change it!")).pass(to: iterator)
                     }
 
                     it("calls action handler") {
@@ -68,11 +68,11 @@ class FluxMiddlewareTests: QuickSpec {
 
                 context("when performed another action") {
 
-                    var iterator: TestIterator!
+                    var iterator: TestPipeline!
 
                     beforeEach {
-                        iterator = TestIterator()
-                        middleware.handle(action: IncrementNumberAction(increment: 1))(iterator)
+                        iterator = TestPipeline()
+                        middleware.handle(action: IncrementNumberAction(increment: 1)).pass(to: iterator)
                     }
 
                     it("calls action handler") {
@@ -86,11 +86,11 @@ class FluxMiddlewareTests: QuickSpec {
                 
                 context("when performed third action") {
 
-                    var iterator: TestIterator!
+                    var iterator: TestPipeline!
 
                     beforeEach {
-                        iterator = TestIterator()
-                        middleware.handle(action: EmptyAction())(iterator)
+                        iterator = TestPipeline()
+                        middleware.handle(action: EmptyAction()).pass(to: iterator)
                     }
 
                     it("calls action handler") {
@@ -114,11 +114,11 @@ class FluxMiddlewareTests: QuickSpec {
 
                     context("when performed unregistered action") {
 
-                        var iterator: TestIterator!
+                        var iterator: TestPipeline!
 
                         beforeEach {
-                            iterator = TestIterator()
-                            middleware.handle(action: ChangeValueAction(value: "change it!"))(iterator)
+                            iterator = TestPipeline()
+                            middleware.handle(action: ChangeValueAction(value: "change it!")).pass(to: iterator)
                         }
 
                         it("does not change the value") {
@@ -138,7 +138,7 @@ class FluxMiddlewareTests: QuickSpec {
 
                 beforeEach {
                     middleware.registerComposer(for: ChangeValueAction.self) { _ in
-                        return FluxNext(ChangeValueAction(value: "Transformed!"))
+                        return .next(ChangeValueAction(value: "Transformed!"))
                     }
 
                     middleware.registerHandler(for: IncrementNumberAction.self) { _ in
@@ -153,11 +153,11 @@ class FluxMiddlewareTests: QuickSpec {
 
                 context("when performed first action") {
 
-                    var iterator: TestIterator!
+                    var iterator: TestPipeline!
 
                     beforeEach {
-                        iterator = TestIterator()
-                        middleware.handle(action: ChangeValueAction(value: "change it!"))(iterator)
+                        iterator = TestPipeline()
+                        middleware.handle(action: ChangeValueAction(value: "change it!")).pass(to: iterator)
                     }
 
                     it("passes correct action to composer") {
@@ -167,11 +167,11 @@ class FluxMiddlewareTests: QuickSpec {
 
                 context("when performed second action") {
 
-                    var iterator: TestIterator!
+                    var iterator: TestPipeline!
 
                     beforeEach {
-                        iterator = TestIterator()
-                        middleware.handle(action: IncrementNumberAction(increment: 1))(iterator)
+                        iterator = TestPipeline()
+                        middleware.handle(action: IncrementNumberAction(increment: 1)).pass(to: iterator)
                     }
 
                     it("calls action handler") {

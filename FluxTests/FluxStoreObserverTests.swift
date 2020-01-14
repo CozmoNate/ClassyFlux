@@ -69,7 +69,7 @@ class FluxStoreObserverTests: QuickSpec {
             context("when state changed") {
 
                 beforeEach {
-                    store.handle(action: ChangeValueAction(value: "test"))(TestIterator())
+                    _ = store.handle(action: ChangeValueAction(value: "test"))
                 }
 
                 it("receives changed state") {
@@ -90,8 +90,7 @@ class FluxStoreObserverTests: QuickSpec {
                             lastState = TestState(value: "one", number: 1)
                             lastKeyPaths = [\TestState.number]
                             lastValue = "ups"
-                            store.handle(action: ChangeValueAction(value: "test 2"))(TestIterator())
-                            
+                            _ = store.handle(action: ChangeValueAction(value: "test 2"))
                         }
 
                         it("does not receives changed state") {

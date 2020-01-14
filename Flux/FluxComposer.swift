@@ -1,13 +1,13 @@
 //
-//  FluxWorker.swift
+//  FluxComposer.swift
 //  ClassyFlux
 //
-//  Created by Natan Zalkin on 03/08/2019.
-//  Copyright © 2019 Natan Zalkin. All rights reserved.
+//  Created by Natan Zalkin on 14/01/2020.
+//  Copyright © 2020 Natan Zalkin. All rights reserved.
 //
 
 /*
- * Copyright (c) 2019 Natan Zalkin
+ * Copyright (c) 2020 Natan Zalkin
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,20 +29,21 @@
  *
  */
 
-/// A protocol that defines how the actions can be handled and how to pass next action to subsequent workers.
-public protocol FluxWorker: AnyObject {
+/// A container that stores functor which can pass concrete action to FluxPipeline.
+public struct FluxComposer {
 
-    /// A unique identifier.
-    var token: AnyHashable { get }
-    
-    /// A priority of handling an action.
-    /// The priority is used by a dispatcher to determine which worker should handle an action first.
-    /// The smaller the value the higher the priority with the 0 is highest priority possible.
-    var priority: UInt { get }
+    private let compose: ((FluxPipeline) -> Void)?
 
-    /// Handles the action dispatched. The function can be performed on a background thread.
-    /// - Parameter action: The action to handle.
-    /// - Returns: The action composer
-    func handle<Action: FluxAction>(action: Action) -> FluxComposer
+    /// Passes next action to subsequent workers.
+    public static func next<T: FluxAction>(_ action: T) -> FluxComposer {
+        return FluxComposer { $0.next(action: action) }
+    }
 
+    public static func stop() -> FluxComposer {
+        return FluxComposer(compose: nil)
+    }
+
+    public func pass(to iterator: FluxPipeline) {
+        compose?(iterator)
+    }
 }

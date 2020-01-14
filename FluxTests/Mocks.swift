@@ -86,9 +86,11 @@ class TestDispatcher: FluxDispatcher {
     }
 }
 
-class TestIterator: FluxIterator {
+class TestPipeline: FluxPipeline {
 
     var lastAction: FluxAction?
+    
+    var isEmpty: Bool = false
     
     func next<Action>(action: Action) where Action : FluxAction {
         lastAction = action
@@ -106,8 +108,8 @@ class TestWorker: FluxWorker {
         self.priority = priority
     }
 
-    func handle<Action>(action: Action) -> FluxPassthroughAction where Action : FluxAction {
+    func handle<Action>(action: Action) -> FluxComposer where Action : FluxAction {
         lastAction = action
-        return FluxNext(action)
+        return .next(action)
     }
 }

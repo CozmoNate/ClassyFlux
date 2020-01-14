@@ -60,7 +60,7 @@ class FluxStoreTests: QuickSpec {
                     context("when performed unregistered action") {
 
                         beforeEach {
-                            store.handle(action: ChangeValueAction(value: "change it!"))(TestIterator())
+                            _ = store.handle(action: ChangeValueAction(value: "change it!"))
                         }
 
                         it("doesn't change store state") {
@@ -72,11 +72,11 @@ class FluxStoreTests: QuickSpec {
 
                 context("when performed well known action") {
 
-                    var iterator: TestIterator!
+                    var iterator: TestPipeline!
 
                     beforeEach {
-                        iterator = TestIterator()
-                        store.handle(action: ChangeValueAction(value: "test"))(iterator)
+                        iterator = TestPipeline()
+                        store.handle(action: ChangeValueAction(value: "test")).pass(to: iterator)
                     }
 
                     it("calls state change events") {
@@ -95,11 +95,11 @@ class FluxStoreTests: QuickSpec {
                 
                 context("when performed action that mutates the whole state") {
 
-                    var iterator: TestIterator!
+                    var iterator: TestPipeline!
 
                     beforeEach {
-                        iterator = TestIterator()
-                        store.handle(action: IncrementNumberAction(increment: 1))(iterator)
+                        iterator = TestPipeline()
+                        store.handle(action: IncrementNumberAction(increment: 1)).pass(to: iterator)
                     }
 
                     it("calls state change events") {
@@ -134,11 +134,11 @@ class FluxStoreTests: QuickSpec {
 
                     context("when performed another action") {
 
-                        var iterator: TestIterator!
+                        var iterator: TestPipeline!
 
                         beforeEach {
-                            iterator = TestIterator()
-                            store.handle(action: IncrementNumberAction(increment: 2))(iterator)
+                            iterator = TestPipeline()
+                            store.handle(action: IncrementNumberAction(increment: 2)).pass(to: iterator)
                         }
 
                         it("correctly reduces store state") {

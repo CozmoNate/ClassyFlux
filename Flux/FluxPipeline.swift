@@ -29,8 +29,10 @@
  *
  */
 
-/// A protocol describing object that passes an action to next worker.
-public protocol FluxIterator: AnyObject {
+/// A protocol describing object that passes an action iteratively through the list of workers.
+public protocol FluxPipeline: AnyObject {
+    
+    var isEmpty: Bool { get }
     
     /// Passes latest action to the next worker.
     /// - Parameter action: The action to perform next.

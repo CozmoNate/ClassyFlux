@@ -161,12 +161,12 @@ open class FluxStore<State>: FluxWorker {
         reducers.unregister(Reduce<Action>.self)
     }
 
-    public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
+    public func handle<Action: FluxAction>(action: Action) -> FluxComposer {
         if let reducer = try? reducers.resolve(Reduce<Action>.self) {
             reduceState(with: reducer, applying: action)
         }
 
-        return FluxNext(action)
+        return .next(action)
     }
 
     internal func reduceState<Action: FluxAction>(with reducer: Reduce<Action>, applying action: Action) {

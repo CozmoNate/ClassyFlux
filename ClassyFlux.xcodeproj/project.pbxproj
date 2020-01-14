@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2F3DA23623B2381900BC8C54 /* FluxIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3DA23523B2381900BC8C54 /* FluxIterator.swift */; };
+		2F3DA23623B2381900BC8C54 /* FluxPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3DA23523B2381900BC8C54 /* FluxPipeline.swift */; };
 		2F55DB4E234331B300A1B6ED /* FluxAggregator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F55DB4D234331B300A1B6ED /* FluxAggregator.swift */; };
 		2F55DB5123433BCE00A1B6ED /* FluxAggregatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F55DB4F2343324500A1B6ED /* FluxAggregatorTests.swift */; };
 		7E0DC17B230FCD43009B8319 /* FluxStoreObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA48E056230FC701009ABA6F /* FluxStoreObserverTests.swift */; };
@@ -25,6 +25,7 @@
 		7EA2A6E822F41A7000104CCA /* ClassyFlux.h in Headers */ = {isa = PBXBuildFile; fileRef = 7EA2A6DA22F41A7000104CCA /* ClassyFlux.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7EBB251122F5FB4800FF9632 /* FluxWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EBB251022F5FB4800FF9632 /* FluxWorker.swift */; };
 		AA2AB05F230A9177002CF10D /* FluxMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2AB05E230A9177002CF10D /* FluxMiddleware.swift */; };
+		AA68C75B23CDDD1500639D89 /* FluxComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA68C75A23CDDD1500639D89 /* FluxComposer.swift */; };
 		AAED50AA2301A11B00C201B4 /* ClassyFlux.podspec in Resources */ = {isa = PBXBuildFile; fileRef = AAED50A92301A11B00C201B4 /* ClassyFlux.podspec */; };
 /* End PBXBuildFile section */
 
@@ -39,7 +40,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2F3DA23523B2381900BC8C54 /* FluxIterator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxIterator.swift; sourceTree = "<group>"; };
+		2F3DA23523B2381900BC8C54 /* FluxPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxPipeline.swift; sourceTree = "<group>"; };
 		2F55DB4D234331B300A1B6ED /* FluxAggregator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxAggregator.swift; sourceTree = "<group>"; };
 		2F55DB4F2343324500A1B6ED /* FluxAggregatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxAggregatorTests.swift; sourceTree = "<group>"; };
 		7E24883922F5DACC00517865 /* FluxStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FluxStore.swift; sourceTree = "<group>"; };
@@ -60,6 +61,7 @@
 		7EBB251022F5FB4800FF9632 /* FluxWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxWorker.swift; sourceTree = "<group>"; };
 		AA2AB05E230A9177002CF10D /* FluxMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxMiddleware.swift; sourceTree = "<group>"; };
 		AA48E056230FC701009ABA6F /* FluxStoreObserverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxStoreObserverTests.swift; sourceTree = "<group>"; };
+		AA68C75A23CDDD1500639D89 /* FluxComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxComposer.swift; sourceTree = "<group>"; };
 		AAED50A92301A11B00C201B4 /* ClassyFlux.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ClassyFlux.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -112,9 +114,10 @@
 			children = (
 				7E24883B22F5DACC00517865 /* FluxAction.swift */,
 				2F55DB4D234331B300A1B6ED /* FluxAggregator.swift */,
+				AA68C75A23CDDD1500639D89 /* FluxComposer.swift */,
 				7E6FC52F230B2B7E0078609F /* FluxDispatcher.swift */,
-				2F3DA23523B2381900BC8C54 /* FluxIterator.swift */,
 				AA2AB05E230A9177002CF10D /* FluxMiddleware.swift */,
+				2F3DA23523B2381900BC8C54 /* FluxPipeline.swift */,
 				7E24883922F5DACC00517865 /* FluxStore.swift */,
 				7EBB251022F5FB4800FF9632 /* FluxWorker.swift */,
 				7EA2A6DA22F41A7000104CCA /* ClassyFlux.h */,
@@ -262,11 +265,12 @@
 			files = (
 				7E6FC530230B2B7E0078609F /* FluxDispatcher.swift in Sources */,
 				7EBB251122F5FB4800FF9632 /* FluxWorker.swift in Sources */,
+				AA68C75B23CDDD1500639D89 /* FluxComposer.swift in Sources */,
 				7E24883D22F5DACC00517865 /* FluxStore.swift in Sources */,
 				2F55DB4E234331B300A1B6ED /* FluxAggregator.swift in Sources */,
 				7E24883F22F5DACC00517865 /* FluxAction.swift in Sources */,
 				AA2AB05F230A9177002CF10D /* FluxMiddleware.swift in Sources */,
-				2F3DA23623B2381900BC8C54 /* FluxIterator.swift in Sources */,
+				2F3DA23623B2381900BC8C54 /* FluxPipeline.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -438,7 +442,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.19.4;
+				MARKETING_VERSION = 1.20.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.ClassyFlux;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = macosx;
@@ -465,7 +469,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.19.4;
+				MARKETING_VERSION = 1.20.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.ClassyFlux;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = macosx;

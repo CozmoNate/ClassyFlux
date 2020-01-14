@@ -32,7 +32,7 @@
 import Foundation
 import ResolverContainer
 
-/// A class that aggregates states from multiple stores and invokes appropriate handlers when the store changes.
+/// An object that aggregates multiple states from different stores and invokes appropriate handlers when the store changes.
 public class FluxAggregator {
 
     /// State changes handler
@@ -55,7 +55,6 @@ public class FluxAggregator {
         guard let store = try? storage.resolve(FluxStore<State>.self) else {
             fatalError("Requested unregistered state type: \(String(describing: State.self))")
         }
-            
         return store.state
     }
     
@@ -68,11 +67,9 @@ public class FluxAggregator {
             guard observingKeyPaths.isEmpty || !observingKeyPaths.isDisjoint(with: changedKeyPaths) else {
                 return
             }
-
             if let handler = try? self.storage.resolve(Handle<State>.self) {
                 handler(state)
             }
-            
             self.changeHandler?(self)
         }
     }
