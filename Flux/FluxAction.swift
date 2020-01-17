@@ -31,8 +31,12 @@
 
 import Foundation
 
+// MARK: - FluxAction
+
 /// A protocol describing an abstract action
 public protocol FluxAction {}
+
+// MARK: - FluxAction Dispatching
 
 public extension FluxAction {
     
@@ -50,6 +54,42 @@ public extension FluxAction {
     }
 
 }
+
+// MARK: - FluxActionEmitter
+
+/// A protocol that defines how the concrete action can be emitted.
+public protocol FluxActionEmitter: AnyObject {
+
+    /// Emits the action.
+    func emit<Action: FluxAction>(action: Action)
+
+}
+
+// MARK: - FluxPassthroughAction
+
+/// A struct that stores the functor that can pass concrete action to FluxActionEmitter or stop action propagation.
+public struct FluxPassthroughAction {
+
+    private var emit: ((FluxActionEmitter) -> Void)?
+
+    /// Passes the action to subsequent workers.
+    public static func next<T: FluxAction>(_ action: T) -> FluxPassthroughAction {
+        return FluxPassthroughAction { $0.emit(action: action) }
+    }
+
+    /// Stops any action propagation.
+    public static func stop() -> FluxPassthroughAction {
+        return FluxPassthroughAction()
+    }
+
+    /// Passes the results to the emitter.
+    public func pass(to emitter: FluxActionEmitter) {
+        emit?(emitter)
+    }
+    
+}
+
+// MARK: - Utility
 
 internal let FluxQueueIdentifierKey = DispatchSpecificKey<UUID>()
 

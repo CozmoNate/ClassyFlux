@@ -23,7 +23,7 @@ enum Action {
     }
 }
 ```
-Example of sending the action with the default dispatcher:
+Example of sending the action with the default dispatcher on the main thread:
 
 ```swift
 Action.UpdateName(name: "Great Name").dispatch()
@@ -57,7 +57,7 @@ class SomeStore: FluxStore<SomeState> {
 
         registerReducer(for: SomeAction.self) { (state, action) in
             state.value = action.value
-            return [\SomeState.value]
+            return [\SomeState.value] // Reports which part of the state did change
         }
     }
 }
@@ -80,7 +80,16 @@ class SomeMiddleware: FluxMiddleware {
         super.init()
 
         registerHandler(for: SomeAction.self) { [unowned self] (action) in
-            self.performWork(value: action.value)
+            self.performWork(value: action.value) // Start async work
+            // Handler passes the same action to subsequent workers by default
+        }
+        
+        registerComposer(for: OtherAction.self) { (action) in
+            return .next(ThirdAction()) // Pass another action to subsequent workers
+        }
+        
+        registerComposer(for: IgnoredAction.self) { (action) in
+            return .stop() // Do not pass the action to subsequent workers
         }
     }
     

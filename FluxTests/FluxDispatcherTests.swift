@@ -24,10 +24,10 @@ class FluxDispatcherTests: QuickSpec {
 
             context("when registered worker") {
 
-                var worker: TestWorker!
+                var worker: MockWorker!
 
                 beforeEach {
-                    worker = TestWorker(priority: 0)
+                    worker = MockWorker(priority: 0)
                     dispatcher.register(workers: [worker])
                 }
 
@@ -74,16 +74,16 @@ class FluxDispatcherTests: QuickSpec {
                 context("when registered additional workers") {
 
                     var first: FluxMiddleware!
-                    var second: TestWorker!
-                    var third: FluxStore<TestState>!
-                    var fouth: FluxStore<TestState>!
+                    var second: MockWorker!
+                    var third: FluxStore<MockState>!
+                    var fouth: FluxStore<MockState>!
 
                     context("when workers have different priorities") {
                         beforeEach {
                             first = FluxMiddleware(priority: 2)
-                            second = TestWorker(priority: 3)
-                            third = TestStore(priority: 1)
-                            fouth = FluxStore(priority: 0, initialState: TestState(value: "1", number: 1))
+                            second = MockWorker(priority: 3)
+                            third = MockStore(priority: 1)
+                            fouth = FluxStore(priority: 0, initialState: MockState(value: "1", number: 1))
                             
                             dispatcher.register(workers: [first, second, third, fouth])
                         }
@@ -112,9 +112,9 @@ class FluxDispatcherTests: QuickSpec {
                     context("when workers have the same priority") {
                         beforeEach {
                             first = FluxMiddleware(priority: 0)
-                            second = TestWorker(priority: 0)
-                            third = TestStore(priority: 0)
-                            fouth = FluxStore(priority: 0, initialState: TestState(value: "1", number: 1))
+                            second = MockWorker(priority: 0)
+                            third = MockStore(priority: 0)
+                            fouth = FluxStore(priority: 0, initialState: MockState(value: "1", number: 1))
                             
                             dispatcher.register(workers: [first, second, third, fouth])
                         }

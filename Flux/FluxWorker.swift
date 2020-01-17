@@ -29,7 +29,7 @@
  *
  */
 
-/// A protocol that defines how the actions can be handled and how to pass next action to subsequent workers.
+/// A protocol that defines how the concrete action can be handled and how to pass the next action to subsequent workers.
 public protocol FluxWorker: AnyObject {
 
     /// A unique identifier.
@@ -42,7 +42,7 @@ public protocol FluxWorker: AnyObject {
 
     /// Handles the action dispatched. The function can be performed on a background thread.
     /// - Parameter action: The action to handle.
-    /// - Returns: The action composer
-    func handle<Action: FluxAction>(action: Action) -> FluxComposer
+    /// - Returns: The action composer that passes an action to next workers.
+    func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction
 
 }

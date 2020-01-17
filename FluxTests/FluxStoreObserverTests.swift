@@ -36,24 +36,24 @@ import Nimble
 
 class FluxStoreObserverTests: QuickSpec {
 
-    var observer: TestStore.Observer?
-    var anotherObserver: TestStore.Observer?
+    var observer: MockStore.Observer?
+    var anotherObserver: MockStore.Observer?
     
     override func spec() {
 
         describe("FluxStore.Observer") {
 
-            var store: FluxStore<TestState>!
-            var lastState: TestState?
-            var lastKeyPaths: Set<PartialKeyPath<TestState>>?
+            var store: FluxStore<MockState>!
+            var lastState: MockState?
+            var lastKeyPaths: Set<PartialKeyPath<MockState>>?
             var lastValue: String?
             
             beforeEach {
-                store = FluxStore(initialState: TestState(value: "initial", number: 0))
+                store = FluxStore(initialState: MockState(value: "initial", number: 0))
 
                 store.registerReducer { (state, action: ChangeValueAction) in
                     state.value = action.value
-                    return [\TestState.value]
+                    return [\MockState.value]
                 }
 
                 self.observer = store.addObserver(for: .stateDidChange) { (state, keyPaths) in
@@ -61,7 +61,7 @@ class FluxStoreObserverTests: QuickSpec {
                     lastKeyPaths = keyPaths
                 }
                 
-                self.anotherObserver = store.addObserver(for: .stateDidChange, observing: [\TestState.value]) { (state) in
+                self.anotherObserver = store.addObserver(for: .stateDidChange, observing: [\MockState.value]) { (state) in
                     lastValue = state.value
                 }
             }
@@ -74,7 +74,7 @@ class FluxStoreObserverTests: QuickSpec {
 
                 it("receives changed state") {
                     expect(lastState?.value).toEventually(equal("test"))
-                    expect(lastKeyPaths).toEventually(equal(Set([\TestState.value])))
+                    expect(lastKeyPaths).toEventually(equal(Set([\MockState.value])))
                     expect(lastValue).toEventually(equal("test"))
                 }
 
@@ -87,15 +87,15 @@ class FluxStoreObserverTests: QuickSpec {
                     context("when state changed") {
 
                         beforeEach {
-                            lastState = TestState(value: "one", number: 1)
-                            lastKeyPaths = [\TestState.number]
+                            lastState = MockState(value: "one", number: 1)
+                            lastKeyPaths = [\MockState.number]
                             lastValue = "ups"
                             _ = store.handle(action: ChangeValueAction(value: "test 2"))
                         }
 
                         it("does not receives changed state") {
                             expect(lastState?.value).toNotEventually(equal("test 2"))
-                            expect(lastKeyPaths).toNotEventually(equal(Set([\TestState.value])))
+                            expect(lastKeyPaths).toNotEventually(equal(Set([\MockState.value])))
                             expect(lastValue).toNotEventually(equal("test 2"))
                         }
                     }

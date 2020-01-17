@@ -17,10 +17,10 @@ class FluxStoreTests: QuickSpec {
 
         describe("FluxStore") {
 
-            var store: TestStore!
+            var store: MockStore!
 
             beforeEach {
-                store = TestStore()
+                store = MockStore()
             }
 
             context("when registered the action") {
@@ -28,12 +28,12 @@ class FluxStoreTests: QuickSpec {
                 beforeEach {
                     store.registerReducer { (state, action: ChangeValueAction) in
                         state.value = action.value
-                        return [\TestState.value]
+                        return [\MockState.value]
                     }
                     
                     store.registerMutator { (state, action: IncrementNumberAction) in
                         guard action.increment != 0 else { return nil }
-                        return TestState(value: "mutated", number: state.number + action.increment)
+                        return MockState(value: "mutated", number: state.number + action.increment)
                     }
                 }
 
@@ -43,8 +43,8 @@ class FluxStoreTests: QuickSpec {
                 }
 
                 it("has registered reducer & mutator") {
-                    expect(try? store.reducers.resolve(TestStore.Reduce<ChangeValueAction>.self)).toNot(beNil())
-                    expect(try? store.reducers.resolve(TestStore.Reduce<IncrementNumberAction>.self)).toNot(beNil())
+                    expect(try? store.reducers.resolve(MockStore.Reduce<ChangeValueAction>.self)).toNot(beNil())
+                    expect(try? store.reducers.resolve(MockStore.Reduce<IncrementNumberAction>.self)).toNot(beNil())
                 }
 
                 context("when unregistered the action") {
@@ -54,7 +54,7 @@ class FluxStoreTests: QuickSpec {
                     }
 
                     it("successfully unregistered the reducer") {
-                        expect(try? store.reducers.resolve(TestStore.Reduce<ChangeValueAction>.self)).to(beNil())
+                        expect(try? store.reducers.resolve(MockStore.Reduce<ChangeValueAction>.self)).to(beNil())
                     }
 
                     context("when performed unregistered action") {
@@ -72,11 +72,11 @@ class FluxStoreTests: QuickSpec {
 
                 context("when performed well known action") {
 
-                    var iterator: TestPipeline!
+                    var emitter: MockEmitter!
 
                     beforeEach {
-                        iterator = TestPipeline()
-                        store.handle(action: ChangeValueAction(value: "test")).pass(to: iterator)
+                        emitter = MockEmitter()
+                        store.handle(action: ChangeValueAction(value: "test")).pass(to: emitter)
                     }
 
                     it("calls state change events") {
@@ -89,17 +89,17 @@ class FluxStoreTests: QuickSpec {
                     }
 
                     it("passes action to composer") {
-                        expect(iterator.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
+                        expect(emitter.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
                     }
                 }
                 
                 context("when performed action that mutates the whole state") {
 
-                    var iterator: TestPipeline!
+                    var emitter: MockEmitter!
 
                     beforeEach {
-                        iterator = TestPipeline()
-                        store.handle(action: IncrementNumberAction(increment: 1)).pass(to: iterator)
+                        emitter = MockEmitter()
+                        store.handle(action: IncrementNumberAction(increment: 1)).pass(to: emitter)
                     }
 
                     it("calls state change events") {
@@ -115,7 +115,7 @@ class FluxStoreTests: QuickSpec {
                     }
 
                     it("passes the action to composer") {
-                        expect(iterator.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
+                        expect(emitter.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
                     }
                 }
 
@@ -124,21 +124,21 @@ class FluxStoreTests: QuickSpec {
                     beforeEach {
                         store.registerReducer { (state, action: IncrementNumberAction) in
                             state.number += action.increment
-                            return [\TestState.number]
+                            return [\MockState.number]
                         }
                     }
 
                     it("has registered IncrementNumberAction reducer") {
-                        expect(try? store.reducers.resolve(TestStore.Reduce<IncrementNumberAction>.self)).toNot(beNil())
+                        expect(try? store.reducers.resolve(MockStore.Reduce<IncrementNumberAction>.self)).toNot(beNil())
                     }
 
                     context("when performed another action") {
 
-                        var iterator: TestPipeline!
+                        var emitter: MockEmitter!
 
                         beforeEach {
-                            iterator = TestPipeline()
-                            store.handle(action: IncrementNumberAction(increment: 2)).pass(to: iterator)
+                            emitter = MockEmitter()
+                            store.handle(action: IncrementNumberAction(increment: 2)).pass(to: emitter)
                         }
 
                         it("correctly reduces store state") {
@@ -146,7 +146,7 @@ class FluxStoreTests: QuickSpec {
                         }
 
                         it("passes action to composer") {
-                            expect(iterator.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 2)))
+                            expect(emitter.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 2)))
                         }
                     }
 

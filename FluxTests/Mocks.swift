@@ -22,52 +22,52 @@ struct IncrementNumberAction: FluxAction, Equatable {
 
 struct EmptyAction: FluxAction, Equatable {}
 
-struct TestState: Equatable {
+struct MockState: Equatable {
     var value: String
     var number: Int
 }
 
-class TestMiddleware: FluxMiddleware {
+class MockMiddleware: FluxMiddleware {
     var didIncrement: Bool?
     var didIntercept: Bool?
 }
 
-class TestStore: FluxStore<TestState> {
+class MockStore: FluxStore<MockState> {
 
     var stateBeforeChange: State?
-    var pathsBeforeChange: Set<PartialKeyPath<TestState>>?
+    var pathsBeforeChange: Set<PartialKeyPath<MockState>>?
     var stateAfterChange: State?
-    var pathsAfterChange: Set<PartialKeyPath<TestState>>?
+    var pathsAfterChange: Set<PartialKeyPath<MockState>>?
     
 
     init(priority: UInt = 0) {
-        super.init(priority: priority, initialState: TestState(value: "initial", number: 0))
+        super.init(priority: priority, initialState: MockState(value: "initial", number: 0))
 
         registerReducer { (state, action: ChangeValueAction) in
             state.value = action.value
-            return [\TestState.value]
+            return [\MockState.value]
         }
 
         registerReducer { (state, action: IncrementNumberAction) in
             state.number += action.increment
-            return [\TestState.number]
+            return [\MockState.number]
         }
     }
 
-    override func stateWillChange(_ state: TestState, at keyPaths: Set<PartialKeyPath<TestState>>) {
+    override func stateWillChange(_ state: MockState, at keyPaths: Set<PartialKeyPath<MockState>>) {
         stateBeforeChange = state
         pathsBeforeChange = keyPaths
         super.stateWillChange(state, at: keyPaths)
     }
 
-    override func stateDidChange(_ state: TestState, at keyPaths: Set<PartialKeyPath<TestState>>) {
+    override func stateDidChange(_ state: MockState, at keyPaths: Set<PartialKeyPath<MockState>>) {
         stateAfterChange = state
         pathsAfterChange = keyPaths
         super.stateDidChange(state, at: keyPaths)
     }
 }
 
-class TestDispatcher: FluxDispatcher {
+class MockDispatcher: FluxDispatcher {
 
     var lastAction: FluxAction?
     var lastWorkers: [FluxWorker]?
@@ -86,18 +86,18 @@ class TestDispatcher: FluxDispatcher {
     }
 }
 
-class TestPipeline: FluxPipeline {
+class MockEmitter: FluxActionEmitter {
 
     var lastAction: FluxAction?
     
     var isEmpty: Bool = false
     
-    func next<Action>(action: Action) where Action : FluxAction {
+    func emit<Action>(action: Action) where Action : FluxAction {
         lastAction = action
     }
 }
 
-class TestWorker: FluxWorker {
+class MockWorker: FluxWorker {
     
     let token: AnyHashable = UUID()
     let priority: UInt
@@ -108,7 +108,7 @@ class TestWorker: FluxWorker {
         self.priority = priority
     }
 
-    func handle<Action>(action: Action) -> FluxComposer where Action : FluxAction {
+    func handle<Action>(action: Action) -> FluxPassthroughAction where Action : FluxAction {
         lastAction = action
         return .next(action)
     }

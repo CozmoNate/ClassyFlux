@@ -17,12 +17,12 @@ class FluxMiddlewareTests: QuickSpec {
 
         describe("FluxMiddleware") {
 
-            var middleware: TestMiddleware!
+            var middleware: MockMiddleware!
             var value: String!
 
             beforeEach {
                 value = "initial"
-                middleware = TestMiddleware()
+                middleware = MockMiddleware()
             }
 
             context("when registered action handlers") {
@@ -50,11 +50,11 @@ class FluxMiddlewareTests: QuickSpec {
 
                 context("when performed registered action") {
 
-                    var iterator: TestPipeline!
+                    var emitter: MockEmitter!
 
                     beforeEach {
-                        iterator = TestPipeline()
-                        middleware.handle(action: ChangeValueAction(value: "change it!")).pass(to: iterator)
+                        emitter = MockEmitter()
+                        middleware.handle(action: ChangeValueAction(value: "change it!")).pass(to: emitter)
                     }
 
                     it("calls action handler") {
@@ -62,17 +62,17 @@ class FluxMiddlewareTests: QuickSpec {
                     }
 
                     it("passes action to composer") {
-                        expect(iterator.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
+                        expect(emitter.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
                     }
                 }
 
                 context("when performed another action") {
 
-                    var iterator: TestPipeline!
+                    var emitter: MockEmitter!
 
                     beforeEach {
-                        iterator = TestPipeline()
-                        middleware.handle(action: IncrementNumberAction(increment: 1)).pass(to: iterator)
+                        emitter = MockEmitter()
+                        middleware.handle(action: IncrementNumberAction(increment: 1)).pass(to: emitter)
                     }
 
                     it("calls action handler") {
@@ -80,17 +80,17 @@ class FluxMiddlewareTests: QuickSpec {
                     }
 
                     it("passes action to composer") {
-                        expect(iterator.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
+                        expect(emitter.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
                     }
                 }
                 
                 context("when performed third action") {
 
-                    var iterator: TestPipeline!
+                    var emitter: MockEmitter!
 
                     beforeEach {
-                        iterator = TestPipeline()
-                        middleware.handle(action: EmptyAction()).pass(to: iterator)
+                        emitter = MockEmitter()
+                        middleware.handle(action: EmptyAction()).pass(to: emitter)
                     }
 
                     it("calls action handler") {
@@ -98,7 +98,7 @@ class FluxMiddlewareTests: QuickSpec {
                     }
 
                     it("does not pass the action to composer") {
-                        expect(iterator.lastAction).to(beNil())
+                        expect(emitter.lastAction).to(beNil())
                     }
                 }
 
@@ -114,11 +114,11 @@ class FluxMiddlewareTests: QuickSpec {
 
                     context("when performed unregistered action") {
 
-                        var iterator: TestPipeline!
+                        var emitter: MockEmitter!
 
                         beforeEach {
-                            iterator = TestPipeline()
-                            middleware.handle(action: ChangeValueAction(value: "change it!")).pass(to: iterator)
+                            emitter = MockEmitter()
+                            middleware.handle(action: ChangeValueAction(value: "change it!")).pass(to: emitter)
                         }
 
                         it("does not change the value") {
@@ -126,7 +126,7 @@ class FluxMiddlewareTests: QuickSpec {
                         }
 
                         it("passes action to composer") {
-                            expect(iterator.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
+                            expect(emitter.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "change it!")))
                         }
                     }
                 }
@@ -153,25 +153,25 @@ class FluxMiddlewareTests: QuickSpec {
 
                 context("when performed first action") {
 
-                    var iterator: TestPipeline!
+                    var emitter: MockEmitter!
 
                     beforeEach {
-                        iterator = TestPipeline()
-                        middleware.handle(action: ChangeValueAction(value: "change it!")).pass(to: iterator)
+                        emitter = MockEmitter()
+                        middleware.handle(action: ChangeValueAction(value: "change it!")).pass(to: emitter)
                     }
 
                     it("passes correct action to composer") {
-                        expect(iterator.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "Transformed!")))
+                        expect(emitter.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "Transformed!")))
                     }
                 }
 
                 context("when performed second action") {
 
-                    var iterator: TestPipeline!
+                    var emitter: MockEmitter!
 
                     beforeEach {
-                        iterator = TestPipeline()
-                        middleware.handle(action: IncrementNumberAction(increment: 1)).pass(to: iterator)
+                        emitter = MockEmitter()
+                        middleware.handle(action: IncrementNumberAction(increment: 1)).pass(to: emitter)
                     }
 
                     it("calls action handler") {
@@ -179,7 +179,7 @@ class FluxMiddlewareTests: QuickSpec {
                     }
 
                     it("passes the same action to composer") {
-                        expect(iterator.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
+                        expect(emitter.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
                     }
                 }
             }

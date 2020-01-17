@@ -36,12 +36,39 @@ import ResolverContainer
 import Combine
 #endif
 
+// MARK: - FluxStoreEvent
+
+/// A name of the notification send alongside with corresponding store event.
+public let FluxStoreWillChangeNotification = Notification.Name(rawValue: "FluxStoreWillChange")
+
+/// A name of the notification send alongside with corresponding store event.
+public let FluxStoreDidChangeNotification = Notification.Name(rawValue: "FluxStoreDidChange")
+
+/// A key in the UserInfo dictionary of a notification pointing to the set of keypaths describing changed properties of store state object.
+public let FluxStoreNotificationKeyPathsKey = "changedKeyPaths"
+
+
+public enum FluxStoreEvent {
+    case stateWillChange
+    case stateDidChange
+
+    /// A name of the notification send alongside with corresponding store event.
+    public var notificationName: Notification.Name {
+        switch self {
+        case .stateWillChange: return FluxStoreWillChangeNotification
+        case .stateDidChange: return FluxStoreDidChangeNotification
+        }
+    }
+}
+
+// MARK: - FluxStore
+
 #if canImport(Combine)
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension FluxStore: ObservableObject {}
 #endif
 
-/// Store contains a state object triggers reducer to modify the state as a response to action dispatched
+/// An object that stores the state and allows state mutation only by handling registered actions.
 open class FluxStore<State>: FluxWorker {
     
     public struct Change {
@@ -67,9 +94,7 @@ open class FluxStore<State>: FluxWorker {
     public lazy var stateDidChange = PassthroughSubject<Change, Never>()
     #endif
 
-
     public let token: AnyHashable
-
     public let priority: UInt
 
     /// A state of the store.
@@ -161,7 +186,7 @@ open class FluxStore<State>: FluxWorker {
         reducers.unregister(Reduce<Action>.self)
     }
 
-    public func handle<Action: FluxAction>(action: Action) -> FluxComposer {
+    public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
         if let reducer = try? reducers.resolve(Reduce<Action>.self) {
             reduceState(with: reducer, applying: action)
         }
@@ -182,26 +207,7 @@ open class FluxStore<State>: FluxWorker {
     
 }
 
-public enum FluxStoreEvent {
-    case stateWillChange, stateDidChange
-
-    /// A name of the notification send alongside with corresponding store event.
-    public var notificationName: Notification.Name {
-        switch self {
-        case .stateWillChange: return FluxStoreWillChangeNotification
-        case .stateDidChange: return FluxStoreDidChangeNotification
-        }
-    }
-}
-
-/// A name of the notification send alongside with corresponding store event.
-public let FluxStoreWillChangeNotification = Notification.Name(rawValue: "FluxStoreWillChange")
-
-/// A name of the notification send alongside with corresponding store event.
-public let FluxStoreDidChangeNotification = Notification.Name(rawValue: "FluxStoreDidChange")
-
-/// A key in the UserInfo dictionary of a notification pointing to the set of keypaths describing changed properties of store state object.
-public let FluxStoreNotificationKeyPathsKey = "changedKeyPaths"
+// MARK: - FluxStore.Observer
 
 extension FluxStore {
 

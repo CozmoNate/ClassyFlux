@@ -34,7 +34,9 @@ import Foundation
 import Combine
 #endif
 
-/// A protocol describing an object that can dispatch actions.
+// MARK: - FluxDispatching
+
+/// A protocol that defines how the action can be dispatched
 public protocol FluxDispatching {
 
     /// A flag indicating if dispatcher dispatches an action at the moment.
@@ -45,6 +47,8 @@ public protocol FluxDispatching {
     func dispatch<Action: FluxAction>(action: Action)
 
 }
+
+// MARK: - FluxDispatcher
 
 /// An object that dispatches actions to registered workers synchronously on the same thread.
 open class FluxDispatcher: FluxDispatching {
@@ -67,11 +71,12 @@ open class FluxDispatcher: FluxDispatching {
     public var isDispatching: Bool { !pipeline.isEmpty }
 
     internal var tokens: Set<AnyHashable>
-    internal let pipeline = Pipeline()
+    internal var pipeline: Pipeline
     
     /// Initialises a dispatcher.
     public init() {
         tokens = Set()
+        pipeline = Pipeline()
         workers = []
     }
 
@@ -95,8 +100,11 @@ open class FluxDispatcher: FluxDispatching {
             willDispatchAction.send(action)
         }
         #endif
-        pipeline.load(workers: workers)
-        pipeline.next(action: action)
+        
+        pipeline
+            .load(workers: workers)
+            .emit(action: action)
+        
         #if canImport(Combine)
         if #available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
             didDispatchAction.send(action)
@@ -104,25 +112,20 @@ open class FluxDispatcher: FluxDispatching {
         #endif
     }
 
-}
-
-// MARK: - Pipeline
-
-public extension FluxDispatcher {
-
-    class Pipeline: FluxPipeline {
-
+    public class Pipeline: FluxActionEmitter {
+        
         private var iterator: IndexingIterator<[FluxWorker]>?
-
+        
         public var isEmpty: Bool { iterator == nil }
-
-        public func load(workers: [FluxWorker]) {
+        
+        public func load(workers: [FluxWorker]) -> Self {
             iterator = workers.makeIterator()
+            return self
         }
 
-        public func next<Action: FluxAction>(action: Action) {
-            if let next = iterator?.next() {
-                next.handle(action: action).pass(to: self)
+        public func emit<Action: FluxAction>(action: Action) {
+            if let worker = iterator?.next() {
+                worker.handle(action: action).pass(to: self)
             } else {
                 iterator = nil
             }
@@ -131,7 +134,7 @@ public extension FluxDispatcher {
 
 }
 
-// MARK: - Utility Methods
+// MARK: - Utility
 
 public extension RandomAccessCollection where Element == FluxWorker {
 

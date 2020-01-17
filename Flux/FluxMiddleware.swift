@@ -38,7 +38,7 @@ open class FluxMiddleware: FluxWorker {
     /// An action handler closure. You can pass different action to subsequent workers, or stop the action to propagate.
     /// - Parameter action: The action to handle.
     /// - Returns: The next action. Use FluxNextAction(FluxAction) functor to pass next action. Passing nil action will stop action propagation.
-    public typealias Handle<Action: FluxAction> = (Action) -> FluxComposer
+    public typealias Handle<Action: FluxAction> = (Action) -> FluxPassthroughAction
 
     public let token: AnyHashable
     public let priority: UInt
@@ -62,7 +62,7 @@ open class FluxMiddleware: FluxWorker {
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter intercept: The closure that will be invoked when the action received.
     public func registerInterceptor<Action: FluxAction>(for action: Action.Type, intercept: @escaping (Action) -> Void) {
-        let handler: Handle<Action> = { (action) -> FluxComposer in
+        let handler: Handle<Action> = { (action) -> FluxPassthroughAction in
             intercept(action)
             return .stop()
         }
@@ -73,7 +73,7 @@ open class FluxMiddleware: FluxWorker {
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter execute: The closure that will be invoked when the action received.
     public func registerHandler<Action: FluxAction>(for action: Action.Type, handle: @escaping (Action) -> Void) {
-        let handler: Handle<Action> = { (action) -> FluxComposer in
+        let handler: Handle<Action> = { (action) -> FluxPassthroughAction in
             handle(action)
             return .next(action)
         }
@@ -86,7 +86,7 @@ open class FluxMiddleware: FluxWorker {
         handlers.unregister(Handle<Action>.self)
     }
 
-    public func handle<Action: FluxAction>(action: Action) -> FluxComposer {
+    public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
         guard let handle = try? self.handlers.resolve(Handle<Action>.self) else {
             return .next(action)
         }
@@ -100,8 +100,8 @@ extension FluxWorker where Self: FluxMiddleware {
     /// Associates an action handler with the actions of specified type with an option pass another action to next workers.
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter compose: The closure that will be invoked when the action received.
-    public func registerComposer<Action: FluxAction>(for action: Action.Type, compose: @escaping (_ owner: Self, _ action: Action) -> FluxComposer) {
-        registerComposer(for: Action.self) { [unowned self] (action) -> FluxComposer in
+    public func registerComposer<Action: FluxAction>(for action: Action.Type, compose: @escaping (_ owner: Self, _ action: Action) -> FluxPassthroughAction) {
+        registerComposer(for: Action.self) { [unowned self] (action) -> FluxPassthroughAction in
             return compose(self, action)
         }
     }
@@ -110,7 +110,7 @@ extension FluxWorker where Self: FluxMiddleware {
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter intercept: The closure that will be invoked when the action received.
     public func registerInterceptor<Action: FluxAction>(for action: Action.Type, intercept: @escaping (_ owner: Self, _ action: Action) -> Void) {
-        registerComposer(for: Action.self) { [unowned self] (action) -> FluxComposer in
+        registerComposer(for: Action.self) { [unowned self] (action) -> FluxPassthroughAction in
             intercept(self, action)
             return .stop()
         }
