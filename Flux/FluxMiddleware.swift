@@ -101,7 +101,8 @@ extension FluxWorker where Self: FluxMiddleware {
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter compose: The closure that will be invoked when the action received.
     public func registerComposer<Action: FluxAction>(for action: Action.Type, compose: @escaping (_ owner: Self, _ action: Action) -> FluxPassthroughAction) {
-        registerComposer(for: Action.self) { [unowned self] (action) -> FluxPassthroughAction in
+        registerComposer(for: Action.self) { [weak self] (action) -> FluxPassthroughAction in
+            guard let self = self else { return .next(action) }
             return compose(self, action)
         }
     }
@@ -110,7 +111,8 @@ extension FluxWorker where Self: FluxMiddleware {
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter intercept: The closure that will be invoked when the action received.
     public func registerInterceptor<Action: FluxAction>(for action: Action.Type, intercept: @escaping (_ owner: Self, _ action: Action) -> Void) {
-        registerComposer(for: Action.self) { [unowned self] (action) -> FluxPassthroughAction in
+        registerComposer(for: Action.self) { [weak self] (action) -> FluxPassthroughAction in
+            guard let self = self else { return .next(action) }
             intercept(self, action)
             return .stop()
         }
@@ -120,7 +122,8 @@ extension FluxWorker where Self: FluxMiddleware {
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter execute: The closure that will be invoked when the action received.
     public func registerHandler<Action: FluxAction>(for action: Action.Type, handle: @escaping (_ owner: Self, _ action: Action) -> Void) {
-        registerHandler(for: Action.self) { [unowned self] (action) -> Void in
+        registerHandler(for: Action.self) { [weak self] (action) -> Void in
+            guard let self = self else { return }
             handle(self, action)
         }
     }

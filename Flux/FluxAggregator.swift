@@ -63,7 +63,9 @@ public class FluxAggregator {
     /// - Parameter observingKeyPaths: The list of KeyPath describing the fields in particular state object which should trigger state change handlers.
     public func register<State>(store: FluxStore<State>, observing observingKeyPaths: Set<PartialKeyPath<State>> = Set(), queue: OperationQueue = .main) {
         storage.register(instance: store as FluxStore<State>)
-        observers[store.token] = store.addObserver(for: .stateDidChange, queue: queue) { [unowned self] state, changedKeyPaths in
+        observers[store.token] = store.addObserver(for: .stateDidChange, queue: queue) { [weak self] state, changedKeyPaths in
+            guard let self = self else { return }
+
             guard observingKeyPaths.isEmpty || !observingKeyPaths.isDisjoint(with: changedKeyPaths) else {
                 return
             }
