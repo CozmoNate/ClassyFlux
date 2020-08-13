@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name             = 'ClassyFlux'
-  s.version          = '1.21.1'
-  s.summary          = 'Flux implementation on Swift'
+  s.version          = '1.22.0'
+  s.summary          = 'Flux implementation in Swift'
   s.homepage         = 'https://github.com/kzlekk/ClassyFlux'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Natan Zalkin' => 'natan.zalkin@me.com' }

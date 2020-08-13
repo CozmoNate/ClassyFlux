@@ -43,8 +43,8 @@ class FluxStoreTests: QuickSpec {
                 }
 
                 it("has registered reducer & mutator") {
-                    expect(try? store.reducers.resolve(MockStore.Reduce<ChangeValueAction>.self)).toNot(beNil())
-                    expect(try? store.reducers.resolve(MockStore.Reduce<IncrementNumberAction>.self)).toNot(beNil())
+                    expect(try? store.reducers.resolve(MockStore.Reducer<ChangeValueAction>.self)).toNot(beNil())
+                    expect(try? store.reducers.resolve(MockStore.Reducer<IncrementNumberAction>.self)).toNot(beNil())
                 }
 
                 context("when unregistered the action") {
@@ -54,7 +54,7 @@ class FluxStoreTests: QuickSpec {
                     }
 
                     it("successfully unregistered the reducer") {
-                        expect(try? store.reducers.resolve(MockStore.Reduce<ChangeValueAction>.self)).to(beNil())
+                        expect(try? store.reducers.resolve(MockStore.Reducer<ChangeValueAction>.self)).to(beNil())
                     }
 
                     context("when performed unregistered action") {
@@ -129,7 +129,7 @@ class FluxStoreTests: QuickSpec {
                     }
 
                     it("has registered IncrementNumberAction reducer") {
-                        expect(try? store.reducers.resolve(MockStore.Reduce<IncrementNumberAction>.self)).toNot(beNil())
+                        expect(try? store.reducers.resolve(MockStore.Reducer<IncrementNumberAction>.self)).toNot(beNil())
                     }
 
                     context("when performed another action") {

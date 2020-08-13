@@ -9,6 +9,7 @@ Simple yet fully-featured Flux pattern implemented in Swift
 
 ## Brief Documentation
 
+You can read more about Flux pattern [here](https://facebook.github.io/flux/docs/in-depth-overview/)
 
 ### FluxAction
 

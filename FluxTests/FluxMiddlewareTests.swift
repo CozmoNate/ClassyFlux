@@ -43,9 +43,9 @@ class FluxMiddlewareTests: QuickSpec {
                 }
 
                 it("has registered action handlers") {
-                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<ChangeValueAction>.self)).toNot(beNil())
-                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<IncrementNumberAction>.self)).toNot(beNil())
-                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<EmptyAction>.self)).toNot(beNil())
+                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handler<ChangeValueAction>.self)).toNot(beNil())
+                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handler<IncrementNumberAction>.self)).toNot(beNil())
+                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handler<EmptyAction>.self)).toNot(beNil())
                 }
 
                 context("when performed registered action") {
@@ -109,7 +109,7 @@ class FluxMiddlewareTests: QuickSpec {
                     }
 
                     it("successfully unregistered the action handler") {
-                        expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<ChangeValueAction>.self)).to(beNil())
+                        expect(try? middleware.handlers.resolve(FluxMiddleware.Handler<ChangeValueAction>.self)).to(beNil())
                     }
 
                     context("when performed unregistered action") {
@@ -147,8 +147,8 @@ class FluxMiddlewareTests: QuickSpec {
                 }
 
                 it("has registered action handler") {
-                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<ChangeValueAction>.self)).toNot(beNil())
-                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handle<IncrementNumberAction>.self)).toNot(beNil())
+                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handler<ChangeValueAction>.self)).toNot(beNil())
+                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handler<IncrementNumberAction>.self)).toNot(beNil())
                 }
 
                 context("when performed first action") {

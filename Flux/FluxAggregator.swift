@@ -37,23 +37,23 @@ public class FluxAggregator {
 
     /// State changes handler
     /// - Parameter state: Actual state value
-    public typealias Handle<State> = (_ state: State) -> Void
-    
+    public typealias Handler<State> = (_ state: State) -> Void
+
     internal let storage: ResolverContainer
-    internal var observers: [AnyHashable: AnyObject]
+    internal var subscriptions: [Subscription]
     internal var changeHandler: ((FluxAggregator) -> Void)?
 
-    /// Initializes an aggregator instance with optional block what called each time when one of registered store changed.
+    /// Initializes an aggregator instance with optional block what called each time when one of registered stores changed.
     public init(changeHandler collectHandler: ((FluxAggregator) -> Void)? = nil) {
         storage = ResolverContainer()
-        observers = [AnyHashable: AnyObject]()
+        subscriptions = []
         changeHandler = collectHandler
     }
 
     /// Returns the state value or nil if the state of the specified type is not available.
     public subscript<State>(_ type: State.Type) -> State {
         guard let store = try? storage.resolve(FluxStore<State>.self) else {
-            fatalError("Requested unregistered state type: \(String(describing: State.self))")
+            fatalError("Trying to access to the unknown state type: \(String(describing: State.self))")
         }
         return store.state
     }
@@ -61,46 +61,50 @@ public class FluxAggregator {
     /// Registers a store and starts to aggregate that store state changes.
     /// - Parameter store: The store to register. Store will be registered under its token, and can be unregistered later by providing its token.
     /// - Parameter observingKeyPaths: The list of KeyPath describing the fields in particular state object which should trigger state change handlers.
-    public func register<State>(store: FluxStore<State>, observing observingKeyPaths: Set<PartialKeyPath<State>> = Set(), queue: OperationQueue = .main) {
+    /// - Parameter queue: The queue where the handler will be called on.
+    /// - Parameter handler: The closure that will be invoked when the state is changed.
+    public func register<State>(store: FluxStore<State>, observing observingKeyPaths: Set<PartialKeyPath<State>> = Set(), queue: OperationQueue = .main, handler: @escaping Handler<State>) {
         storage.register(instance: store as FluxStore<State>)
-        observers[store.token] = store.addObserver(for: .stateDidChange, queue: queue) { [weak self] state, changedKeyPaths in
+        let observer = store.addObserver(for: .stateDidChange, observing: observingKeyPaths, queue: queue) { [weak self] state in
             guard let self = self else { return }
-
-            guard observingKeyPaths.isEmpty || !observingKeyPaths.isDisjoint(with: changedKeyPaths) else {
-                return
-            }
-            if let handler = try? self.storage.resolve(Handle<State>.self) {
-                handler(state)
-            }
+            handler(state)
             self.changeHandler?(self)
         }
+        subscriptions.append(Subscription(observer: observer, worker: store))
     }
 
-    /// Associates change handler with the state of specified type.
-    /// - Parameter state: The type of a state object to associate with handler.
-    /// - Parameter execute: The closure that will be invoked when the state is changed.
-    public func registerHandler<State>(for state: State.Type = State.self, handler: @escaping Handle<State>) {
-        storage.register { handler }
-    }
-
-    /// Unregisters handler associated with specified state type.
-    public func unregisterHandler<State>(for state: State.Type) {
-        storage.unregister(Handle<State>.self)
-    }
-
-    /// Unregisters store and handler associated with specified state type.
-    /// - Parameter state: The type of a state object.
-    public func unregister<State>(state: State.Type) {
-        if let store = storage.unregister(FluxStore<State>.self) {
-            observers.removeValue(forKey: store.token)
-        }
-        unregisterHandler(for: state)
+    /// Unregisters store, remove aggregated state and handlers associated with specified state type.
+    /// - Parameter store: The store to unregister
+    public func unregister<State>(store: FluxStore<State>) {
+        storage.unregister(FluxStore<State>.self)
+        subscriptions = subscriptions.filter { $0.worker.token != store.token }
     }
  
-    /// Unregisters all observers and stop receiving state changed events
+    /// Unregisters all observers, remove aggregated state values and stop receiving state changed events
     public func unregisterAll() {
         storage.unregisterAll()
-        observers.removeAll()
+        subscriptions.removeAll()
     }
     
+}
+
+internal extension FluxAggregator {
+    
+    struct Subscription: Hashable {
+        static func == (lhs: FluxAggregator.Subscription, rhs: FluxAggregator.Subscription) -> Bool {
+            return lhs.hashValue == rhs.hashValue
+        }
+        
+        let observer: AnyHashable
+        let worker: FluxWorker
+        
+        var hashValue: Int {
+            return observer.hashValue
+        }
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(observer)
+        }
+    }
+
 }

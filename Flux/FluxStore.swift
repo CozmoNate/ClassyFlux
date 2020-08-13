@@ -81,7 +81,7 @@ open class FluxStore<State>: FluxWorker {
     /// A state reducer closure. Returns the list of keyPaths describing state changed fields.
     /// - Parameter state: The mutable copy of current state to apply changes.
     /// - Parameter action: The action invoked the reducer.
-    public typealias Reduce<Action: FluxAction> = (inout State, Action) -> [PartialKeyPath<State>]
+    public typealias Reducer<Action: FluxAction> = (inout State, Action) -> [PartialKeyPath<State>]
 
     #if canImport(Combine)
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
@@ -138,17 +138,17 @@ open class FluxStore<State>: FluxWorker {
         NotificationCenter.default.post(name: FluxStoreEvent.stateDidChange.notificationName, object: self, userInfo: [FluxStoreNotificationKeyPathsKey: keyPaths])
     }
 
-    /// Adds an observer that will be invoked each time the store chages its state
+    /// Adds an observer that will be invoked each time the store changes its state
     /// - Parameter queue: The queue to schedule change handler on
-    /// - Parameter changeHandler: The closure will be invoked each time the state chages with the actual state object
+    /// - Parameter changeHandler: The closure will be invoked each time the state changes with the actual state object
     public func addObserver(for event: FluxStoreEvent, queue: OperationQueue = .main, changeHandler: @escaping (State, Set<PartialKeyPath<State>>) -> Void) -> Observer {
         return Observer(for: event, from: self, queue: queue, changeHandler: changeHandler)
     }
     
-    /// Adds an observer that will be invoked each time the store chages its state
+    /// Adds an observer that will be invoked each time the store changes its state
     /// - Parameter queue: The queue to schedule change handler on
     /// - Parameter observingKeyPaths: The list of KeyPath describing the fields in particular state object which should trigger state change handlers.
-    /// - Parameter changeHandler: The closure will be invoked each time the state chages with the actual state object
+    /// - Parameter changeHandler: The closure will be invoked each time the state changes with the actual state object
     public func addObserver(for event: FluxStoreEvent, observing observingKeyPaths: Set<PartialKeyPath<State>>, queue: OperationQueue = .main, changeHandler: @escaping (State) -> Void) -> Observer {
         return Observer(for: event, from: self, queue: queue) { state, changedKeyPaths in
             if changedKeyPaths.isDisjoint(with: observingKeyPaths) {
@@ -161,7 +161,7 @@ open class FluxStore<State>: FluxWorker {
     /// Associates a reducer with the action of specified type.
     /// - Parameter action: The type of the actions to associate with reducer.
     /// - Parameter reducer: The closure that will be invoked when the action received.
-    public func registerReducer<Action: FluxAction>(for action: Action.Type = Action.self, reducer: @escaping Reduce<Action>) {
+    public func registerReducer<Action: FluxAction>(for action: Action.Type = Action.self, reducer: @escaping Reducer<Action>) {
         reducers.register { reducer }
     }
     
@@ -169,7 +169,7 @@ open class FluxStore<State>: FluxWorker {
     /// - Parameter action: The type of the actions to associate with reducer.
     /// - Parameter mutator: The closure that will be invoked when the action received, providing actual state value. Return mutated state or nil, when no changes need to be applied to the state.
     public func registerMutator<Action: FluxAction>(for action: Action.Type = Action.self, mutator: @escaping (State, Action) -> State?) {
-        let reducer: Reduce<Action> = { (state, action) in
+        let reducer: Reducer<Action> = { (state, action) in
             guard let mutated = mutator(state, action) else { return []}
             
             state = mutated
@@ -183,18 +183,18 @@ open class FluxStore<State>: FluxWorker {
     /// Unregisters reducer associated with specified action type.
     /// - Parameter action: The action for which the associated reducer should be removed.
     public func unregisterReducer<Action: FluxAction>(for action: Action.Type) {
-        reducers.unregister(Reduce<Action>.self)
+        reducers.unregister(Reducer<Action>.self)
     }
 
     public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
-        if let reducer = try? reducers.resolve(Reduce<Action>.self) {
+        if let reducer = try? reducers.resolve(Reducer<Action>.self) {
             reduceState(with: reducer, applying: action)
         }
 
         return .next(action)
     }
 
-    internal func reduceState<Action: FluxAction>(with reducer: Reduce<Action>, applying action: Action) {
+    internal func reduceState<Action: FluxAction>(with reducer: Reducer<Action>, applying action: Action) {
         var draftState = state
         let keyPaths = Set(reducer(&draftState, action))
 
@@ -212,8 +212,13 @@ open class FluxStore<State>: FluxWorker {
 extension FluxStore {
 
     /// An object that helps to subscribe to store changes. Unregisters observer closure automatically when released from memory.
-    public class Observer {
-
+    public class Observer: Hashable {
+        
+        public static func == (lhs: FluxStore<State>.Observer, rhs: FluxStore<State>.Observer) -> Bool {
+            return lhs.token == rhs.token
+        }
+        
+        internal let token: AnyHashable = AnyHashable(UUID())
         internal let observer: NSObjectProtocol
 
         internal init<State>(for event: FluxStoreEvent, from store: FluxStore<State>, queue: OperationQueue, changeHandler: @escaping (State, Set<PartialKeyPath<State>>) -> Void) {
@@ -225,6 +230,10 @@ extension FluxStore {
                 }
         }
 
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(token)
+        }
+        
         deinit {
             NotificationCenter.default.removeObserver(observer)
         }

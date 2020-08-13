@@ -15,13 +15,10 @@ let package = Package(
         .library(name: "ClassyFlux", targets: ["ClassyFlux"])
     ],
     dependencies: [
-        .package(url: "https://github.com/Quick/Quick.git", from: "2.0.0"),
-        .package(url: "https://github.com/Quick/Nimble.git", from: "8.0.0"),
-        .package(url: "https://github.com/kzlekk/ResolverContainer.git", from: "1.3.3"),
+        .package(url: "https://github.com/kzlekk/ResolverContainer.git", .branch("master")),
     ],
     targets: [
-        .target(name: "ClassyFlux", dependencies: ["ResolverContainer"], path: "Flux"),
-        .testTarget(name: "ClassyFluxTests", dependencies: ["ClassyFlux", "Quick", "Nimble"], path: "FluxTests")
+        .target(name: "ClassyFlux", dependencies: ["ResolverContainer"], path: "Flux")
     ],
     swiftLanguageVersions: [ .v5 ]
 )

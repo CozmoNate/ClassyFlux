@@ -38,7 +38,7 @@ open class FluxMiddleware: FluxWorker {
     /// An action handler closure. You can pass different action to subsequent workers, or stop the action to propagate.
     /// - Parameter action: The action to handle.
     /// - Returns: The next action. Use FluxNextAction(FluxAction) functor to pass next action. Passing nil action will stop action propagation.
-    public typealias Handle<Action: FluxAction> = (Action) -> FluxPassthroughAction
+    public typealias Handler<Action: FluxAction> = (Action) -> FluxPassthroughAction
 
     public let token: AnyHashable
     public let priority: UInt
@@ -54,7 +54,7 @@ open class FluxMiddleware: FluxWorker {
     /// Associates an action handler with the actions of specified type with an option to prevent current action propagation and/or pass another action to next workers.
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter compose: The closure that will be invoked when the action received.
-    public func registerComposer<Action: FluxAction>(for action: Action.Type, compose handler: @escaping Handle<Action>) {
+    public func registerComposer<Action: FluxAction>(for action: Action.Type, compose handler: @escaping Handler<Action>) {
         handlers.register { handler }
     }
 
@@ -62,7 +62,7 @@ open class FluxMiddleware: FluxWorker {
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter intercept: The closure that will be invoked when the action received.
     public func registerInterceptor<Action: FluxAction>(for action: Action.Type, intercept: @escaping (Action) -> Void) {
-        let handler: Handle<Action> = { (action) -> FluxPassthroughAction in
+        let handler: Handler<Action> = { (action) -> FluxPassthroughAction in
             intercept(action)
             return .stop()
         }
@@ -73,7 +73,7 @@ open class FluxMiddleware: FluxWorker {
     /// - Parameter action: The type of the actions to associate with handler.
     /// - Parameter execute: The closure that will be invoked when the action received.
     public func registerHandler<Action: FluxAction>(for action: Action.Type, handle: @escaping (Action) -> Void) {
-        let handler: Handle<Action> = { (action) -> FluxPassthroughAction in
+        let handler: Handler<Action> = { (action) -> FluxPassthroughAction in
             handle(action)
             return .next(action)
         }
@@ -83,11 +83,11 @@ open class FluxMiddleware: FluxWorker {
     /// Unregisters handler associated with specified action type.
     /// - Parameter action: The action for which the associated handler should be removed
     public func unregisterHandler<Action: FluxAction>(for action: Action.Type) {
-        handlers.unregister(Handle<Action>.self)
+        handlers.unregister(Handler<Action>.self)
     }
 
     public func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction {
-        guard let handle = try? self.handlers.resolve(Handle<Action>.self) else {
+        guard let handle = try? self.handlers.resolve(Handler<Action>.self) else {
             return .next(action)
         }
         return handle(action)

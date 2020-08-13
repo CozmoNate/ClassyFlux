@@ -49,68 +49,45 @@ class FluxAggregatorTests: QuickSpec {
             }
             
             context("when registered the store") {
-             
+                var changedState: MockState?
+                
                 beforeEach {
-                    aggregator.register(store: store, observing: [\MockState.value])
+                    aggregator.register(store: store, observing: [\MockState.value]) { (state) in
+                        changedState = state
+                    }
                 }
                 
                 it("adds store observer") {
-                    expect(aggregator.observers[store.token]).notTo(beNil())
+                    expect(aggregator.subscriptions.count).to(equal(1))
                 }
                 
                 it("stores store state") {
                     expect(aggregator[MockState.self]).to(equal(MockState(value: "initial", number: 0)))
                 }
                 
-                context("when registered state handler") {
-                    
-                    var changedState: MockState?
+                context("when the store changes") {
                     
                     beforeEach {
-                        aggregator.registerHandler(for: MockState.self) { (state) in
-                            changedState = state
-                        }
+                        _ = store.handle(action: ChangeValueAction(value: "aggregate"))
                     }
                     
-                    it("adds the handler into resolver container") {
-                        expect(try? aggregator.storage.resolve(FluxAggregator.Handle<MockState>.self)).notTo(beNil())
+                    it("invokes change handler on aggregator") {
+                        expect(changedState).to(equal(MockState(value: "aggregate", number: 0)))
                     }
                     
-                    context("when store chages") {
-                        
-                        beforeEach {
-                            _ = store.handle(action: ChangeValueAction(value: "aggregate"))
-                        }
-                        
-                        it("invokes change handler on aggregator") {
-                            expect(changedState).to(equal(MockState(value: "aggregate", number: 0)))
-                        }
-                        
-                        it("passes changed state to aggregator") {
-                            expect(aggregator[MockState.self]).to(equal(MockState(value: "aggregate", number: 0)))
-                        }
-                    }
-                    
-                    context("when unregistered the handler") {
-
-                        beforeEach {
-                            aggregator.unregisterHandler(for: MockState.self)
-                        }
-                    
-                        it("removes the handler from resolver container") {
-                            expect(try? aggregator.storage.resolve(FluxAggregator.Handle<MockState>.self)).to(beNil())
-                        }
+                    it("passes changed state to aggregator") {
+                        expect(aggregator[MockState.self]).to(equal(MockState(value: "aggregate", number: 0)))
                     }
                 }
                 
-                context("when unregistered the state") {
+                context("when unregistered the store") {
                     
                     beforeEach {
-                        aggregator.unregister(state: MockState.self)
+                        aggregator.unregister(store: store)
                     }
                     
                     it("removes store observer") {
-                        expect(aggregator.observers[store.token]).to(beNil())
+                        expect(aggregator.subscriptions).to(beEmpty())
                         expect(try? aggregator.storage.resolve(MockState.self)).to(beNil())
                     }
                 }
@@ -122,7 +99,7 @@ class FluxAggregatorTests: QuickSpec {
                     }
 
                     it("removes store observer") {
-                        expect(aggregator.observers).to(beEmpty())
+                        expect(aggregator.subscriptions).to(beEmpty())
                         expect(try? aggregator.storage.resolve(MockState.self)).to(beNil())
                     }
                 }
