@@ -15,7 +15,7 @@ let package = Package(
         .library(name: "ClassyFlux", targets: ["ClassyFlux"])
     ],
     dependencies: [
-        .package(url: "https://github.com/kzlekk/ResolverContainer.git", .branch("master")),
+        .package(url: "https://github.com/kzlekk/ResolverContainer.git", , from: "1.3.0"),
     ],
     targets: [
         .target(name: "ClassyFlux", dependencies: ["ResolverContainer"], path: "Flux")
