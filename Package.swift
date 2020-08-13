@@ -15,10 +15,10 @@ let package = Package(
         .library(name: "ClassyFlux", targets: ["ClassyFlux"])
     ],
     dependencies: [
-        .package(url: "https://github.com/kzlekk/ResolverContainer.git", from: "1.3.0"),
+        .package(url: "https://github.com/kzlekk/ResolvingContainer.git", from: "1.0.0"),
     ],
     targets: [
-        .target(name: "ClassyFlux", dependencies: ["ResolverContainer"], path: "Flux")
+        .target(name: "ClassyFlux", dependencies: ["ResolvingContainer"], path: "ClassyFlux")
     ],
     swiftLanguageVersions: [ .v5 ]
 )

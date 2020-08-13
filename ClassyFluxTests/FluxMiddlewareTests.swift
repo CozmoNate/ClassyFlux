@@ -28,24 +28,26 @@ class FluxMiddlewareTests: QuickSpec {
             context("when registered action handlers") {
 
                 beforeEach {
-                    middleware.registerComposer(for: ChangeValueAction.self) { (_, action) in
+                    middleware.registerHandler(for: ChangeValueAction.self) { (action) in
                         value = action.value
                         return .next(action)
                     }
 
                     middleware.registerHandler(for: IncrementNumberAction.self) { (owner, action) in
                         owner.didIncrement = true
+                        return .next(action)
                     }
                     
-                    middleware.registerInterceptor(for: EmptyAction.self) { (owner, action) in
+                    middleware.registerHandler(for: EmptyAction.self) { (owner, action) in
                         owner.didIntercept = true
+                        return .stop()
                     }
                 }
 
                 it("has registered action handlers") {
-                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handler<ChangeValueAction>.self)).toNot(beNil())
-                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handler<IncrementNumberAction>.self)).toNot(beNil())
-                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handler<EmptyAction>.self)).toNot(beNil())
+                    expect(middleware.handlers.resolve(FluxMiddleware.Handler<ChangeValueAction>.self)).toNot(beNil())
+                    expect(middleware.handlers.resolve(FluxMiddleware.Handler<IncrementNumberAction>.self)).toNot(beNil())
+                    expect(middleware.handlers.resolve(FluxMiddleware.Handler<EmptyAction>.self)).toNot(beNil())
                 }
 
                 context("when performed registered action") {
@@ -109,7 +111,7 @@ class FluxMiddlewareTests: QuickSpec {
                     }
 
                     it("successfully unregistered the action handler") {
-                        expect(try? middleware.handlers.resolve(FluxMiddleware.Handler<ChangeValueAction>.self)).to(beNil())
+                        expect(middleware.handlers.resolve(FluxMiddleware.Handler<ChangeValueAction>.self)).to(beNil())
                     }
 
                     context("when performed unregistered action") {
@@ -137,18 +139,19 @@ class FluxMiddlewareTests: QuickSpec {
                 var didCallHandler: Bool?
 
                 beforeEach {
-                    middleware.registerComposer(for: ChangeValueAction.self) { _ in
+                    middleware.registerHandler(for: ChangeValueAction.self) { _ in
                         return .next(ChangeValueAction(value: "Transformed!"))
                     }
 
-                    middleware.registerHandler(for: IncrementNumberAction.self) { _ in
+                    middleware.registerHandler(for: IncrementNumberAction.self) { action in
                         didCallHandler = true
+                        return .next(action)
                     }
                 }
 
                 it("has registered action handler") {
-                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handler<ChangeValueAction>.self)).toNot(beNil())
-                    expect(try? middleware.handlers.resolve(FluxMiddleware.Handler<IncrementNumberAction>.self)).toNot(beNil())
+                    expect(middleware.handlers.resolve(FluxMiddleware.Handler<ChangeValueAction>.self)).toNot(beNil())
+                    expect(middleware.handlers.resolve(FluxMiddleware.Handler<IncrementNumberAction>.self)).toNot(beNil())
                 }
 
                 context("when performed first action") {

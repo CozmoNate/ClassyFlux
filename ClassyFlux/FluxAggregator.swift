@@ -30,7 +30,7 @@
  */
 
 import Foundation
-import ResolverContainer
+import ResolvingContainer
 
 /// An object that aggregates multiple states from different stores and invokes appropriate handlers when the store changes.
 public class FluxAggregator {
@@ -39,20 +39,20 @@ public class FluxAggregator {
     /// - Parameter state: Actual state value
     public typealias Handler<State> = (_ state: State) -> Void
 
-    internal let storage: ResolverContainer
-    internal var subscriptions: [Subscription]
+    internal let storage: ResolvingContainer
+    internal var subscriptions: [(observer: AnyObject, worker: FluxWorker)]
     internal var changeHandler: ((FluxAggregator) -> Void)?
 
     /// Initializes an aggregator instance with optional block what called each time when one of registered stores changed.
     public init(changeHandler collectHandler: ((FluxAggregator) -> Void)? = nil) {
-        storage = ResolverContainer()
+        storage = ResolvingContainer()
         subscriptions = []
         changeHandler = collectHandler
     }
 
     /// Returns the state value or nil if the state of the specified type is not available.
     public subscript<State>(_ type: State.Type) -> State {
-        guard let store = try? storage.resolve(FluxStore<State>.self) else {
+        guard let store = storage.resolve(FluxStore<State>.self) else {
             fatalError("Trying to access to the unknown state type: \(String(describing: State.self))")
         }
         return store.state
@@ -70,7 +70,7 @@ public class FluxAggregator {
             handler(state)
             self.changeHandler?(self)
         }
-        subscriptions.append(Subscription(observer: observer, worker: store))
+        subscriptions.append((observer: observer, worker: store))
     }
 
     /// Unregisters store, remove aggregated state and handlers associated with specified state type.
@@ -85,26 +85,4 @@ public class FluxAggregator {
         storage.unregisterAll()
         subscriptions.removeAll()
     }
-    
-}
-
-internal extension FluxAggregator {
-    
-    struct Subscription: Hashable {
-        static func == (lhs: FluxAggregator.Subscription, rhs: FluxAggregator.Subscription) -> Bool {
-            return lhs.hashValue == rhs.hashValue
-        }
-        
-        let observer: AnyHashable
-        let worker: FluxWorker
-        
-        var hashValue: Int {
-            return observer.hashValue
-        }
-        
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(observer)
-        }
-    }
-
 }

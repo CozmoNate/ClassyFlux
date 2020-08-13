@@ -36,8 +36,6 @@ import Foundation
 /// A protocol describing an abstract action
 public protocol FluxAction {}
 
-// MARK: - FluxAction Dispatching
-
 public extension FluxAction {
     
     /// Dispatches the action with the dispatcher on specified queue.
@@ -52,7 +50,6 @@ public extension FluxAction {
             }
         }
     }
-
 }
 
 // MARK: - FluxActionEmitter
@@ -62,7 +59,6 @@ public protocol FluxActionEmitter: AnyObject {
 
     /// Emits the action.
     func emit<Action: FluxAction>(action: Action)
-
 }
 
 // MARK: - FluxPassthroughAction
@@ -70,8 +66,8 @@ public protocol FluxActionEmitter: AnyObject {
 /// A struct that stores the functor that can pass concrete action to FluxActionEmitter or stop action propagation.
 public struct FluxPassthroughAction {
 
-    private var emit: ((FluxActionEmitter) -> Void)?
-
+    // MARK: Static
+    
     /// Passes the action to subsequent workers.
     public static func next<T: FluxAction>(_ action: T) -> FluxPassthroughAction {
         return FluxPassthroughAction { $0.emit(action: action) }
@@ -81,12 +77,15 @@ public struct FluxPassthroughAction {
     public static func stop() -> FluxPassthroughAction {
         return FluxPassthroughAction()
     }
+    
+    // MARK: Instance
+    
+    private var emit: ((FluxActionEmitter) -> Void)?
 
     /// Passes the results to the emitter.
     public func pass(to emitter: FluxActionEmitter) {
         emit?(emitter)
     }
-    
 }
 
 // MARK: - Utility

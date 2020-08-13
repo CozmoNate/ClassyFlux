@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'ClassyFlux'
-  s.version          = '1.22.2'
+  s.version          = '2.0.0'
   s.summary          = 'Flux implementation in Swift'
   s.homepage         = 'https://github.com/kzlekk/ClassyFlux'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.watchos.deployment_target = '5.0'
   s.tvos.deployment_target = '12.0'
 
-  s.dependency 'ResolverContainer'
+  s.dependency 'ResolvingContainer'
 
   s.source_files = ['Flux/FluxAction.swift',
                     'Flux/FluxAggregator.swift',

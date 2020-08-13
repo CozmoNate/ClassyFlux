@@ -110,13 +110,18 @@ open class FluxDispatcher: FluxDispatching {
             didDispatchAction.send(action)
         }
         #endif
-    }
+    }    
+}
 
+// MARK: - FluxDispatcher.Pipeline
+
+extension FluxDispatcher {
+    
     public class Pipeline: FluxActionEmitter {
         
-        private var iterator: IndexingIterator<[FluxWorker]>?
-        
         public var isEmpty: Bool { iterator == nil }
+        
+        private var iterator: IndexingIterator<[FluxWorker]>?
         
         public func load(workers: [FluxWorker]) -> Self {
             iterator = workers.makeIterator()
@@ -131,7 +136,6 @@ open class FluxDispatcher: FluxDispatching {
             }
         }
     }
-
 }
 
 // MARK: - Utility

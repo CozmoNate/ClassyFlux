@@ -8,7 +8,7 @@
 
 import Foundation
 import SwiftUI
-import ResolverContainer
+import ResolvingContainer
 
 @testable import ClassyFlux
 
@@ -32,27 +32,17 @@ class MockMiddleware: FluxMiddleware {
     var didIntercept: Bool?
 }
 
+class MockRepository: FluxRepository {
+    var value: String = "initial"
+    var number: Int = 0
+}
+
 class MockStore: FluxStore<MockState> {
 
     var stateBeforeChange: State?
     var pathsBeforeChange: Set<PartialKeyPath<MockState>>?
     var stateAfterChange: State?
     var pathsAfterChange: Set<PartialKeyPath<MockState>>?
-    
-
-    init(priority: UInt = 0) {
-        super.init(priority: priority, initialState: MockState(value: "initial", number: 0))
-
-        registerReducer { (state, action: ChangeValueAction) in
-            state.value = action.value
-            return [\MockState.value]
-        }
-
-        registerReducer { (state, action: IncrementNumberAction) in
-            state.number += action.increment
-            return [\MockState.number]
-        }
-    }
 
     override func stateWillChange(_ state: MockState, at keyPaths: Set<PartialKeyPath<MockState>>) {
         stateBeforeChange = state

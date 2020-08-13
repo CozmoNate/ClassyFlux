@@ -44,7 +44,11 @@ class FluxAggregatorTests: QuickSpec {
         describe("FluxAggregator") {
 
             beforeEach {
-                store = MockStore()
+                store = MockStore(initialState: MockState(value: "initial", number: 0))
+                store.registerReducer { (state, action: ChangeValueAction) in
+                    state.value = action.value
+                    return [\MockState.value]
+                }
                 aggregator = FluxAggregator()
             }
             
@@ -88,7 +92,7 @@ class FluxAggregatorTests: QuickSpec {
                     
                     it("removes store observer") {
                         expect(aggregator.subscriptions).to(beEmpty())
-                        expect(try? aggregator.storage.resolve(MockState.self)).to(beNil())
+                        expect(aggregator.storage.resolve(MockState.self)).to(beNil())
                     }
                 }
 
@@ -100,7 +104,7 @@ class FluxAggregatorTests: QuickSpec {
 
                     it("removes store observer") {
                         expect(aggregator.subscriptions).to(beEmpty())
-                        expect(try? aggregator.storage.resolve(MockState.self)).to(beNil())
+                        expect(aggregator.storage.resolve(MockState.self)).to(beNil())
                     }
                 }
             }

@@ -7,12 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2F07613224E801DA00A91409 /* FluxRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F07613024E7FF4900A91409 /* FluxRepositoryTests.swift */; };
+		2F07613824E8037400A91409 /* ResolvingContainer in Frameworks */ = {isa = PBXBuildFile; productRef = 2F07613724E8037400A91409 /* ResolvingContainer */; };
 		2F55DB4E234331B300A1B6ED /* FluxAggregator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F55DB4D234331B300A1B6ED /* FluxAggregator.swift */; };
 		2F55DB5123433BCE00A1B6ED /* FluxAggregatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F55DB4F2343324500A1B6ED /* FluxAggregatorTests.swift */; };
-		7E0DC17B230FCD43009B8319 /* FluxStoreObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA48E056230FC701009ABA6F /* FluxStoreObserverTests.swift */; };
-		7E1509FE2301D24F00E497D7 /* ResolverContainer in Frameworks */ = {isa = PBXBuildFile; productRef = 7E1509FD2301D24F00E497D7 /* ResolverContainer */; };
-		7E24883522F5DA9800517865 /* Quick in Frameworks */ = {isa = PBXBuildFile; productRef = 7E24883422F5DA9800517865 /* Quick */; };
-		7E24883822F5DAA300517865 /* Nimble in Frameworks */ = {isa = PBXBuildFile; productRef = 7E24883722F5DAA300517865 /* Nimble */; };
+		2F946AEF24E57B3300CD0366 /* FluxRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F946AEE24E57B3300CD0366 /* FluxRepository.swift */; };
+		2FD42C9724ECFC4000AE26D4 /* Quick in Frameworks */ = {isa = PBXBuildFile; productRef = 2FD42C9624ECFC4000AE26D4 /* Quick */; };
+		2FD42C9A24ECFC5200AE26D4 /* Nimble in Frameworks */ = {isa = PBXBuildFile; productRef = 2FD42C9924ECFC5200AE26D4 /* Nimble */; };
+		2FD42C9D24ED031A00AE26D4 /* FluxRepositorySubscriptionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD42C9B24ECFDD300AE26D4 /* FluxRepositorySubscriptionTest.swift */; };
+		7E0DC17B230FCD43009B8319 /* FluxStoreSubscriptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA48E056230FC701009ABA6F /* FluxStoreSubscriptionTests.swift */; };
 		7E24883D22F5DACC00517865 /* FluxStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E24883922F5DACC00517865 /* FluxStore.swift */; };
 		7E24883F22F5DACC00517865 /* FluxAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E24883B22F5DACC00517865 /* FluxAction.swift */; };
 		7E46BA0722F747AA00162C03 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E46BA0622F747AA00162C03 /* Mocks.swift */; };
@@ -38,8 +41,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2F07613024E7FF4900A91409 /* FluxRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxRepositoryTests.swift; sourceTree = "<group>"; };
 		2F55DB4D234331B300A1B6ED /* FluxAggregator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxAggregator.swift; sourceTree = "<group>"; };
 		2F55DB4F2343324500A1B6ED /* FluxAggregatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxAggregatorTests.swift; sourceTree = "<group>"; };
+		2F946AEE24E57B3300CD0366 /* FluxRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxRepository.swift; sourceTree = "<group>"; };
+		2FD42C9B24ECFDD300AE26D4 /* FluxRepositorySubscriptionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxRepositorySubscriptionTest.swift; sourceTree = "<group>"; };
 		7E24883922F5DACC00517865 /* FluxStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FluxStore.swift; sourceTree = "<group>"; };
 		7E24883B22F5DACC00517865 /* FluxAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FluxAction.swift; sourceTree = "<group>"; };
 		7E4674C8230BB3FD004F99F3 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -57,7 +63,7 @@
 		7EB6F3302301D7FE00179F06 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		7EBB251022F5FB4800FF9632 /* FluxWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxWorker.swift; sourceTree = "<group>"; };
 		AA2AB05E230A9177002CF10D /* FluxMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxMiddleware.swift; sourceTree = "<group>"; };
-		AA48E056230FC701009ABA6F /* FluxStoreObserverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxStoreObserverTests.swift; sourceTree = "<group>"; };
+		AA48E056230FC701009ABA6F /* FluxStoreSubscriptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluxStoreSubscriptionTests.swift; sourceTree = "<group>"; };
 		AAED50A92301A11B00C201B4 /* ClassyFlux.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ClassyFlux.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -66,7 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E1509FE2301D24F00E497D7 /* ResolverContainer in Frameworks */,
+				2F07613824E8037400A91409 /* ResolvingContainer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,8 +80,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E24883822F5DAA300517865 /* Nimble in Frameworks */,
-				7E24883522F5DA9800517865 /* Quick in Frameworks */,
+				2FD42C9A24ECFC5200AE26D4 /* Nimble in Frameworks */,
+				2FD42C9724ECFC4000AE26D4 /* Quick in Frameworks */,
 				7EA2A6E122F41A7000104CCA /* ClassyFlux.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -90,8 +96,8 @@
 				AAED50A92301A11B00C201B4 /* ClassyFlux.podspec */,
 				7EB6F3302301D7FE00179F06 /* README.md */,
 				7E4674C8230BB3FD004F99F3 /* LICENSE */,
-				7EA2A6D922F41A7000104CCA /* Flux */,
-				7EA2A6E422F41A7000104CCA /* FluxTests */,
+				7EA2A6D922F41A7000104CCA /* ClassyFlux */,
+				7EA2A6E422F41A7000104CCA /* ClassyFluxTests */,
 				7EA2A6D822F41A7000104CCA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -105,33 +111,36 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		7EA2A6D922F41A7000104CCA /* Flux */ = {
+		7EA2A6D922F41A7000104CCA /* ClassyFlux */ = {
 			isa = PBXGroup;
 			children = (
 				7E24883B22F5DACC00517865 /* FluxAction.swift */,
 				2F55DB4D234331B300A1B6ED /* FluxAggregator.swift */,
 				7E6FC52F230B2B7E0078609F /* FluxDispatcher.swift */,
 				AA2AB05E230A9177002CF10D /* FluxMiddleware.swift */,
+				2F946AEE24E57B3300CD0366 /* FluxRepository.swift */,
 				7E24883922F5DACC00517865 /* FluxStore.swift */,
 				7EBB251022F5FB4800FF9632 /* FluxWorker.swift */,
 				7EA2A6DA22F41A7000104CCA /* ClassyFlux.h */,
 				7EA2A6DB22F41A7000104CCA /* Info.plist */,
 			);
-			path = Flux;
+			path = ClassyFlux;
 			sourceTree = "<group>";
 		};
-		7EA2A6E422F41A7000104CCA /* FluxTests */ = {
+		7EA2A6E422F41A7000104CCA /* ClassyFluxTests */ = {
 			isa = PBXGroup;
 			children = (
 				2F55DB4F2343324500A1B6ED /* FluxAggregatorTests.swift */,
 				7EA2A6E522F41A7000104CCA /* FluxDispatcherTests.swift */,
 				7E46BA0822F7482600162C03 /* FluxMiddlewareTests.swift */,
-				AA48E056230FC701009ABA6F /* FluxStoreObserverTests.swift */,
+				2F07613024E7FF4900A91409 /* FluxRepositoryTests.swift */,
+				2FD42C9B24ECFDD300AE26D4 /* FluxRepositorySubscriptionTest.swift */,
 				7E4E252722F73D68002C0C09 /* FluxStoreTests.swift */,
+				AA48E056230FC701009ABA6F /* FluxStoreSubscriptionTests.swift */,
 				7E46BA0622F747AA00162C03 /* Mocks.swift */,
 				7EA2A6E722F41A7000104CCA /* Info.plist */,
 			);
-			path = FluxTests;
+			path = ClassyFluxTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -163,7 +172,7 @@
 			);
 			name = ClassyFlux;
 			packageProductDependencies = (
-				7E1509FD2301D24F00E497D7 /* ResolverContainer */,
+				2F07613724E8037400A91409 /* ResolvingContainer */,
 			);
 			productName = Flux;
 			productReference = 7EA2A6D722F41A7000104CCA /* ClassyFlux.framework */;
@@ -184,8 +193,8 @@
 			);
 			name = ClassyFluxTests;
 			packageProductDependencies = (
-				7E24883422F5DA9800517865 /* Quick */,
-				7E24883722F5DAA300517865 /* Nimble */,
+				2FD42C9624ECFC4000AE26D4 /* Quick */,
+				2FD42C9924ECFC5200AE26D4 /* Nimble */,
 			);
 			productName = FluxTests;
 			productReference = 7EA2A6E022F41A7000104CCA /* ClassyFluxTests.xctest */;
@@ -220,9 +229,9 @@
 			);
 			mainGroup = 7EA2A6CD22F41A7000104CCA;
 			packageReferences = (
-				7E24883322F5DA9800517865 /* XCRemoteSwiftPackageReference "Quick" */,
-				7E24883622F5DAA300517865 /* XCRemoteSwiftPackageReference "Nimble" */,
-				7E1509FC2301D24F00E497D7 /* XCRemoteSwiftPackageReference "ResolverContainer" */,
+				2F07613624E8037400A91409 /* XCRemoteSwiftPackageReference "ResolvingContainer" */,
+				2FD42C9524ECFC4000AE26D4 /* XCRemoteSwiftPackageReference "Quick" */,
+				2FD42C9824ECFC5200AE26D4 /* XCRemoteSwiftPackageReference "Nimble" */,
 			);
 			productRefGroup = 7EA2A6D822F41A7000104CCA /* Products */;
 			projectDirPath = "";
@@ -261,6 +270,7 @@
 				7EBB251122F5FB4800FF9632 /* FluxWorker.swift in Sources */,
 				7E24883D22F5DACC00517865 /* FluxStore.swift in Sources */,
 				2F55DB4E234331B300A1B6ED /* FluxAggregator.swift in Sources */,
+				2F946AEF24E57B3300CD0366 /* FluxRepository.swift in Sources */,
 				7E24883F22F5DACC00517865 /* FluxAction.swift in Sources */,
 				AA2AB05F230A9177002CF10D /* FluxMiddleware.swift in Sources */,
 			);
@@ -270,10 +280,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E0DC17B230FCD43009B8319 /* FluxStoreObserverTests.swift in Sources */,
+				7E0DC17B230FCD43009B8319 /* FluxStoreSubscriptionTests.swift in Sources */,
 				2F55DB5123433BCE00A1B6ED /* FluxAggregatorTests.swift in Sources */,
 				7E46BA0922F7482600162C03 /* FluxMiddlewareTests.swift in Sources */,
+				2FD42C9D24ED031A00AE26D4 /* FluxRepositorySubscriptionTest.swift in Sources */,
 				7E4E252822F73D68002C0C09 /* FluxStoreTests.swift in Sources */,
+				2F07613224E801DA00A91409 /* FluxRepositoryTests.swift in Sources */,
 				7EA2A6E622F41A7000104CCA /* FluxDispatcherTests.swift in Sources */,
 				7E46BA0722F747AA00162C03 /* Mocks.swift in Sources */,
 			);
@@ -427,14 +439,14 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Flux/Info.plist;
+				INFOPLIST_FILE = ClassyFlux/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.22.2;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.ClassyFlux;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = macosx;
@@ -454,14 +466,14 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Flux/Info.plist;
+				INFOPLIST_FILE = ClassyFlux/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.22.2;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.ClassyFlux;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = macosx;
@@ -476,13 +488,13 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = FluxTests/Info.plist;
+				INFOPLIST_FILE = ClassyFluxTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.FluxTests;
+				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.ClassyFluxTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
@@ -495,13 +507,13 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = FluxTests/Info.plist;
+				INFOPLIST_FILE = ClassyFluxTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.FluxTests;
+				PRODUCT_BUNDLE_IDENTIFIER = org.kzlekk.ClassyFluxTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
@@ -542,46 +554,46 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		7E1509FC2301D24F00E497D7 /* XCRemoteSwiftPackageReference "ResolverContainer" */ = {
+		2F07613624E8037400A91409 /* XCRemoteSwiftPackageReference "ResolvingContainer" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/kzlekk/ResolverContainer.git";
+			repositoryURL = "https://github.com/kzlekk/ResolvingContainer.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.3.0;
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.0.0;
 			};
 		};
-		7E24883322F5DA9800517865 /* XCRemoteSwiftPackageReference "Quick" */ = {
+		2FD42C9524ECFC4000AE26D4 /* XCRemoteSwiftPackageReference "Quick" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Quick/Quick.git";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
 			};
 		};
-		7E24883622F5DAA300517865 /* XCRemoteSwiftPackageReference "Nimble" */ = {
+		2FD42C9824ECFC5200AE26D4 /* XCRemoteSwiftPackageReference "Nimble" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Quick/Nimble.git";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.1.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		7E1509FD2301D24F00E497D7 /* ResolverContainer */ = {
+		2F07613724E8037400A91409 /* ResolvingContainer */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 7E1509FC2301D24F00E497D7 /* XCRemoteSwiftPackageReference "ResolverContainer" */;
-			productName = ResolverContainer;
+			package = 2F07613624E8037400A91409 /* XCRemoteSwiftPackageReference "ResolvingContainer" */;
+			productName = ResolvingContainer;
 		};
-		7E24883422F5DA9800517865 /* Quick */ = {
+		2FD42C9624ECFC4000AE26D4 /* Quick */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 7E24883322F5DA9800517865 /* XCRemoteSwiftPackageReference "Quick" */;
+			package = 2FD42C9524ECFC4000AE26D4 /* XCRemoteSwiftPackageReference "Quick" */;
 			productName = Quick;
 		};
-		7E24883722F5DAA300517865 /* Nimble */ = {
+		2FD42C9924ECFC5200AE26D4 /* Nimble */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 7E24883622F5DAA300517865 /* XCRemoteSwiftPackageReference "Nimble" */;
+			package = 2FD42C9824ECFC5200AE26D4 /* XCRemoteSwiftPackageReference "Nimble" */;
 			productName = Nimble;
 		};
 /* End XCSwiftPackageProductDependency section */

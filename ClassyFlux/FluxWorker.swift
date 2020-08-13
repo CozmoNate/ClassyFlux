@@ -44,5 +44,4 @@ public protocol FluxWorker: AnyObject {
     /// - Parameter action: The action to handle.
     /// - Returns: The action composer that passes an action to next workers.
     func handle<Action: FluxAction>(action: Action) -> FluxPassthroughAction
-
 }

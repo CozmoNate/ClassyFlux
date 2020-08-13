@@ -1,13 +1,13 @@
 //
-//  FluxStoreObserverTests.swift
+//  FluxRepositorySubscriptionTest.swift
 //  ClassyFlux
 //
-//  Created by Natan Zalkin on 23/08/2019.
-//  Copyright © 2019 Natan Zalkin. All rights reserved.
+//  Created by Natan Zalkin on 19/08/2020.
+//  Copyright © 2020 Natan Zalkin. All rights reserved.
 //
 
 /*
- * Copyright (c) 2019 Natan Zalkin
+ * Copyright (c) 2020 Natan Zalkin
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,68 +34,62 @@ import Nimble
 
 @testable import ClassyFlux
 
-class FluxStoreObserverTests: QuickSpec {
+class FluxRepositorySubscriptionTests: QuickSpec {
 
-    var observer: MockStore.Observer?
-    var anotherObserver: MockStore.Observer?
-    
     override func spec() {
 
-        describe("FluxStore.Observer") {
-
-            var store: FluxStore<MockState>!
-            var lastState: MockState?
-            var lastKeyPaths: Set<PartialKeyPath<MockState>>?
+        describe("FluxRepository.Subscription") {
+            
+            var repository: MockRepository!
+            var subscriptions: [MockRepository.Subscription]!
             var lastValue: String?
+            var lastKeyPaths: Set<PartialKeyPath<MockRepository>>?
             
             beforeEach {
-                store = FluxStore(initialState: MockState(value: "initial", number: 0))
+                repository = MockRepository()
 
-                store.registerReducer { (state, action: ChangeValueAction) in
+                repository.registerMutator(for: ChangeValueAction.self) { (state, action) in
                     state.value = action.value
-                    return [\MockState.value]
-                }
-
-                self.observer = store.addObserver(for: .stateDidChange) { (state, keyPaths) in
-                    lastState = state
-                    lastKeyPaths = keyPaths
+                    return [\MockRepository.value]
                 }
                 
-                self.anotherObserver = store.addObserver(for: .stateDidChange, observing: [\MockState.value]) { (state) in
+                subscriptions = []
+
+                repository.addObserver { (state, keyPaths) in
+                    lastKeyPaths = keyPaths
+                }.store(in: &subscriptions)
+                
+                repository.addObserver(observing: [\MockRepository.value]) { (state) in
                     lastValue = state.value
-                }
+                }.store(in: &subscriptions)
             }
             
             context("when state changed") {
 
                 beforeEach {
-                    _ = store.handle(action: ChangeValueAction(value: "test"))
+                    _ = repository.handle(action: ChangeValueAction(value: "test"))
                 }
 
                 it("receives changed state") {
-                    expect(lastState?.value).toEventually(equal("test"))
-                    expect(lastKeyPaths).toEventually(equal(Set([\MockState.value])))
+                    expect(lastKeyPaths).toEventually(equal(Set([\MockRepository.value])))
                     expect(lastValue).toEventually(equal("test"))
                 }
 
                 context("when deallocated") {
                     beforeEach {
-                        self.observer = nil
-                        self.anotherObserver = nil
+                        subscriptions.removeAll()
+                        lastValue = "stub"
+                        lastKeyPaths = []
                     }
 
                     context("when state changed") {
 
                         beforeEach {
-                            lastState = MockState(value: "one", number: 1)
-                            lastKeyPaths = [\MockState.number]
-                            lastValue = "ups"
-                            _ = store.handle(action: ChangeValueAction(value: "test 2"))
+                            _ = repository.handle(action: ChangeValueAction(value: "test 2"))
                         }
 
                         it("does not receives changed state") {
-                            expect(lastState?.value).toNotEventually(equal("test 2"))
-                            expect(lastKeyPaths).toNotEventually(equal(Set([\MockState.value])))
+                            expect(lastKeyPaths).toNotEventually(equal(Set([\MockRepository.value])))
                             expect(lastValue).toNotEventually(equal("test 2"))
                         }
                     }

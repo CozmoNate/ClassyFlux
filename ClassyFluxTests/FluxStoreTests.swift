@@ -20,7 +20,7 @@ class FluxStoreTests: QuickSpec {
             var store: MockStore!
 
             beforeEach {
-                store = MockStore()
+                store = MockStore(initialState: MockState(value: "initial", number: 0))
             }
 
             context("when registered the action") {
@@ -30,11 +30,6 @@ class FluxStoreTests: QuickSpec {
                         state.value = action.value
                         return [\MockState.value]
                     }
-                    
-                    store.registerMutator { (state, action: IncrementNumberAction) in
-                        guard action.increment != 0 else { return nil }
-                        return MockState(value: "mutated", number: state.number + action.increment)
-                    }
                 }
 
                 it("has correct initial value") {
@@ -43,8 +38,7 @@ class FluxStoreTests: QuickSpec {
                 }
 
                 it("has registered reducer & mutator") {
-                    expect(try? store.reducers.resolve(MockStore.Reducer<ChangeValueAction>.self)).toNot(beNil())
-                    expect(try? store.reducers.resolve(MockStore.Reducer<IncrementNumberAction>.self)).toNot(beNil())
+                    expect(store.reducers.resolve(MockStore.Reducer<ChangeValueAction>.self)).toNot(beNil())
                 }
 
                 context("when unregistered the action") {
@@ -54,7 +48,7 @@ class FluxStoreTests: QuickSpec {
                     }
 
                     it("successfully unregistered the reducer") {
-                        expect(try? store.reducers.resolve(MockStore.Reducer<ChangeValueAction>.self)).to(beNil())
+                        expect(store.reducers.resolve(MockStore.Reducer<ChangeValueAction>.self)).to(beNil())
                     }
 
                     context("when performed unregistered action") {
@@ -92,32 +86,6 @@ class FluxStoreTests: QuickSpec {
                         expect(emitter.lastAction as? ChangeValueAction).to(equal(ChangeValueAction(value: "test")))
                     }
                 }
-                
-                context("when performed action that mutates the whole state") {
-
-                    var emitter: MockEmitter!
-
-                    beforeEach {
-                        emitter = MockEmitter()
-                        store.handle(action: IncrementNumberAction(increment: 1)).pass(to: emitter)
-                    }
-
-                    it("calls state change events") {
-                        expect(store.stateBeforeChange?.value).to(equal("initial"))
-                        expect(store.stateBeforeChange?.number).to(equal(0))
-                        expect(store.stateAfterChange?.value).to(equal("mutated"))
-                        expect(store.stateAfterChange?.number).to(equal(1))
-                    }
-
-                    it("correctly reduces store state") {
-                        expect(store.state.value).to(equal("mutated"))
-                        expect(store.state.number).to(equal(1))
-                    }
-
-                    it("passes the action to composer") {
-                        expect(emitter.lastAction as? IncrementNumberAction).to(equal(IncrementNumberAction(increment: 1)))
-                    }
-                }
 
                 context("can add another reducer") {
 
@@ -129,7 +97,7 @@ class FluxStoreTests: QuickSpec {
                     }
 
                     it("has registered IncrementNumberAction reducer") {
-                        expect(try? store.reducers.resolve(MockStore.Reducer<IncrementNumberAction>.self)).toNot(beNil())
+                        expect(store.reducers.resolve(MockStore.Reducer<IncrementNumberAction>.self)).toNot(beNil())
                     }
 
                     context("when performed another action") {

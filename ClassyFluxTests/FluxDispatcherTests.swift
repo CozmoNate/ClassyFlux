@@ -82,7 +82,7 @@ class FluxDispatcherTests: QuickSpec {
                         beforeEach {
                             first = FluxMiddleware(priority: 2)
                             second = MockWorker(priority: 3)
-                            third = MockStore(priority: 1)
+                            third = MockStore(priority: 1, initialState: MockState(value: "initial", number: 0))
                             fouth = FluxStore(priority: 0, initialState: MockState(value: "1", number: 1))
                             
                             dispatcher.register(workers: [first, second, third, fouth])
@@ -113,7 +113,7 @@ class FluxDispatcherTests: QuickSpec {
                         beforeEach {
                             first = FluxMiddleware(priority: 0)
                             second = MockWorker(priority: 0)
-                            third = MockStore(priority: 0)
+                            third = MockStore(priority: 0, initialState: MockState(value: "initial", number: 0))
                             fouth = FluxStore(priority: 0, initialState: MockState(value: "1", number: 1))
                             
                             dispatcher.register(workers: [first, second, third, fouth])
