@@ -41,9 +41,9 @@
         "package": "ResolverContainer",
         "repositoryURL": "https://github.com/kzlekk/ResolverContainer.git",
         "state": {
-          "branch": "master",
+          "branch": null,
           "revision": "306837216b9f78dc4de55f1039bc8d59e66dc9fa",
-          "version": null
+          "version": "1.3.4"
         }
       }
     ]

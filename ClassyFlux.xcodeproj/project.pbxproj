@@ -546,8 +546,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kzlekk/ResolverContainer.git";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
 			};
 		};
 		7E24883322F5DA9800517865 /* XCRemoteSwiftPackageReference "Quick" */ = {
