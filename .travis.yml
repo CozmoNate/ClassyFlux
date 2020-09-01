@@ -1,7 +1,7 @@
 
 language: swift
 
-osx_image: xcode11
+osx_image: xcode11.6
 
 branches:
  only:
@@ -22,6 +22,7 @@ install:
   - bundle install --without=documentation
 
 script:
+  - xcodebuild -resolvePackageDependencies
   - xcodebuild clean test -workspace "$WORKSPACE" -scheme "$SCHEME" -destination "$DESTINATION" -configuration Debug ONLY_ACTIVE_ARCH=YES ENABLE_TESTABILITY=YES | xcpretty;
   
 after_success:
